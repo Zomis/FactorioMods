@@ -23,7 +23,7 @@ function showResourceCount(player)
         return
     end
     local count = floodCount({}, player.selected)
-    player.gui.top.resource_total.caption = player.selected.name .. ": " .. count
+    player.gui.top.resource_total.caption = player.selected.name .. ": " .. count.total .. " in " .. count.count .. " tiles"
 end
 
 function initPlayers()
@@ -38,7 +38,7 @@ function playerCreated(event)
 end
 
 function initPlayer(player)
-    player.gui.top.add{type="label", name="resource_total", caption="0"}
+    player.gui.top.add{type="label", name="resource_total", caption=""}
 end
 
 function floodCount(checked, entity)
@@ -46,10 +46,11 @@ function floodCount(checked, entity)
     local pos = entity.position
     local key = pos.x .. "," .. pos.y
     if checked[key] then
-        return 0
+        return {total = 0, count = 0}
     end
     checked[key] = true
     local total = entity.amount
+    local count = 1
     for y = -1, 1 do
         for x = -1, 1 do
             if (x ~= 0 or y ~= 0) then
@@ -57,10 +58,12 @@ function floodCount(checked, entity)
                 local yy = pos.y + y
                 local neighbor = entity.surface.find_entity(name, { xx, yy })
                 if neighbor ~= nil then
-                    total = total + floodCount(checked, neighbor)
+                    local neighborStats = floodCount(checked, neighbor)
+                    total = total + neighborStats.total
+                    count = count + neighborStats.count
                 end
             end
         end
     end
-    return total
+    return {total = total, count = count}
 end
