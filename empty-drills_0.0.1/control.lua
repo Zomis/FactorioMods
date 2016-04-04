@@ -29,12 +29,35 @@ end)
 script.on_event(defines.events.on_gui_click, function(event)
 	local element = event.element
 	local playerIndex = event.player_index
-	game.players[playerIndex].print("Clicked " .. element.name)
+	local player = game.players[playerIndex]
+	player.print("Clicked " .. element.name)
+	local force = player.force
 	if element.name == "empty_drills" then
 		-- loop through map and scan for empty drills
-		
-	end
+		local drills = scanEmptyDrills(force)
+		local uselessCount = #drills
+		player.print("There are " .. uselessCount .. " useless drills")
+    end
 end)
+
+function scanEmptyDrills(force)
+	local drills = { }
+	local surface = game.get_surface(1)
+	for coord in surface.get_chunks() do
+		local X, Y = coord.x, coord.y;
+
+		if surface.is_chunk_generated { X, Y } then
+			local area = {{X*32, Y*32}, {X*32 + 32, Y*32 + 32}}
+			for _, entity in pairs(surface.find_entities_filtered { area = area, type = "mining-drill", force = force.name}) do
+				local resources = findResourcesFor(entity)
+				if resources == 0 then
+					table.insert(drills, entity)
+				end
+			end
+		end
+	end
+	return drills
+end
 
 function initPlayers()
     for _, player in ipairs(game.players) do
