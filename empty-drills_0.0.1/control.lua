@@ -1,4 +1,5 @@
 require "defines"
+require "tempview"
 
 function distance(position1, position2)
 	return ((position1.x - position2.x)^2 + (position1.y - position2.y)^2)^0.5
@@ -30,14 +31,31 @@ script.on_event(defines.events.on_gui_click, function(event)
 	local element = event.element
 	local playerIndex = event.player_index
 	local player = game.players[playerIndex]
-	player.print("Clicked " .. element.name)
 	local force = player.force
 	if element.name == "empty_drills" then
 		-- loop through map and scan for empty drills
 		local drills = scanEmptyDrills(force)
 		local uselessCount = #drills
-		player.print("There are " .. uselessCount .. " useless drills")
+		player.print("There are " .. uselessCount .. " useless drills. Showing closest")
+		
+		-- Find closest unused drill
+		local minDistance = nil
+		local closestDrill = nil
+		for _, drill in ipairs(drills) do
+			local distance = distance(player.position, drill.position)
+			if minDistance == nil or distance < minDistance then
+				minDistance = distance
+				closestDrill = drill
+			end
+		end
+		if closestDrill ~= nil then
+			viewPosition(player, playerIndex, closestDrill.position)
+		end
     end
+	
+	if element.name == "locationViewBack" then
+		resetPosition(player, playerIndex)
+	end
 end)
 
 function scanEmptyDrills(force)
