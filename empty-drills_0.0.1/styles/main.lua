@@ -17,7 +17,7 @@ data.raw["gui-style"].default["lv_location_view"] =
         type = "monolith",
         monolith_image =
         {
-            filename = "__advanced-logistics-system__/graphics/location.png",
+            filename = "location.png",
             priority = "extra-high-no-scale",
             width = 100,
             height = 100,
@@ -29,7 +29,7 @@ data.raw["gui-style"].default["lv_location_view"] =
         type = "monolith",
         monolith_image =
         {
-            filename = "__advanced-logistics-system__/graphics/location-hover.png",
+            filename = "location-hover.png",
             priority = "extra-high-no-scale",
             width = 100,
             height = 100,
@@ -41,7 +41,7 @@ data.raw["gui-style"].default["lv_location_view"] =
         type = "monolith",
         monolith_image =
         {
-            filename = "__advanced-logistics-system__/graphics/location-hover.png",
+            filename = "location-hover.png",
             width = 100,
             height = 100,
             x = 0
