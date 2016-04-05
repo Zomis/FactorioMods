@@ -49,6 +49,13 @@ script.on_event(defines.events.on_gui_click, function(event)
 		if closestDrill ~= nil then
 			viewPosition(player, playerIndex, closestDrill.position)
 		end
+		
+		local drillsPerResource = scanUsedDrills(force)
+		for resourceName, data in pairs(drillsPerResource) do
+			local count = data.count
+			local sum = data.sum
+			player.print(count .. " drills for " .. resourceName .. " having " .. sum .. " resources remaining")
+		end
     end
 	
 	if element.name == "locationViewBack" then
@@ -67,6 +74,29 @@ function scanEmptyDrills(force)
 			for _, entity in pairs(surface.find_entities_filtered { area = area, type = "mining-drill", force = force.name}) do
 				if drillIsEmpty(entity) then
 					table.insert(drills, entity)
+				end
+			end
+		end
+	end
+	return drills
+end
+
+function scanUsedDrills(force)
+	local drills = { }
+	local surface = game.get_surface(1)
+	for coord in surface.get_chunks() do
+		local X, Y = coord.x, coord.y;
+
+		if surface.is_chunk_generated { X, Y } then
+			local area = {{X*32, Y*32}, {X*32 + 32, Y*32 + 32}}
+			for _, entity in pairs(surface.find_entities_filtered { area = area, type = "mining-drill", force = force.name}) do
+				local drillResources = findResourcesFor(entity)
+				for resourceName, amount in pairs(drillResources) do
+					if drills[resourceName] == nil then
+						drills[resourceName] = { count = 0, sum = 0 }
+					end
+					drills[resourceName].count = drills[resourceName].count + 1
+					drills[resourceName].sum = drills[resourceName].sum + amount
 				end
 			end
 		end
