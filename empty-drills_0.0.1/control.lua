@@ -16,11 +16,9 @@ end)
 script.on_event(defines.events.on_resource_depleted, function(event)
 	local resource = event.entity
     for _, player in ipairs(game.players) do
-        -- player.print("Depleted resource " .. resource.name .. " at " .. resource.position.x .. ", " .. resource.position.y)
 		local drills = findMiningDrillsFor(resource)
 		for i, drill in pairs(drills) do
-			local resources = findResourcesFor(drill)
-			if resources == 0 then
+			if drillIsEmpty(drill) then
 				player.print("Useless Drill " .. drill.name .. " at " .. drill.position.x .. ", " .. drill.position.y .. " used to mine " .. resource.name)
 			end
 		end
@@ -67,8 +65,7 @@ function scanEmptyDrills(force)
 		if surface.is_chunk_generated { X, Y } then
 			local area = {{X*32, Y*32}, {X*32 + 32, Y*32 + 32}}
 			for _, entity in pairs(surface.find_entities_filtered { area = area, type = "mining-drill", force = force.name}) do
-				local resources = findResourcesFor(entity)
-				if resources == 0 then
+				if drillIsEmpty(entity) then
 					table.insert(drills, entity)
 				end
 			end
@@ -133,15 +130,25 @@ function findResourcesFor(drill)
 	local range = getDrillRange(drill)
 	local surface = game.get_surface(1)
 	local resources = surface.find_entities_filtered({area = {{pos.x - range, pos.y - range}, {pos.x + range, pos.y + range}}, type = "resource" })
-	local sum = 0
+	local sum = {}
 	for i, resource in pairs(resources) do
-		sum = sum + resource.amount
+		if sum[resource.name] == nil then
+			sum[resource.name] = 0
+		end
+		sum[resource.name] = sum[resource.name] + resource.amount
 	end
 	return sum
 end
 
-
-
+function drillIsEmpty(drill)
+	local resources = findResourcesFor(drill)
+	for name, amount in pairs(resources) do
+		if amount > 0 then
+			return false
+		end
+	end
+	return true
+end
 
 
 
