@@ -17,7 +17,7 @@ data.raw["gui-style"].default["lv_location_view"] =
         type = "monolith",
         monolith_image =
         {
-            filename = "location.png",
+            filename = "__empty-drills__/styles/location.png",
             priority = "extra-high-no-scale",
             width = 100,
             height = 100,
@@ -29,7 +29,7 @@ data.raw["gui-style"].default["lv_location_view"] =
         type = "monolith",
         monolith_image =
         {
-            filename = "location-hover.png",
+            filename = "__empty-drills__/styles/location-hover.png",
             priority = "extra-high-no-scale",
             width = 100,
             height = 100,
@@ -41,7 +41,7 @@ data.raw["gui-style"].default["lv_location_view"] =
         type = "monolith",
         monolith_image =
         {
-            filename = "location-hover.png",
+            filename = "__empty-drills__/styles/location-hover.png",
             width = 100,
             height = 100,
             x = 0
