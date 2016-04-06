@@ -1,0 +1,9 @@
+{
+    "name": "timeline",
+    "version": "0.0.1",
+    "title": "Timeline",
+    "author": "Zomis",
+    "description": "Save information about important key events in your game, to help you get better next time",
+    "homepage": "https://github.com/Zomis/FactorioMods",
+    "dependencies": ["base >= 0.12.12"]
+}
