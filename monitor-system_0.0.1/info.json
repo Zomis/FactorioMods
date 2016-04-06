@@ -1,0 +1,9 @@
+{
+    "name": "monitor-system",
+    "version": "0.0.1",
+    "title": "Monitor System",
+    "author": "Zomis",
+    "description": "Monitor factories to see what you need to do to produce more stuff",
+    "homepage": "https://github.com/Zomis/FactorioMods",
+    "dependencies": ["base >= 0.12.12"]
+}
