@@ -15,10 +15,10 @@ end)
 script.on_event(defines.events.on_built_entity, function(event)
 	local player = game.players[event.player_index]
 	local force = player.force
-    markTimeline(force, "built-entity", event.created_entity.name)
+    markTimeline(force, "built-entity", event.created_entity.name, nil)
 end)
 
-function markTimeline(force, name, params)
+function markTimeline(force, name, params, value)
 	local mark = { name = name, param = params, tick = game.tick }
 	local forceData = global.forces[force.name]
 	if not forceData then
@@ -61,6 +61,16 @@ end
 function initPlayer(player)
     player.gui.top.add { type = "button", name = "timeline", caption = "Timeline" }
 end
+
+script.on_event(defines.events.on_research_finished, function(event)
+	local name = event.research.name
+	local force = event.research.force
+	local forceData = global.forces[force.name]
+	forceData.research = forceData.research or {}
+	local level = forceData.research[name] or 0
+	forceData.research[name] = level + 1
+	markTimeline(force, "research-finished", name, level + 1)
+end)
 
 script.on_event(defines.events.on_gui_click, function(event)
 	local element = event.element
