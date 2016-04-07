@@ -78,6 +78,7 @@ script.on_event(defines.events.on_gui_click, function(event)
 	local player = game.players[playerIndex]
 	local force = player.force
 	if element.name == "timeline" then
+		setTimelineMark(player, 0)
 		showTimeline(player)
     end
 	if element.name == "hideTimeline" then
@@ -91,6 +92,14 @@ script.on_event(defines.events.on_gui_click, function(event)
 		saveTimeline(player, "timeline.html")
 	end
 end)
+
+function setTimelineMark(player, index)
+	
+end
+
+function getTimelineMark(player)
+	
+end
 
 function nextMark(player)
 	if not global.players[player.index] then
