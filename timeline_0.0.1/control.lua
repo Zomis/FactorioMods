@@ -1,5 +1,6 @@
 require "defines"
 require "interface"
+require "htmlsave"
 
 script.on_init(function()
 	global.forces = global.forces or {}
@@ -105,7 +106,7 @@ function hideTimeline(player)
 end
 
 function saveTimeline(player, filename)
-	game.write_file(filename, "<html><head></head><body><p>test</p></body></html>")
+	game.write_file(filename, htmlString(player))
 end
 
 function showTimeline(player)
