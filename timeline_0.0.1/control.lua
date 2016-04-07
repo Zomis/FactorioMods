@@ -75,6 +75,9 @@ script.on_event(defines.events.on_gui_click, function(event)
 	if element.name == "nextMark" then
 		nextMark(player)
 	end
+	if element.name == "saveTimeline" then
+		saveTimeline(player, "timeline.html")
+	end
 end)
 
 function nextMark(player)
@@ -101,6 +104,10 @@ function hideTimeline(player)
 	end
 end
 
+function saveTimeline(player, filename)
+	game.write_file(filename, "<html><head></head><body><p>test</p></body></html>")
+end
+
 function showTimeline(player)
 	if player.gui.center.timelineFrame then
 		hideTimeline(player)
@@ -110,5 +117,6 @@ function showTimeline(player)
 	frame.add { type = "label", name = "currentMark", caption = "current" }
 	frame.add { type = "button", name = "nextMark", caption = "Next" }
 	frame.add { type = "button", name = "hideTimeline", caption = "Hide" }
+	frame.add { type = "button", name = "saveTimeline", caption = "Save" }
 	nextMark(player)
 end
