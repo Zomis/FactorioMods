@@ -70,11 +70,7 @@ script.on_event(defines.events.on_gui_click, function(event)
 		showTimeline(player)
     end
 	if element.name == "hideTimeline" then
-		local frame = player.gui.center.timelineFrame
-		if frame then
-			frame.destroy()
-			return
-		end
+		hideTimeline(player)
 	end
 	if element.name == "nextMark" then
 		nextMark(player)
@@ -97,7 +93,19 @@ function nextMark(player)
 	player.gui.center.timelineFrame.currentMark.caption = showMark.name .. " - " .. showMark.param .. " - " .. showMark.tick
 end
 
+function hideTimeline(player)
+	local frame = player.gui.center.timelineFrame
+	if frame then
+		frame.destroy()
+		return
+	end
+end
+
 function showTimeline(player)
+	if player.gui.center.timelineFrame then
+		hideTimeline(player)
+		return
+	end
 	local frame = player.gui.center.add { type = "frame", name = "timelineFrame", direction = "vertical" }
 	frame.add { type = "label", name = "currentMark", caption = "current" }
 	frame.add { type = "button", name = "nextMark", caption = "Next" }
