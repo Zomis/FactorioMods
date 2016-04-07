@@ -1,4 +1,5 @@
 require "defines"
+--require "craftingcheck"
 
 script.on_init(function()
     initPlayers()
@@ -85,15 +86,6 @@ function getAssemblingInfo(entity)
 	info.missing = missingString
 	return info
 end
-
-script.on_event(defines.events.on_tick, function(event)
-    if event.tick % 10 ~= 0 then
-        return
-    end
-    for index, player in ipairs(game.players) do
-        -- showResourceCount(player)
-    end
-end)
 
 function initPlayers()
     for _, player in ipairs(game.players) do
