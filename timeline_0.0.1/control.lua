@@ -71,6 +71,7 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
 	if element.name == "hideTimeline" then
 		hideTimeline(player)
+		return
 	end
 	if element.name == "nextMark" then
 		nextMark(player)
@@ -100,7 +101,6 @@ function hideTimeline(player)
 	local frame = player.gui.center.timelineFrame
 	if frame then
 		frame.destroy()
-		return
 	end
 end
 
