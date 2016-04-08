@@ -1,4 +1,6 @@
 mod-list.json
+working/
+untested/
 
 # Compiled Lua sources
 luac.out
