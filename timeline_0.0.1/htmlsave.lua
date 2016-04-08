@@ -1,10 +1,10 @@
 function row(mark)
 	local TICKS_PER_SECOND = 60
 	local tick = mark.tick
-	local seconds = tick / TICKS_PER_SECOND % 60
-	local minutes = (seconds / 60) % 60
-	local hours = seconds / 60 / 60
-	local timestamp = string.format("%02d:%02d:%02d", hours, minutes, seconds)
+    local seconds = tick / TICKS_PER_SECOND
+	local minutes = seconds / 60
+	local hours = minutes / 60
+	local timestamp = string.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
 	
 	local name = mark.name
 	local param = mark.param
