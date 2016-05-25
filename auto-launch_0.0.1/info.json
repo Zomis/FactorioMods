@@ -1,0 +1,9 @@
+{
+    "name": "auto-launch",
+    "version": "0.0.1",
+    "title": "Rocket Auto Launch",
+    "author": "Zomis",
+    "description": "Automatically Launch Rocket when it is built and has satellite",
+    "homepage": "https://github.com/Zomis/FactorioMods",
+    "dependencies": ["base >= 0.12.12"]
+}
