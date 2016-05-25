@@ -89,7 +89,7 @@ script.on_event(defines.events.on_gui_click, function(event)
 		nextMark(player)
 	end
 	if element.name == "saveTimeline" then
-		saveTimeline(player, "timeline.html")
+		saveTimeline(player, "timeline-" .. event.tick .. ".html")
 	end
 end)
 
