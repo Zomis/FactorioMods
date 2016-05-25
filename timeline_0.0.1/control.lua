@@ -12,6 +12,13 @@ script.on_event(defines.events.on_player_created, function(event)
     playerCreated(event)
 end)
 
+script.on_event(defines.events.on_rocket_launched, function(event)
+    local forceData = global.forces[event.rocket.force.name]
+	forceData.rockets_launched = forceData.rockets_launched or 0
+	forceData.rockets_launched = forceData.rockets_launched + 1
+	markTimeline(event.rocket.force, "rocket-launched", forceData.rockets_launched, forceData.rockets_launched)
+end)
+
 script.on_event(defines.events.on_built_entity, function(event)
 	local player = game.players[event.player_index]
 	local force = player.force
