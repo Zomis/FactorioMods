@@ -11,6 +11,16 @@ script.on_event(defines.events.on_tick, function(event)
 	end
 end)
 
+function scanAllRockets(event)
+	full_scan("silos", { "rocket-silo" })
+	
+end
+
+script.on_init(scanAllRockets)
+script.on_load(scanAllRockets)
+
+setup("silos", { "rocket-silo" })
+
 function launchIfReady(silo)
 	if siloIsReady(silo) then
 		silo.launch_rocket()
