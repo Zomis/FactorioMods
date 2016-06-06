@@ -1,9 +1,3 @@
-function broadcast(str)
-	for i, player in pairs(game.players) do
-		player.print(str)
-	end
-end
-
 function full_scan(key, force, entity_types)
 	global[key] = findTypes(entity_types, force)
 end
@@ -32,7 +26,6 @@ function setupTracking(key, entity_types)
 			if entity_type == entity.name then
 				global[key] = global[key] or {}
 				table.insert(global[key], entity)
-				broadcast("added entity from table")
 			end
 		end
 	end
@@ -43,7 +36,6 @@ function setupTracking(key, entity_types)
 				global[key] = global[key] or {}
 				for idx, e in pairs(global[key]) do
 					if e == entity then
-						broadcast("removed entity from table at index " .. tostring(idx))
 						table.remove(global[key], idx)
 					end
 				end
