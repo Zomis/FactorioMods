@@ -22,7 +22,8 @@ function showResourceCount(player)
         player.gui.top.resource_total.caption = ""
         return
     end
-    local count = floodCount({}, player.selected)
+    local resources = floodFindResources(player.selected)
+    local count = sumResources(resources)
     player.gui.top.resource_total.caption = player.selected.name .. ": " .. count.total .. " in " .. count.count .. " tiles"
 end
 
@@ -41,29 +42,38 @@ function initPlayer(player)
     player.gui.top.add{type="label", name="resource_total", caption=""}
 end
 
-function floodCount(checked, entity)
+function sumResources(resources)
+    local total = 0
+    local count = 0
+    for key, resource in pairs(resources) do
+        total = total + resource.amount
+        count = count + 1
+    end
+    return {total = total, count = count}
+end
+
+function floodFindResources(entity)
+    local found = {}
+    floodCount(found, entity)
+    return found
+end
+
+function floodCount(found, entity)
     local name = entity.name
     local pos = entity.position
     local key = pos.x .. "," .. pos.y
-    if checked[key] then
-        return {total = 0, count = 0}
+    if found[key] then
+        return
     end
-    checked[key] = true
-    local total = entity.amount
-    local count = 1
-    for y = -1, 1 do
-        for x = -1, 1 do
-            if (x ~= 0 or y ~= 0) then
-                local xx = pos.x + x
-                local yy = pos.y + y
-                local neighbor = entity.surface.find_entity(name, { xx, yy })
-                if neighbor ~= nil then
-                    local neighborStats = floodCount(checked, neighbor)
-                    total = total + neighborStats.total
-                    count = count + neighborStats.count
-                end
-            end
+    found[key] = entity
+    
+    local RANGE = 2.2
+    local surface = entity.surface
+    local area = {{pos.x - RANGE, pos.y - RANGE}, {pos.x + RANGE, pos.y + RANGE}}
+    for _, res in pairs(surface.find_entities_filtered { area = area, name = entity.name}) do
+        local key2 = res.position.x .. "," .. res.position.y
+        if not found[key2] then
+            floodCount(found, res)
         end
     end
-    return {total = total, count = count}
 end
