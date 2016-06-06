@@ -1,5 +1,6 @@
-# FactorioMonitorMod
-Mod for the Factorio game: A Monitoring system to get an overview of how your machines are doing
+# Factorio Mods
+
+Several mods for the Factorio game, each mod is described below.
 
 ## Auto Launch
 
