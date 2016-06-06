@@ -1,10 +1,9 @@
-function full_scan(key, force, entity_types)
-	global[key] = findTypes(entity_types, force)
+function full_scan(surface, key, force, entity_types)
+	global[key] = findTypes(surface, force, entity_types)
 end
 
-function findTypes(entity_types, force)
+function findTypes(surface, force, entity_types)
 	local results = { }
-	local surface = game.get_surface(1)
     for i, entity_type in ipairs(entity_types) do
         for coord in surface.get_chunks() do
             local X, Y = coord.x, coord.y;

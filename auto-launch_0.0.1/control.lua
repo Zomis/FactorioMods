@@ -13,7 +13,7 @@ script.on_event(defines.events.on_tick, function(event)
 end)
 
 function scanAllRockets(event)
-	full_scan("silos", nil, { "rocket-silo" })
+	full_scan(game.get_surface(1), "silos", nil, { "rocket-silo" })
 end
 
 script.on_init(scanAllRockets)
