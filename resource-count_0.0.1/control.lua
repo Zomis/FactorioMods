@@ -30,6 +30,10 @@ function showResourceCount(player)
     player.gui.top.resource_total.caption = player.selected.name .. ": " .. count.total .. " in " .. count.count .. " tiles"
 end
 
+function keyFor(entity)
+    return entity.position.x .. "," .. entity.position.y
+end
+
 function initPlayers()
     for _, player in ipairs(game.players) do
         initPlayer(player)
@@ -63,8 +67,7 @@ end
 
 function floodCount(found, entity)
     local name = entity.name
-    local pos = entity.position
-    local key = pos.x .. "," .. pos.y
+    local key = keyFor(entity)
     if found[key] then
         return
     end
@@ -72,9 +75,10 @@ function floodCount(found, entity)
     
     local RANGE = 2.2
     local surface = entity.surface
+    local pos = entity.position
     local area = {{pos.x - RANGE, pos.y - RANGE}, {pos.x + RANGE, pos.y + RANGE}}
     for _, res in pairs(surface.find_entities_filtered { area = area, name = entity.name}) do
-        local key2 = res.position.x .. "," .. res.position.y
+        local key2 = keyFor(res)
         if not found[key2] then
             floodCount(found, res)
         end
