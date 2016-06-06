@@ -22,11 +22,17 @@ script.on_load(scanAllRockets)
 setupTracking("silos", { "rocket-silo" })
 
 function launchIfReady(silo)
+    if not silo.valid then
+        return false
+    end
 	if siloIsReady(silo) then
 		silo.launch_rocket()
 	end
 end
 
 function siloIsReady(silo)
+    if not silo.valid then
+        return false
+    end
 	return silo.get_item_count("satellite") > 0
 end
