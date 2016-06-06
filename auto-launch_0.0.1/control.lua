@@ -17,7 +17,6 @@ function scanAllRockets(event)
 end
 
 script.on_init(scanAllRockets)
-script.on_load(scanAllRockets)
 
 setupTracking("silos", { "rocket-silo" })
 
