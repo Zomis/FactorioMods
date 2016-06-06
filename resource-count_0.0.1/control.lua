@@ -18,6 +18,9 @@ script.on_event(defines.events.on_tick, function(event)
 end)
 
 function showResourceCount(player)
+    if (not player.valid) or (not player.connected) then
+        return
+    end
     if (player.selected == nil) or (player.selected.prototype.type ~= "resource") then
         player.gui.top.resource_total.caption = ""
         return
