@@ -25,7 +25,21 @@ function showResourceCount(player)
         player.gui.top.resource_total.caption = ""
         return
     end
-    local resources = floodFindResources(player.selected)
+    global.selects = global.selects or {}
+    global.selects[player.index] = global.selects[player.index] or {}
+    local previousSelected = global.selects[player.index]
+    local key = keyFor(player.selected)
+    
+    if previousSelected[key] then
+        showForResources(player, previousSelected)
+    else
+        local resources = floodFindResources(player.selected)
+        global.selects[player.index] = resources
+        showForResources(player, resources)
+    end
+end
+
+function showForResources(player, resources)
     local count = sumResources(resources)
     player.gui.top.resource_total.caption = player.selected.name .. ": " .. count.total .. " in " .. count.count .. " tiles"
 end
