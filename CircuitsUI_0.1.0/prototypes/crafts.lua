@@ -6,7 +6,7 @@ data:extend({
     ingredients =
     {
       {"advanced-circuit", 5},
-      {"lamp", 3}
+      {"small-lamp", 3}
     },
     result = "ui-combinator"
   }
