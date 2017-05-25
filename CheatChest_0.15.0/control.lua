@@ -49,6 +49,9 @@ function fixChest(entity)
     if network == nil then
         return
     end
+    if network.signals == nil then
+        return
+    end
     -- Red = Also remove. Green = Add only.
     for j, signal in ipairs(network.signals) do
         if signal.signal.type == "item" then
