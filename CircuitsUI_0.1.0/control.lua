@@ -60,24 +60,63 @@ local function createGUI(entity)
   return newGui
 end
 
+--We add all the belts in the game to our data
+local function onInit()
+  if not global.fum_uic then
+    global.fum_uic = {}
+  end
+  combinatorsToUI = global.fum_uic
+
+  local toRemove = {}
+  for k, v in pairs(combinatorsToUI) do
+    if v[1] then
+      v.entity = v[1]
+    end
+    if v[2] then
+      v.ui = v[2]
+    end
+    if not v.entity or not v.entity.valid then
+        table.insert(toRemove, key)
+    end
+  end
+  for k, v in pairs(toRemove) do
+    destroyCombinator(k)
+  end
+  
+end
+
+--We store which belts are in the world for next time
+local function onLoad()
+  combinatorsToUI = global.fum_uic
+end 
+
 --Destroys a gui and removes from table
 local function destroyGui(entity)
-  local centerpane = game.players[1].gui.left
   --out("Tries to remove : " .. tostring(entity) .. "at : " .. txtpos(entity.position))
   out(#combinatorsToUI)
   for k, v in pairs(combinatorsToUI) do
-    --out(tostring(v[1]) .. ", " .. tostring(v[2]))
-    local ent = v[1]
-    out(txtpos(ent.position))
-    if txtpos(ent.position) == txtpos(entity.position) then
-      v[2].destroy()
-      out("destroy")
-      table.remove(combinatorsToUI, k)
-      if #centerpane["fum_frame"]["fum_panel"].children == 0 then
-        centerpane["fum_frame"].destroy()
-      end
+    --out(tostring(v.entity) .. ", " .. tostring(v[2]))
+    local ent = v.entity
+    if ent then
+        out(txtpos(ent.position))
+    end
+    if not ent or txtpos(ent.position) == txtpos(entity.position) then
+      destroyCombinator(k)
     end
   end
+end
+
+function destroyCombinator(key)
+    local v = combinatorsToUI[k]
+    if v then
+        v.ui.destroy()
+    end
+    out("destroy")
+    table.remove(combinatorsToUI, k)
+    local centerpane = game.players[1].gui.left
+    if #centerpane["fum_frame"]["fum_panel"].children == 0 then
+        centerpane["fum_frame"].destroy()
+    end
 end
 
 
@@ -96,6 +135,9 @@ end
 
 -- Tells signal of the gauge based on entity (and signals associed)
 local function combinatorSignal(entity)
+  if not entity then
+    return
+  end
   local circuit = entity.get_circuit_network(defines.wire_type.red)
   local signal = valorForCircuit(circuit)
   if signal == nil then
@@ -109,7 +151,7 @@ end
 local function onPlaceEntity(event)
   if event.created_entity.name == "ui-combinator" then
     newUI = createGUI(event.created_entity)
-    local temp = {event.created_entity, newUI}
+    local temp = {entity = event.created_entity, ui = newUI}
     table.insert(combinatorsToUI, temp)
     --out("Added : ".. tostring(event.created_entity) .. " at : " .. txtpos(event.created_entity.position) )
     out("Size : " .. #combinatorsToUI)
@@ -126,30 +168,42 @@ end
 
 
 --Updates UI based on blocks signals
-local function onTick()
-  if 0 == game.tick % update_interval then
-
-    for k, v in pairs(combinatorsToUI) do
-      signal = combinatorSignal(combinatorsToUI[k][1])
-      if signal then
-        out(signal.signal.name)
+local function updateUICombinator(uicomb)
+    signal = combinatorSignal(uicomb.entity)
+    if not uicomb.ui then
+        return
+    end
+    local signal2 = uicomb.ui["zomissignal"]
+    if signal then
+        -- out(signal.signal.name)
         
-		local signal2 = combinatorsToUI[k][2]["zomissignal"]
+        if not signal2 then
+            game.print("no signal2 found for " .. uicomb.entity)
+            return
+        end
         local typename = signal.signal.type
         if typename == "virtual" then
             typename = "virtual-signal"
         end
         signal2.sprite = typename .. "/" .. signal.signal.name
         local prototypes = itemSelection_prototypesForGroup(typename)
-        signal2.tooltip = prototypes[signal.signal.name].localised_name
+        signal2.tooltip = prototypes[signal.signal.name].localised_name -- signal.count
 
-        combinatorsToUI[k][2]["gauge_bar"].value = signal.count / 100.0
-        combinatorsToUI[k][2]["gauge_bar"].style.smooth_color = color_table[signal.signal.name]
-      else
-        combinatorsToUI[k][2]["gauge_bar"].value = 0
+        uicomb.ui["gauge_bar"].value = signal.count / 100.0
+        uicomb.ui["gauge_bar"].style.smooth_color = color_table[signal.signal.name]
+    else
+        uicomb.ui["gauge_bar"].value = 0
         signal2.sprite = ""
         signal2.tooltip = ""
-      end
+    end
+end
+
+
+local function onTick()
+  if 0 == game.tick % update_interval then
+
+    for k, v in pairs(combinatorsToUI) do
+      updateUICombinator(combinatorsToUI[k])
     end
 
 
