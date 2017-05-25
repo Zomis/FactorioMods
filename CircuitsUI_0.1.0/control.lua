@@ -6,6 +6,7 @@
 -- Configure update interval
 
 require "libs.itemselection"
+require "signal_gui"
 
 --We'll keep our own base of belts to not iterate trough all belts everytime
 local combinatorsToUI = {}
@@ -26,7 +27,7 @@ local color_table = {
 
 
 --Helper method for my debugging while coding
-local function out( txt)
+local function out(txt)
   debug = false
   if debug then
     game.print(txt)
@@ -54,7 +55,7 @@ local function createGUI(entity)
   newGui.add({type = "textfield", name = "gauge_label"})
   newGui["gauge_label"].text = "ID : " .. id
   newGui.add({type = "progressbar", name = "gauge_bar", size=5, value = 0.0, style = "custom_bar_style"})
-  newGui.add({type = "sprite-button", name = "zomissignal", style = "slot_button_style", sprite=""})
+  CreateSignalGuiPanel(newGui, nil)
   
   
   return newGui
@@ -150,7 +151,7 @@ end
 --When we place a new ui combinator, it's stored. Value is {entity, ui}
 local function onPlaceEntity(event)
   if event.created_entity.name == "ui-combinator" then
-    newUI = createGUI(event.created_entity)
+    local newUI = createGUI(event.created_entity)
     local temp = {entity = event.created_entity, ui = newUI}
     table.insert(combinatorsToUI, temp)
     --out("Added : ".. tostring(event.created_entity) .. " at : " .. txtpos(event.created_entity.position) )
@@ -169,33 +170,15 @@ end
 
 --Updates UI based on blocks signals
 local function updateUICombinator(uicomb)
-    signal = combinatorSignal(uicomb.entity)
-    if not uicomb.ui then
-        return
-    end
-    local signal2 = uicomb.ui["zomissignal"]
-    if signal then
-        -- out(signal.signal.name)
-        
-        if not signal2 then
-            game.print("no signal2 found for " .. uicomb.entity)
-            return
-        end
-        local typename = signal.signal.type
-        if typename == "virtual" then
-            typename = "virtual-signal"
-        end
-        signal2.sprite = typename .. "/" .. signal.signal.name
-        local prototypes = itemSelection_prototypesForGroup(typename)
-        signal2.tooltip = prototypes[signal.signal.name].localised_name -- signal.count
+  local entity = uicomb.entity
+  local circuit = entity.get_circuit_network(defines.wire_type.red)
+  if not circuit then
+    circuit = entity.get_circuit_network(defines.wire_type.green)
+  end
+  if circuit then
+    UpdateSignalGuiPanel(uicomb.ui.signals, circuit)
+  end
 
-        uicomb.ui["gauge_bar"].value = signal.count / 100.0
-        uicomb.ui["gauge_bar"].style.smooth_color = color_table[signal.signal.name]
-    else
-        uicomb.ui["gauge_bar"].value = 0
-        signal2.sprite = ""
-        signal2.tooltip = ""
-    end
 end
 
 
