@@ -27,16 +27,25 @@ local function UpdateSingleSignal(gui, signal)
 --        gui.icon.tooltip = prototypes[signal.signal.name].localised_name -- signal.count
 end
 
+function DestroyExcessGui(gui, count)
+  while gui["signal" .. count] do
+    out("Destroying " .. count)
+    gui["signal" .. count].destroy()
+    count = count + 1
+  end
+end
+
 function UpdateSignalGuiPanel(gui, circuit_network)
   if not gui then
     out("No gui")
     return
   end
-  if not circuit_network.signals then
-    out("No signals?")
+  local count = 1
+  if not circuit_network or not circuit_network.signals then
+    out("No signals")
+    DestroyExcessGui(gui, count)
     return
   end
-  local count = 1
   for k, v in pairs(circuit_network.signals) do
     out("Signal " .. v.signal.name .. " has " .. v.count)
     if not gui["signal" .. count] then
@@ -49,13 +58,6 @@ function UpdateSignalGuiPanel(gui, circuit_network)
     UpdateSingleSignal(signalUI, v)
     count = count + 1
   end
-  count = count + 1
-  while gui["signal" .. count] do
-    out("Destroying " .. count)
-    gui["signal" .. count].destroy()
-    count = count + 1
-  end
-  
-  
+  DestroyExcessGui(gui, count)
 end
 

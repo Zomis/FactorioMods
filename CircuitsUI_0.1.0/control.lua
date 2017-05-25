@@ -13,19 +13,6 @@ local combinatorsToUI = {}
 local update_interval = 30 --That's a lot I think.
 
 
-local color_table = {
-  ["signal-red"] = {r=1},
-  ["signal-green"] = {g=1},
-  ["signal-blue"] = {b=1},
-  ["signal-yellow"] = {r=1, g=1},
-  ["signal-pink"] = {r=1, b=1},
-  ["signal-cyan"] = {b=1, g=1},
-  ["signal-white"] = {r = 1, g = 1, b = 1},
-  ["signal-grey"] = {r=0.5, g=0.5, b=0.5},
-  ["signal-black"] ={}
-}
-
-
 --Helper method for my debugging while coding
 local function out(txt)
   debug = false
@@ -54,10 +41,7 @@ local function createGUI(entity)
   local newGui = centerpane["fum_frame"]["fum_panel"].add({type = "scroll-pane", name = "gauge" .. id, direction="horizontal"})
   newGui.add({type = "textfield", name = "gauge_label"})
   newGui["gauge_label"].text = "ID : " .. id
-  newGui.add({type = "progressbar", name = "gauge_bar", size=5, value = 0.0, style = "custom_bar_style"})
   CreateSignalGuiPanel(newGui, nil)
-  
-  
   return newGui
 end
 
@@ -120,34 +104,6 @@ function destroyCombinator(key)
     end
 end
 
-
-local function valorForCircuit(circuit)
-  if circuit then
-    if circuit.signals then
-      for k, signal in pairs(circuit.signals) do
-        if signal then
-          return signal
-        end
-      end
-    end
-  end
-  return nil
-end
-
--- Tells signal of the gauge based on entity (and signals associed)
-local function combinatorSignal(entity)
-  if not entity then
-    return
-  end
-  local circuit = entity.get_circuit_network(defines.wire_type.red)
-  local signal = valorForCircuit(circuit)
-  if signal == nil then
-    circuit = entity.get_circuit_network(defines.wire_type.green)
-    signal = valorForCircuit(circuit)
-  end
-  return signal
-end
-
 --When we place a new ui combinator, it's stored. Value is {entity, ui}
 local function onPlaceEntity(event)
   if event.created_entity.name == "ui-combinator" then
@@ -184,12 +140,9 @@ end
 
 local function onTick()
   if 0 == game.tick % update_interval then
-
     for k, v in pairs(combinatorsToUI) do
       updateUICombinator(combinatorsToUI[k])
     end
-
-
   end
 end
 
