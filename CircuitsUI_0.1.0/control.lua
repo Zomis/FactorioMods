@@ -25,17 +25,6 @@ local color_table = {
 }
 
 
---Helper method returning key of the highest value in a table
-local function maxkey(initialtable)
- local maxval = math.max(unpack(initialtable))
- local inv={}
- for k,v in pairs(initialtable) do
-   inv[v]=k
- end
- return inv[maxval]
-end
-
-
 --Helper method for my debugging while coding
 local function out( txt)
   debug = false
