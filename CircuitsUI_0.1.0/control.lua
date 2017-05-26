@@ -82,22 +82,26 @@ local function destroyGui(entity)
   for k, v in pairs(combinatorsToUI) do
     --out(tostring(v.entity) .. ", " .. tostring(v[2]))
     local ent = v.entity
-    if ent then
+    if ent and ent.valid then
         out(txtpos(ent.position))
     end
-    if not ent or txtpos(ent.position) == txtpos(entity.position) then
+    if not ent or not ent.valid then
+      destroyCombinator(k)
+      return
+    end
+    if entity.valid and txtpos(ent.position) == txtpos(entity.position) then
       destroyCombinator(k)
     end
   end
 end
 
 function destroyCombinator(key)
-    local v = combinatorsToUI[k]
+    local v = combinatorsToUI[key]
     if v then
-        v.ui.destroy()
+      v.ui.destroy()
     end
     out("destroy")
-    table.remove(combinatorsToUI, k)
+    table.remove(combinatorsToUI, key)
     local centerpane = game.players[1].gui.left
     if #centerpane["fum_frame"]["fum_panel"].children == 0 then
         centerpane["fum_frame"].destroy()
