@@ -36,10 +36,20 @@ local function UpdateSingleSignal(gui, signal)
   if typename == "virtual" then
     typename = "virtual-signal"
   end
-  gui.icon.sprite = typename .. "/" .. signal.signal.name
+  local prototype
+  if typename == "item" then
+    prototype = game.item_prototypes[signal.signal.name]
+  elseif typename == "fluid" then
+    prototype = game.fluid_prototypes[signal.signal.name]
+  elseif typename == "virtual-signal" then
+    prototype = game.virtual_signal_prototypes[signal.signal.name]
+  end
+  local spriteName = typename .. "/" .. signal.signal.name
+  if gui.icon.sprite ~= spriteName then
+    gui.icon.tooltip = prototype.localised_name
+    gui.icon.sprite = typename .. "/" .. signal.signal.name
+  end
   gui.valueLabel.caption = CountString(signal.count)
---        local prototypes = itemSelection_prototypesForGroup(typename)
---        gui.icon.tooltip = prototypes[signal.signal.name].localised_name -- signal.count
 end
 
 function DestroyExcessGui(gui, count)
