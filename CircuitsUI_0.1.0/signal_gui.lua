@@ -15,6 +15,30 @@ function CreateSignalGuiPanel(parent, signals)
   return gui
 end
 
+local suffixChars = { "", "k", "M", "G", "T", "P", "E" }
+
+function CountString(count)
+  local absValue = math.abs(count)
+  local prefix = ""
+  if count < 0 then
+    prefix = "-"
+  end
+  local suffix = 1
+  while absValue >= 1000 do
+    absValue = absValue / 1000
+    suffix = suffix + 1
+  end
+  
+  local str = tostring(absValue)
+  if absValue < 10 then
+    return prefix .. string.sub(str, 1, 3) .. suffixChars[suffix]
+  end
+  if absValue < 100 then
+    return prefix .. string.sub(str, 1, 2) .. suffixChars[suffix]
+  end
+  return prefix .. string.sub(str, 1, 3) .. suffixChars[suffix]
+end
+
 local function UpdateSingleSignal(gui, signal)
   local typename = signal.signal.type
   if typename == "virtual" then
@@ -22,7 +46,7 @@ local function UpdateSingleSignal(gui, signal)
   end
   out("Updating: " .. typename .. "/" .. signal.signal.name .. " value " .. signal.count)
   gui.icon.sprite = typename .. "/" .. signal.signal.name
-  gui.valueLabel.caption = tostring(signal.count) -- use pretty-printing, with k and M prefixes.
+  gui.valueLabel.caption = CountString(signal.count)
 --        local prototypes = itemSelection_prototypesForGroup(typename)
 --        gui.icon.tooltip = prototypes[signal.signal.name].localised_name -- signal.count
 end
