@@ -131,10 +131,7 @@ local function updateUICombinator(uicomb)
   if not circuit then
     circuit = entity.get_circuit_network(defines.wire_type.green)
   end
-  if circuit then
-    UpdateSignalGuiPanel(uicomb.ui.signals, circuit)
-  end
-
+  UpdateSignalGuiPanel(uicomb.ui.signals, circuit)
 end
 
 
