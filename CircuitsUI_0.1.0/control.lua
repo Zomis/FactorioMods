@@ -5,7 +5,6 @@
 -- Work in multiplayer
 -- Configure update interval
 
-require "libs.itemselection"
 require "signal_gui"
 
 --We'll keep our own base of belts to not iterate trough all belts everytime
@@ -31,16 +30,19 @@ local function createGUI(entity)
   local centerpane = game.players[1].gui.left
   if centerpane["fum_frame"] == nil then
     centerpane.add({type = "frame", name = "fum_frame"})
-    centerpane["fum_frame"].add({type = "scroll-pane", name = "fum_panel"})
+    centerpane["fum_frame"].add({type = "flow", name = "fum_panel", direction = "vertical"})
   end
 
   while centerpane["fum_frame"]["fum_panel"]["gauge" .. id] do
     id = id + 1
   end
   
-  local newGui = centerpane["fum_frame"]["fum_panel"].add({type = "scroll-pane", name = "gauge" .. id, direction="horizontal"})
-  newGui.add({type = "textfield", name = "gauge_label"})
-  newGui["gauge_label"].text = "ID : " .. id
+  local newGui = centerpane["fum_frame"]["fum_panel"].add({
+    type = "scroll-pane", name = "gauge" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
+    style = "circuits_ui_scroll"
+  })
+  newGui.add({type = "label", name = "gauge_label"})
+  newGui["gauge_label"].caption = "ID : " .. id
   CreateSignalGuiPanel(newGui, nil)
   return newGui
 end
@@ -131,6 +133,13 @@ end
 --Updates UI based on blocks signals
 local function updateUICombinator(uicomb)
   local entity = uicomb.entity
+  if not entity then
+    return
+  end
+  if not entity.valid then
+    destroyGui(entity)
+    return
+  end
   local circuit = entity.get_circuit_network(defines.wire_type.red)
   if not circuit then
     circuit = entity.get_circuit_network(defines.wire_type.green)
