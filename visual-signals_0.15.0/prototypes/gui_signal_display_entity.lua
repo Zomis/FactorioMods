@@ -1,15 +1,10 @@
---entity
-
-b = 0.7
-
-
 data:extend({
 {
     type = "constant-combinator",
-    name = "ui-combinator",
-    icon = "__CircuitsUI__/graphics/icons/constant-combinator.png",
+    name = "gui-signal-display",
+    icon = "__visual-signals__/graphics/icons/constant-combinator.png",
     flags = {"placeable-neutral", "player-creation"},
-    minable = {hardness = 0.2, mining_time = 0.5, result = "ui-combinator"},
+    minable = {hardness = 0.2, mining_time = 0.5, result = "gui-signal-display"},
     max_health = 150,
     corpse = "small-remnants",
 
@@ -41,7 +36,7 @@ data:extend({
     {
       north =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/combinator-entities.png",
+        filename = "__visual-signals__/graphics/entity/combinator/combinator-entities.png",
         x = 158,
         y = 126,
         width = 79,
@@ -51,7 +46,7 @@ data:extend({
       },
       east =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/combinator-entities.png",
+        filename = "__visual-signals__/graphics/entity/combinator/combinator-entities.png",
         y = 126,
         width = 79,
         height = 63,
@@ -60,7 +55,7 @@ data:extend({
       },
       south =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/combinator-entities.png",
+        filename = "__visual-signals__/graphics/entity/combinator/combinator-entities.png",
         x = 237,
         y = 126,
         width = 79,
@@ -70,7 +65,7 @@ data:extend({
       },
       west =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/combinator-entities.png",
+        filename = "__visual-signals__/graphics/entity/combinator/combinator-entities.png",
         x = 79,
         y = 126,
         width = 79,
@@ -84,7 +79,7 @@ data:extend({
     {
       north =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/activity-leds/combinator-led-constant-north.png",
+        filename = "__visual-signals__/graphics/entity/combinator/activity-leds/combinator-led-constant-north.png",
         width = 11,
         height = 10,
         frame_count = 1,
@@ -92,7 +87,7 @@ data:extend({
       },
       east =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/activity-leds/combinator-led-constant-east.png",
+        filename = "__visual-signals__/graphics/entity/combinator/activity-leds/combinator-led-constant-east.png",
         width = 14,
         height = 12,
         frame_count = 1,
@@ -100,7 +95,7 @@ data:extend({
       },
       south =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/activity-leds/combinator-led-constant-south.png",
+        filename = "__visual-signals__/graphics/entity/combinator/activity-leds/combinator-led-constant-south.png",
         width = 11,
         height = 11,
         frame_count = 1,
@@ -108,7 +103,7 @@ data:extend({
       },
       west =
       {
-        filename = "__CircuitsUI__/graphics/entity/combinator/activity-leds/combinator-led-constant-west.png",
+        filename = "__visual-signals__/graphics/entity/combinator/activity-leds/combinator-led-constant-west.png",
         width = 12,
         height = 12,
         frame_count = 1,
@@ -192,12 +187,12 @@ data:extend({
 data:extend({
 	{
     type = "item",
-    name = "ui-combinator",
-    icon = "__CircuitsUI__/graphics/icons/constant-combinator.png",
+    name = "gui-signal-display",
+    icon = "__visual-signals__/graphics/icons/constant-combinator.png",
     flags = { "goes-to-quickbar" },
     subgroup = "circuit-network",
-    place_result="ui-combinator",
-    order = "b[combinators]-u[ui-combinator]",
+    place_result="gui-signal-display",
+    order = "b[combinators]-u[gui-signal-display]",
     stack_size= 50,
   }
 })

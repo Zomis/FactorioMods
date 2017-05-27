@@ -2,19 +2,19 @@ data:extend({
   {
     type = "technology",
     name = "visual-signals",
-    icon = "__CircuitsUI__/graphics/icons/constant-combinator.png",
+    icon = "__visual-signals__/graphics/icons/constant-combinator.png",
     icon_size = 32,
     effects =
     {
       {
         type = "unlock-recipe",
-        recipe = "ui-combinator"
+        recipe = "gui-signal-display"
       }
     },
     prerequisites = {"advanced-electronics-2", "circuit-network", "optics"},
     unit =
     {
-      count = 500,
+      count = 5,
       ingredients = {
         {"science-pack-1", 1},
         {"science-pack-2", 1},

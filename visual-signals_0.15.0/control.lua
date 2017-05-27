@@ -1,20 +1,18 @@
 --control.lua
--- Show ALL signals connected to network, and the value of them
--- Button in top left to open up list of all UI Combinators
--- Condition on UI combinator for when to auto-show the data
--- Work in multiplayer
--- Configure update interval
+-- Condition on gui-signal-display for when to show the data if it is hidden
+-- Configure update interval?
+-- Search for signal
 
 require "signal_gui"
 
--- Table with integer keys and ui-combinators (entity, title)
+-- Table with integer keys and gui-signal-displays (entity, title)
 local combinatorsToUI = {}
 local update_interval = 30
 
 
 --Helper method for my debugging while coding
 local function out(txt)
-  debug = false
+  debug = true
   if debug then
     game.print(txt)
   end
@@ -35,22 +33,21 @@ end
 --Creates a new GUI and returns it's var
 local function createGUI(uicomb, id, player)
   local top = player.gui.top
-  if top["circuitsUI"] == nil then
-    out("create top ui")
-    top.add({type = "sprite-button", name = "circuitsUI", style = "slot_button_style", sprite = "item/ui-combinator"})
+  if top["visual_signals"] == nil then
+    top.add({type = "sprite-button", name = "visual_signals", style = "slot_button_style", sprite = "item/gui-signal-display"})
   end
   
   local centerpane = player.gui.left
-  if centerpane["fum_frame"] == nil then
-    centerpane.add({type = "frame", name = "fum_frame"})
-    centerpane["fum_frame"].add({type = "flow", name = "fum_panel", direction = "vertical"})
+  if centerpane["gui_signal_display"] == nil then
+    centerpane.add({type = "frame", name = "gui_signal_display"})
+    centerpane["gui_signal_display"].add({type = "flow", name = "gui_signal_panel", direction = "vertical"})
   end
 
-  local newGui = centerpane["fum_frame"]["fum_panel"].add({
-    type = "scroll-pane", name = "gauge" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
-    style = "circuits_ui_scroll"
+  local newGui = centerpane["gui_signal_display"]["gui_signal_panel"].add({
+    type = "scroll-pane", name = "panel" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
+    style = "gui_signal_display_scroll"
   })
-  newGui.add({type = "label", name = "gauge_label", caption = uicomb.title})
+  newGui.add({type = "label", name = "panel_label", caption = uicomb.title})
   CreateSignalGuiPanel(newGui, nil, "signals")
   return newGui
 end
@@ -112,23 +109,23 @@ function destroyCombinator(key)
     combinatorsToUI[key] = nil
     for k, player in pairs(game.players) do
       local centerpane = player.gui.left
-      if centerpane["fum_frame"] then
-        if centerpane["fum_frame"]["fum_panel"]["gauge" .. key] then
-          centerpane["fum_frame"]["fum_panel"]["gauge" .. key].destroy()
+      if centerpane["gui_signal_display"] then
+        if centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key] then
+          centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key].destroy()
         end
 
-        if #centerpane["fum_frame"]["fum_panel"].children == 0 then
-          centerpane["fum_frame"].destroy()
+        if #centerpane["gui_signal_display"]["gui_signal_panel"].children == 0 then
+          centerpane["gui_signal_display"].destroy()
         end
       end
     end
 end
 
---When we place a new ui combinator, it's stored. Value is {entity, ui}
+--When we place a new gui-signal-display, it's stored. Value is {entity, ui}
 local function onPlaceEntity(event)
-  if event.created_entity.name == "ui-combinator" then
+  if event.created_entity.name == "gui-signal-display" then
     local id = getNewId()
-    local uicomb = {entity = event.created_entity, title = "CircuitUI_" .. id}
+    local uicomb = {entity = event.created_entity, title = "Signal Display " .. id}
     combinatorsToUI[id] = uicomb
     if event.robot then
       for k, player in pairs(event.robot.force.players) do
@@ -144,7 +141,7 @@ end
 
 --Entity removed from table when removed from world
 local function onRemoveEntity(event)
-  if event.entity.name == "ui-combinator" then
+  if event.entity.name == "gui-signal-display" then
     destroyGui(event.entity)
   end
 end
@@ -166,9 +163,9 @@ local function updateUICombinator(key, uicomb)
   end
   local force = entity.force
   for k, player in ipairs(force.players) do
-    local guiRoot = player.gui.left["fum_frame"]["fum_panel"]
-    if guiRoot["gauge" .. key] then
-      UpdateSignalGuiPanel(guiRoot["gauge" .. key].signals, circuit)
+    local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
+    if guiRoot["panel" .. key] then
+      UpdateSignalGuiPanel(guiRoot["panel" .. key].signals, circuit)
     end
   end
   return true
@@ -189,11 +186,11 @@ end
 
 local function onClickShownCheckbox(event)
   local player = game.players[event.player_index]
-  local length = string.len("circuitsUI_shown")
+  local length = string.len("gui_signal_display_shown")
   local id = string.sub(event.element.name, length + 1)
-  local guiRoot = player.gui.left["fum_frame"]["fum_panel"]
-  if guiRoot["gauge" .. id] then
-    guiRoot["gauge" .. id].destroy()
+  local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
+  if guiRoot["panel" .. id] then
+    guiRoot["panel" .. id].destroy()
   else
     local combui = combinatorsToUI[tonumber(id)]
     createGUI(combui, id, player)
@@ -201,24 +198,22 @@ local function onClickShownCheckbox(event)
 end
 
 local function onClick(event)
-  if string.find(event.element.name, "circuitsUI_shown") then
+  if string.find(event.element.name, "gui_signal_display_shown") then
     onClickShownCheckbox(event)
   end
-  if event.element.name ~= "circuitsUI" then
+  if event.element.name ~= "visual_signals" then
     return
   end
   local player = game.players[event.player_index]
-  if player.gui.center["circuitsUI"] then
-    player.gui.center["circuitsUI"].destroy()
+  if player.gui.center["gui_signal_displayUI"] then
+    player.gui.center["gui_signal_displayUI"].destroy()
   else
-    local frame = player.gui.center.add({type = "frame", name = "circuitsUI"}) --, direction = "vertical"})
-    -- player.gui.center.add({type = "frame", name = "fum_frame"})
-    -- frame.add({type = "flow", name = "fum_panel", direction = "vertical"})
+    local frame = player.gui.center.add({type = "frame", name = "gui_signal_displayUI"})
     local tableui = frame.add({type = "table", name = "table", colspan = 3})
     for k, v in pairs(combinatorsToUI) do
       out("combinatorsToUI has " .. k)
     end
-    local guiRoot = player.gui.left["fum_frame"]["fum_panel"]
+    local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
     for k, v in pairs(guiRoot.children) do
       out("player has " .. v.name)
     end
@@ -232,30 +227,38 @@ local function onClick(event)
         end
       
         CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
-        local shown = guiRoot["gauge" .. k] ~= nil
+        local shown = guiRoot["panel" .. k] ~= nil
         out("checking if player has " .. k .. ": " .. tostring(shown))
-        tableui.add({type = "checkbox", name = "circuitsUI_shown" .. k, caption = "Show", state = shown})
+        tableui.add({type = "checkbox", name = "gui_signal_display_shown" .. k, caption = "Show", state = shown})
       end
     end
     
+    -- search
+    -- general settings, show/hide left panel
+    
+    -- name
+    -- signals
+    -- show/hide
+    -- show/hide condition
+--    local list = frame.add({type = "scroll-pane", name = "list", vertical_scroll_policy = "always", horizontal_scroll_policy = "auto", style = "gui_signal_display_ui_list"})
   end
 end
 
 local function onPlayerChangedForce(event)
   local player = game.players[event.player_index]
-  if player.gui.center["circuitsUI"] then
-    player.gui.center["circuitsUI"].destroy()
+  if player.gui.center["gui_signal_displayUI"] then
+    player.gui.center["gui_signal_displayUI"].destroy()
   end
-  if not player.gui.left["fum_frame"] then
+  if not player.gui.left["gui_signal_display"] then
     return
   end
-  if not player.gui.left["fum_frame"]["fum_panel"] then
+  if not player.gui.left["gui_signal_display"]["gui_signal_panel"] then
     return
   end
-  local guiRoot = player.gui.left["fum_frame"]["fum_panel"]
+  local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
   for k, v in pairs(combinatorsToUI) do
-    if guiRoot["gauge" .. k] then
-      guiRoot["gauge" .. k].destroy()
+    if guiRoot["panel" .. k] then
+      guiRoot["panel" .. k].destroy()
     end
   end
 end
