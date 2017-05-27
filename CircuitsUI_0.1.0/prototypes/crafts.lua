@@ -2,11 +2,14 @@ data:extend({
 {
     type = "recipe",
     name = "ui-combinator",
-    enabled = true,
+    enabled = false,
+    energy_required = 30,
     ingredients =
     {
-      {"advanced-circuit", 5},
-      {"small-lamp", 3}
+      {"radar", 10},
+      {"advanced-circuit", 200},
+      {"processing-unit", 50},
+      {"small-lamp", 20}
     },
     result = "ui-combinator"
   }

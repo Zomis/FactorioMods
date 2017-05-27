@@ -1,29 +1,28 @@
 data:extend({
-{
+  {
     type = "technology",
-    name = "atomic-bomb",
-    icon = "__base__/graphics/technology/atomic-bomb.png",
+    name = "visual-signals",
+    icon = "__CircuitsUI__/graphics/icons/constant-combinator.png",
+    icon_size = 32,
     effects =
     {
       {
         type = "unlock-recipe",
-        recipe = "atomic-bomb"
+        recipe = "ui-combinator"
       }
     },
-    prerequisites = {"nuclear-power", "military-4", "rocketry"},
+    prerequisites = {"advanced-electronics-2", "circuit-network", "optics"},
     unit =
     {
-      count = 5000,
-      ingredients =
-      {
+      count = 500,
+      ingredients = {
         {"science-pack-1", 1},
         {"science-pack-2", 1},
         {"science-pack-3", 1},
-        {"military-science-pack", 1},
-        {"production-science-pack", 1},
-        {"high-tech-science-pack", 1}
+        {"production-science-pack", 2},
+        {"high-tech-science-pack", 2}
       },
-      time = 45
+      time = 60
     },
     order = "e-a-b"
   }
