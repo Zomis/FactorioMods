@@ -14,7 +14,7 @@ data:extend({
     prerequisites = {"advanced-electronics-2", "circuit-network", "optics"},
     unit =
     {
-      count = 5,
+      count = 500,
       ingredients = {
         {"science-pack-1", 1},
         {"science-pack-2", 1},
