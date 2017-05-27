@@ -1,5 +1,5 @@
-function CreateSignalGuiPanel(parent, signals)
-  local gui = parent.add({type = "flow", direction = "horizontal", name = "signals"})
+function CreateSignalGuiPanel(parent, signals, name)
+  local gui = parent.add({type = "flow", direction = "horizontal", name = name})
   
   if signals ~= nil then
     UpdateSignalGuiPanel(gui, signals)
