@@ -208,7 +208,8 @@ local function onClick(event)
   if player.gui.center["gui_signal_displayUI"] then
     player.gui.center["gui_signal_displayUI"].destroy()
   else
-    local frame = player.gui.center.add({type = "frame", name = "gui_signal_displayUI"})
+    local frameRoot = player.gui.center.add({type = "frame", name = "gui_signal_displayUI"})
+    local frame = frameRoot.add({type = "scroll-pane", name = "gui_signal_scroll", style = "gui_signal_display_list"})
     local tableui = frame.add({type = "table", name = "table", colspan = 3})
     for k, v in pairs(combinatorsToUI) do
       out("combinatorsToUI has " .. k)
