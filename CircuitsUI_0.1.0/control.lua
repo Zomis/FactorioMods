@@ -223,16 +223,39 @@ local function onClick(event)
       out("player has " .. v.name)
     end
     for k, v in pairs(combinatorsToUI) do
-      tableui.add({type = "textfield", name = "nameEdit" .. k, text = v.title or ""})
+      if v.entity.force.name == player.force.name then
+        tableui.add({type = "textfield", name = "nameEdit" .. k, text = v.title or ""})
       
-      local circuit = v.entity.get_circuit_network(defines.wire_type.red)
-      if not circuit then
-        circuit = v.entity.get_circuit_network(defines.wire_type.green)
+        local circuit = v.entity.get_circuit_network(defines.wire_type.red)
+        if not circuit then
+          circuit = v.entity.get_circuit_network(defines.wire_type.green)
+        end
+      
+        CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
+        local shown = guiRoot["gauge" .. k] ~= nil
+        out("checking if player has " .. k .. ": " .. tostring(shown))
+        tableui.add({type = "checkbox", name = "circuitsUI_shown" .. k, caption = "Show", state = shown})
       end
-      
-      CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
-      local shown = guiRoot["gauge" .. k] ~= nil
-      tableui.add({type = "checkbox", name = "circuitsUI_shown" .. k, caption = "Show", state = shown})
+    end
+    
+  end
+end
+
+local function onPlayerChangedForce(event)
+  local player = game.players[event.player_index]
+  if player.gui.center["circuitsUI"] then
+    player.gui.center["circuitsUI"].destroy()
+  end
+  if not player.gui.left["fum_frame"] then
+    return
+  end
+  if not player.gui.left["fum_frame"]["fum_panel"] then
+    return
+  end
+  local guiRoot = player.gui.left["fum_frame"]["fum_panel"]
+  for k, v in pairs(combinatorsToUI) do
+    if guiRoot["gauge" .. k] then
+      guiRoot["gauge" .. k].destroy()
     end
   end
 end
@@ -250,3 +273,5 @@ script.on_event(defines.events.on_entity_died, onRemoveEntity)
 
 script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
+
+script.on_event(defines.events.on_player_changed_force, onPlayerChangedForce)
