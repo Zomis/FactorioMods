@@ -220,7 +220,7 @@ local function onClick(event)
     end
     for k, v in pairs(combinatorsToUI) do
       if v.entity.force.name == player.force.name then
-        tableui.add({type = "textfield", name = "nameEdit" .. k, text = v.title or ""})
+        tableui.add({type = "textfield", name = "gui_signal_display_nameEdit" .. k, text = v.title or ""})
       
         local circuit = v.entity.get_circuit_network(defines.wire_type.red)
         if not circuit then
@@ -264,6 +264,28 @@ local function onPlayerChangedForce(event)
   end
 end
 
+local function onTextChange(event)
+  if string.find(event.element.name, "gui_signal_display_nameEdit") then
+    local length = string.len("gui_signal_display_nameEdit")
+    local id = tonumber(string.sub(event.element.name, length + 1))
+    local uicomb = combinatorsToUI[id]
+    local player = game.players[event.player_index]
+    if not uicomb then
+      player.print("No gui signal display for id " .. id)
+      return
+    end
+    uicomb.title = event.element.text
+    for k, p in pairs(game.players) do
+      if player.gui.left["gui_signal_display"] and player.gui.left["gui_signal_display"]["gui_signal_panel"] then
+        local rootGUI = player.gui.left["gui_signal_display"]["gui_signal_panel"]
+        if rootGUI["panel" .. id] then
+          rootGUI["panel" .. id]["panel_label"].caption = uicomb.title
+        end
+      end
+    end
+  end
+end
+
 script.on_init(onInit)
 script.on_configuration_changed(onInit)
 script.on_load(onLoad)
@@ -279,3 +301,4 @@ script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
 
 script.on_event(defines.events.on_player_changed_force, onPlayerChangedForce)
+script.on_event(defines.events.on_gui_text_changed, onTextChange)
