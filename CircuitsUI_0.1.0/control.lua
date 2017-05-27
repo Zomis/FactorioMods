@@ -7,9 +7,9 @@
 
 require "signal_gui"
 
---We'll keep our own base of belts to not iterate trough all belts everytime
+-- Table with integer keys and ui-combinators (entity, title)
 local combinatorsToUI = {}
-local update_interval = 30 --That's a lot I think.
+local update_interval = 30
 
 
 --Helper method for my debugging while coding
@@ -33,14 +33,14 @@ local function getNewId()
 end
 
 --Creates a new GUI and returns it's var
-local function createGUI(entity, id)
-  local top = game.players[1].gui.top
+local function createGUI(uicomb, id, player)
+  local top = player.gui.top
   if top["circuitsUI"] == nil then
     out("create top ui")
     top.add({type = "sprite-button", name = "circuitsUI", style = "slot_button_style", sprite = "item/ui-combinator"})
   end
   
-  local centerpane = game.players[1].gui.left
+  local centerpane = player.gui.left
   if centerpane["fum_frame"] == nil then
     centerpane.add({type = "frame", name = "fum_frame"})
     centerpane["fum_frame"].add({type = "flow", name = "fum_panel", direction = "vertical"})
@@ -103,20 +103,26 @@ local function destroyGui(entity)
     end
     if entity.valid and txtpos(ent.position) == txtpos(entity.position) then
       destroyCombinator(k)
+      return
     end
   end
 end
 
 function destroyCombinator(key)
-    local v = combinatorsToUI[key]
-    if v then
-      v.ui.destroy()
-    end
-    out("destroy")
-    table.remove(combinatorsToUI, key)
-    local centerpane = game.players[1].gui.left
-    if #centerpane["fum_frame"]["fum_panel"].children == 0 then
-        centerpane["fum_frame"].destroy()
+    local uicomb = combinatorsToUI[key]
+    out("destroy " .. key .. " value " .. tostring(uicomb))
+    combinatorsToUI[key] = nil
+    for k, player in pairs(game.players) do
+      local centerpane = player.gui.left
+      if centerpane["fum_frame"] then
+        if centerpane["fum_frame"]["fum_panel"]["gauge" .. key] then
+          centerpane["fum_frame"]["fum_panel"]["gauge" .. key].destroy()
+        end
+
+        if #centerpane["fum_frame"]["fum_panel"].children == 0 then
+          centerpane["fum_frame"].destroy()
+        end
+      end
     end
 end
 
@@ -124,9 +130,16 @@ end
 local function onPlaceEntity(event)
   if event.created_entity.name == "ui-combinator" then
     local id = getNewId()
-    local newUI = createGUI(event.created_entity, id)
-    local temp = {entity = event.created_entity, ui = newUI, title = "CircuitUI_" .. id}
-    combinatorsToUI[id] = temp -- table.insert(combinatorsToUI, temp)
+    local uicomb = {entity = event.created_entity, title = "CircuitUI_" .. id}
+    combinatorsToUI[id] = uicomb
+    if event.robot then
+      for k, player in pairs(event.robot.force.players) do
+        createGUI(uicomb, id, player)
+      end
+    else
+      local player = game.players[event.player_index]
+      createGUI(uicomb, id, player)
+    end
     --out("Added : ".. tostring(event.created_entity) .. " at : " .. txtpos(event.created_entity.position) )
     out("Size : " .. #combinatorsToUI)
   end
@@ -145,11 +158,11 @@ end
 local function updateUICombinator(key, uicomb)
   local entity = uicomb.entity
   if not entity then
-    return
+    return false
   end
   if not entity.valid then
     destroyGui(entity)
-    return
+    return false
   end
   local circuit = entity.get_circuit_network(defines.wire_type.red)
   if not circuit then
@@ -162,13 +175,18 @@ local function updateUICombinator(key, uicomb)
       UpdateSignalGuiPanel(guiRoot["gauge" .. key].signals, circuit)
     end
   end
+  return true
 end
 
 
 local function onTick()
   if 0 == game.tick % update_interval then
     for k, v in pairs(combinatorsToUI) do
-      updateUICombinator(k, combinatorsToUI[k])
+      local updateOK = updateUICombinator(k, combinatorsToUI[k])
+      if not updateOK then
+        out("Removed something, skipping the rest")
+        return
+      end
     end
   end
 end
@@ -182,7 +200,7 @@ local function onClickShownCheckbox(event)
     guiRoot["gauge" .. id].destroy()
   else
     local combui = combinatorsToUI[tonumber(id)]
-    createGUI(combui.entity, id) -- also pass player
+    createGUI(combui, id, player)
   end
 end
 
@@ -217,7 +235,7 @@ local function onClick(event)
       end
       
       CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
-      local shown = guiRoot[v.ui.name] ~= nil
+      local shown = guiRoot["gauge" .. k] ~= nil
       tableui.add({type = "checkbox", name = "circuitsUI_shown" .. k, caption = "Show", state = shown})
     end
   end
