@@ -50,9 +50,7 @@ local function createGUI(uicomb, id, player)
     type = "scroll-pane", name = "gauge" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
     style = "circuits_ui_scroll"
   })
-  newGui.add({type = "label", name = "gauge_label"})
-  
-  newGui["gauge_label"].caption = "ID : " .. id
+  newGui.add({type = "label", name = "gauge_label", caption = uicomb.title})
   CreateSignalGuiPanel(newGui, nil, "signals")
   return newGui
 end
@@ -90,7 +88,6 @@ end
 --Destroys a gui and removes from table
 local function destroyGui(entity)
   --out("Tries to remove : " .. tostring(entity) .. "at : " .. txtpos(entity.position))
-  out(#combinatorsToUI)
   for k, v in pairs(combinatorsToUI) do
     --out(tostring(v.entity) .. ", " .. tostring(v[2]))
     local ent = v.entity
@@ -98,6 +95,7 @@ local function destroyGui(entity)
         out(txtpos(ent.position))
     end
     if not ent or not ent.valid then
+      out("no ent or not valid: " .. tostring(ent))
       destroyCombinator(k)
       return
     end
@@ -141,7 +139,6 @@ local function onPlaceEntity(event)
       createGUI(uicomb, id, player)
     end
     --out("Added : ".. tostring(event.created_entity) .. " at : " .. txtpos(event.created_entity.position) )
-    out("Size : " .. #combinatorsToUI)
   end
 end
 
@@ -149,7 +146,6 @@ end
 local function onRemoveEntity(event)
   if event.entity.name == "ui-combinator" then
     destroyGui(event.entity)
-    out("Size : " .. #combinatorsToUI)
   end
 end
 
@@ -227,7 +223,7 @@ local function onClick(event)
       out("player has " .. v.name)
     end
     for k, v in pairs(combinatorsToUI) do
-      tableui.add({type = "textfield", name = "nameEdit" .. k, text = v.name or ""})
+      tableui.add({type = "textfield", name = "nameEdit" .. k, text = v.title or ""})
       
       local circuit = v.entity.get_circuit_network(defines.wire_type.red)
       if not circuit then
