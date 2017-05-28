@@ -2,13 +2,11 @@
 
 Several mods for the Factorio game, each mod is described below.
 
-## Auto Launch
+## Visual Signals (GUI Signal Display)
 
-Launch rockets automatically as soon as they are built and loaded with a satellite.
+Allows players to keep track of circuit networks in the GUI at any time.
 
-## Resource Count
-
-Hold over a resource patch to see how many resources there are in the whole connected patch.
+Originally based on [CircuitsUI by Fumelgo](https://mods.factorio.com/mods/Fumelgo/CircuitsUI) but massively modified to become a mod on its own.
 
 ## Empty Drills
 
