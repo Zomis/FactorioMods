@@ -2,11 +2,13 @@
 
 Several mods for the Factorio game, each mod is described below.
 
-## Visual Signals (GUI Signal Display)
+## [Visual Signals](https://mods.factorio.com/mods/zomis/visual-signals) (GUI Signal Display)
 
 Allows players to keep track of circuit networks in the GUI at any time.
 
 Originally based on [CircuitsUI by Fumelgo](https://mods.factorio.com/mods/Fumelgo/CircuitsUI) but massively modified to become a mod on its own.
+
+![Factorio screenshot](https://mods-data.factorio.com/pub_data/media_files/vjrlqhNDv4QS.png)
 
 ## Empty Drills
 
