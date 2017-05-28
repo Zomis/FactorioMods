@@ -12,7 +12,7 @@ local update_interval = 30
 
 --Helper method for my debugging while coding
 local function out(txt)
-  debug = true
+  debug = false
   if debug then
     game.print(txt)
   end
