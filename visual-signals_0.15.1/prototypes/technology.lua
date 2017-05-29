@@ -11,18 +11,15 @@ data:extend({
         recipe = "gui-signal-display"
       }
     },
-    prerequisites = {"advanced-electronics-2", "circuit-network", "optics"},
+    prerequisites = {"circuit-network", "optics"},
     unit =
     {
-      count = 500,
+      count = 200,
       ingredients = {
         {"science-pack-1", 1},
-        {"science-pack-2", 1},
-        {"science-pack-3", 1},
-        {"production-science-pack", 2},
-        {"high-tech-science-pack", 2}
+        {"science-pack-2", 1}
       },
-      time = 60
+      time = 15
     },
     order = "e-a-b"
   }

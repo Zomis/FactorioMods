@@ -6,10 +6,10 @@ data:extend({
     energy_required = 20,
     ingredients =
     {
-      {"radar", 10},
-      {"advanced-circuit", 200},
-      {"processing-unit", 50},
-      {"small-lamp", 20}
+      {"radar", 4},
+      {"green-wire", 40},
+      {"red-wire", 40},
+      {"small-lamp", 10}
     },
     result = "gui-signal-display"
   }
