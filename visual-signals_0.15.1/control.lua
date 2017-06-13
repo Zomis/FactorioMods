@@ -133,7 +133,9 @@ local function onPlaceEntity(event)
       end
     else
       local player = game.players[event.player_index]
-      createGUI(uicomb, id, player)
+      for k, player in pairs(player.force.players) do
+        createGUI(uicomb, id, player)
+      end
     end
     --out("Added : ".. tostring(event.created_entity) .. " at : " .. txtpos(event.created_entity.position) )
   end
@@ -163,9 +165,11 @@ local function updateUICombinator(key, uicomb)
   end
   local force = entity.force
   for k, player in ipairs(force.players) do
-    local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
-    if guiRoot["panel" .. key] then
-      UpdateSignalGuiPanel(guiRoot["panel" .. key].signals, circuit)
+    if player.gui.left["gui_signal_display"] and player.gui.left["gui_signal_display"]["gui_signal_panel"] then
+      local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
+      if guiRoot["panel" .. key] then
+        UpdateSignalGuiPanel(guiRoot["panel" .. key].signals, circuit)
+      end
     end
   end
   return true
