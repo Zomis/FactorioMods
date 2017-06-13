@@ -30,20 +30,19 @@ local function getNewId()
   return id
 end
 
---Creates a new GUI and returns it's var
 local function createGUI(uicomb, id, player)
   local top = player.gui.top
   if top["visual_signals"] == nil then
     top.add({type = "sprite-button", name = "visual_signals", style = "slot_button_style", sprite = "item/gui-signal-display"})
   end
   
-  local centerpane = player.gui.left
-  if centerpane["gui_signal_display"] == nil then
-    centerpane.add({type = "frame", name = "gui_signal_display"})
-    centerpane["gui_signal_display"].add({type = "flow", name = "gui_signal_panel", direction = "vertical"})
+  local left = player.gui.left
+  if left["gui_signal_display"] == nil then
+    left.add({type = "frame", name = "gui_signal_display"})
+    left["gui_signal_display"].add({type = "flow", name = "gui_signal_panel", direction = "vertical"})
   end
 
-  local newGui = centerpane["gui_signal_display"]["gui_signal_panel"].add({
+  local newGui = left["gui_signal_display"]["gui_signal_panel"].add({
     type = "scroll-pane", name = "panel" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
     style = "gui_signal_display_scroll"
   })
