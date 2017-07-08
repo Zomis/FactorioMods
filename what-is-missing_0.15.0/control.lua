@@ -131,6 +131,9 @@ local function removeMachine(entity)
 end
 
 local function checkMachine(entity)
+    if not entity.valid then
+        return
+    end
     if entity.type == "assembling-machine" then
         local pos = txtpos(entity.position)
         -- out("Checking " .. pos)
@@ -206,7 +209,7 @@ local function scanMissing(target, reportTo)
     local missing = {}
     
     for j, entity in pairs(machineList) do
-        if entity.type == "assembling-machine" then
+        if entity.valid and entity.type == "assembling-machine" then
             local recipe = entity.recipe
             local ingredients = recipe.ingredients
             local current = entity.get_inventory(defines.inventory.assembling_machine_input)
