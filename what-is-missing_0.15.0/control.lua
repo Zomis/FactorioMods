@@ -25,6 +25,8 @@
 -- Table with product as key and a list of machines that is producing that as value
 require "entity_tick_iterate"
 
+local STEP_BY_STEP = false
+
 local machines = {}
 local machineRecipes = {} -- KEY: position, VALUE: entity + recipe. Check one machine per tick
 
@@ -89,6 +91,8 @@ end
 
 local function addMachine(entity)
     if entity.type == "assembling-machine" then
+        local pos = txtpos(entity.position)
+        -- out("Add " .. pos)
         -- checkMachine(entity)
         local outputs = getOutputsForMachine(entity)
         if outputs == nil then
@@ -129,8 +133,9 @@ end
 local function checkMachine(entity)
     if entity.type == "assembling-machine" then
         local pos = txtpos(entity.position)
+        -- out("Checking " .. pos)
         if not machineRecipes[pos] then
-            out("Add machineRecipes " .. pos)
+            -- out("Add machineRecipes " .. pos)
             machineRecipes[pos] = { entity = entity, recipe = entity.recipe }
         elseif machineRecipes[pos].recipe ~= entity.recipe then
             local previous = machineRecipes[pos].recipe
@@ -235,23 +240,28 @@ end
 -- Perform a scan to find bottlenecks
 local function perform(player)
     -- local player_search = 
-    out("Performing for " .. player.name)
---    local entity = entityTickIterateNext()
---    if entity then
---        local str = txtpos(entity.position)
---        out("Found entity " .. str)
---    end
+--    out("Performing for " .. player.name)
+    if STEP_BY_STEP then
+        local entity = entityTickIterateNext()
+        if entity then
+            local str = txtpos(entity.position)
+            -- out("Found entity " .. str)
+            checkMachine(entity)
+        end
+    end
     local player_search = { "satellite" }
     for k, target in pairs(player_search) do
         -- find machines and check what is missing, recursive
-        scanMissing(target, player)
+--        scanMissing(target, player)
     end
 end
 
 local function onTick()
-    local entity = entityTickIterateNext()
-    if entity then
-        checkMachine(entity)
+    if not STEP_BY_STEP then
+        local entity = entityTickIterateNext()
+        if entity then
+            checkMachine(entity)
+        end
     end
     if 0 == game.tick % update_interval then
         for k, player in pairs(game.players) do
