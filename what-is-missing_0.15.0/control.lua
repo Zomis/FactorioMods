@@ -210,11 +210,23 @@ local function scanMissing(target, reportTo)
     
     for j, entity in pairs(machineList) do
         if entity.valid and entity.type == "assembling-machine" then
+            local awaitingOutput = entity.get_inventory(defines.inventory.assembling_machine_output)
             local recipe = entity.recipe
+            local available = true
+            if not awaitingOutput.is_empty() then
+                -- entity not empty, probably waiting for something to be output.
+                -- inserters do not insert anything if output of machine is full
+                -- TODO: Check for multiple outputs. Consider oil refinery with full light oil for example. Or Uranium 238.
+                available = false
+            end
+        
             local ingredients = recipe.ingredients
             local current = entity.get_inventory(defines.inventory.assembling_machine_input)
             local fluidBoxCount = 1
             for i, ingredient in ipairs(ingredients) do
+                if not available then
+                    break
+                end
                 local wanted = ingredient.amount
                 
                 local have = 0
