@@ -61,18 +61,18 @@ local function createGUI(player)
         left["what_is_missing"].add({type = "flow", name = "panel", direction = "vertical"})
         out("Left UI Created for " .. player.name)
     end
-  
-    if true then
-        out("Returning from createGUI for " .. player.name)
-        return
-    end
 
-    local id = 0
-    local newGui = left["what_is_missing"]["panel"].add({type = "scroll-pane", name = "panel" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
-        style = "scroll"
-    })
-    newGui.add({type = "label", name = "panel_label", caption = uicomb.title})
-    return newGui
+    if not left.what_is_missing.panel["research"] then
+        local flow = left.what_is_missing.panel
+        flow.add({type = "checkbox", name = "research", caption = "Current Research", state = false})
+        flow.add({type = "flow", name = "missing0", direction = "horizontal"})
+        flow.add({type = "checkbox", name = "rocket", caption = "Rocket", state = false})
+        flow.add({type = "flow", name = "missing1", direction = "horizontal"})
+        
+        flow.add({type = "flow", name = "missing2", direction = "horizontal"})
+        flow.missing2.add({type = "button", name = "what_is_missing_delete2", caption = "X"})
+        flow.missing2.add({type = "choose-elem-button", name = "wanted", elem_type = "item"})
+    end
 end
 
 function getOutputsForMachine(entity)
@@ -249,10 +249,23 @@ local function perform(player)
             checkMachine(entity)
         end
     end
-    local player_search = { "satellite" }
+    
+    local left = player.gui.left
+    local panel = left.what_is_missing.panel
+    local player_search = { }
+    if panel.research.state then
+        -- Scan research (Find labs and check current force research and required stuff)
+    end
+    if panel.rocket.state then
+        -- Scan rocket (Find rocket-silo and check inventory - and recipe?)
+    end
+    if panel.missing2.wanted.elem_value then
+        table.insert(player_search, panel.missing2.wanted.elem_value)
+    end
+
     for k, target in pairs(player_search) do
         -- find machines and check what is missing, recursive
---        scanMissing(target, player)
+        scanMissing(target, player)
     end
 end
 
