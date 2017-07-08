@@ -26,8 +26,6 @@ local STEP_BY_STEP = false
 local machines = {}
 local machineRecipes = {} -- KEY: position, VALUE: entity + recipe. Check one machine per tick
 
--- Table with player index as key and a list of that player's searches as value (product name)
-local searches = {}
 local update_interval = 60
 
 local function out(txt)
@@ -74,8 +72,16 @@ end
 function getOutputsForMachine(entity)
     if entity.type == "assembling-machine" then
         local recipe = entity.recipe
-        if recipe ~= nil then
+        if recipe then
             return recipe.products
+        end
+    end
+    if entity.type == "furnace" then
+        local recipe = entity.recipe
+        if recipe then
+            return recipe.products
+        elseif entity.previous_recipe then
+            return entity.previous_recipe.products
         end
     end
     return nil
@@ -86,7 +92,7 @@ local function txtpos(pos)
 end
 
 local function addMachine(entity)
-    if entity.type == "assembling-machine" then
+    if entity.type == "assembling-machine" or entity.type == "furnace" then
         local pos = txtpos(entity.position)
         -- out("Add " .. pos)
         -- checkMachine(entity)
@@ -95,13 +101,11 @@ local function addMachine(entity)
             return
         end
         for i, product in ipairs(outputs) do
-            --product.type
+            -- TODO: consider product.type ?
             machines[product.name] = machines[product.name] or {}
             table.insert(machines[product.name], entity)
         end
-        --        entity.previous_recipe
     end
---    machines
 end
 
 local function removeValueFromList(list, value)
@@ -131,64 +135,75 @@ local function checkMachine(entity)
     if not entity.valid then
         return
     end
-    if entity.type == "assembling-machine" then
+    if entity.type == "assembling-machine" or entity.type == "furnace" then
         local pos = txtpos(entity.position)
         -- out("Checking " .. pos)
         if not machineRecipes[pos] then
             -- out("Add machineRecipes " .. pos)
-            machineRecipes[pos] = { entity = entity, recipe = entity.recipe }
+            local machineRecipe = entity.recipe
+            if entity.type == "furnace" and entity.recipe == nil then
+                machineRecipe = entity.previous_recipe
+            end
+            machineRecipes[pos] = { entity = entity, recipe = machineRecipe }
         else
             local intable = machineRecipes[pos].recipe
             local inentity = entity.recipe
+            if entity.type == "furnace" and entity.recipe == nil then
+                inentity = entity.previous_recipe
+            end
             if intable == inentity then
                 return
             end
             local previous = machineRecipes[pos].recipe
-            local current = entity.recipe
-            machineRecipes[pos] = { entity = entity, recipe = entity.recipe }
+            local current = inentity
+            machineRecipes[pos] = { entity = entity, recipe = inentity }
             if previous then
-                 removeMachine(entity)
-                 -- remove from machines
-                 previous = previous.name
+                removeMachine(entity)
+                previous = previous.name
             end
             if current then
-                 addMachine(entity)
-                 current = current.name
+                addMachine(entity)
+                current = current.name
             end
             out("Changed recipe at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
         end
     end
 end    
 
--- Add all machines in the game to our machines table
+-- Add all assembling machines and furnaces in the game to our machines table
 local function onInit()
     for forceIndex, f in pairs(game.forces) do
         for surfaceIndex, surface in pairs(game.surfaces) do
-            for c in surface.get_chunks() do
-                for key, ent in pairs(surface.find_entities_filtered({area={{c.x * 32, c.y * 32}, {c.x * 32 + 32, c.y * 32 + 32}}, force = f, type = "assembling-machine"})) do
-                  if ent.type == "assembling-machine" then
+            for key, ent in pairs(surface.find_entities_filtered({ force = f, type = "assembling-machine"})) do
+                if ent.type == "assembling-machine" then
                     addMachine(ent)
-                  end
-                  if ent.type == "furnace" then
+                end
+            end
+            for key, ent in pairs(surface.find_entities_filtered({ force = f, type = "furnace"})) do
+                if ent.type == "furnace" then
                     addMachine(ent)
-                  end
-                  if ent.type == "mining-drill" then
-                    addMachine(ent)
-                  end
+                end
+            end
+--            for key, ent in pairs(surface.find_entities_filtered({ force = f, type = "mining-drill"})) do
+                -- ent.mining_target.name
+--                if ent.type == "mining-drill" then
+--                  addMachine(ent)
+--                end
+--            end
 --                ent.type
 --                ent.get_inventory
 --                ent.get_output_inventory
 --                ent.get_fuel_inventory
 --                ent.get_burnt_result_inventory()
-                end
-            end
         end
     end
+    global.machines = machines
+    global.machineRecipes = machineRecipes
 end
 
--- We store which belts are in the world for next time
 local function onLoad()
-    searches = global.what_is_missing_search
+    machines = global.machines
+    machineRecipes = global.machineRecipes
 end 
 
 -- When we place a new entity, we need to add it to our list of machines
@@ -206,7 +221,7 @@ local function onRemoveEntity(event)
 end
 
 local function scanMissing(target, reportTo)
---    out("Scan missing " .. target .. " and report to " .. reportTo.name)
+    out("Scan missing " .. target .. " and report to " .. reportTo.name)
     local machineList = machines[target] or {}
     local missing = {}
     
@@ -246,6 +261,47 @@ local function scanMissing(target, reportTo)
                 end
             end
         end
+        if entity.valid and entity.type == "furnace" then
+            local awaitingOutput = entity.get_inventory(defines.inventory.furnace_result)
+            local recipe = entity.recipe or entity.previous_recipe
+            local available = true
+            if not awaitingOutput.is_empty() then
+                -- entity not empty, probably waiting for something to be output.
+                -- inserters do not insert anything if output of machine is full
+                -- TODO: Check for multiple outputs. Consider oil refinery with full light oil for example. Or Uranium 238.
+                -- Is there any FURNACE recipe that has multiple outputs?
+                available = false
+            end
+            
+            local fuel = entity.get_inventory(defines.inventory.fuel)
+            if fuel and fuel.is_empty() then
+                missing["FUEL"] = entity
+            end
+        
+            local ingredients = recipe.ingredients
+            local current = entity.get_inventory(defines.inventory.furnace_source)
+            local fluidBoxCount = 1
+            for i, ingredient in ipairs(ingredients) do
+                if not available then
+                    break
+                end
+                local wanted = ingredient.amount
+                
+                local have = 0
+                if ingredient.type == "fluid" then
+                    local fluidBox = entity.fluidbox[fluidBoxCount]
+                    if fluidBox ~= nil then -- if this is nil then the fluidBox is empty
+                        have = fluidBox.amount
+                    end
+                    fluidBoxCount = fluidBoxCount + 1
+                elseif ingredient.type == "item" then
+                    have = current.get_item_count(ingredient.name)
+                end
+                if have < wanted then
+                    missing[ingredient.name] = entity
+                end
+            end
+        end
     end
     
     for missingName, entity in pairs(missing) do
@@ -258,8 +314,6 @@ end
 
 -- Perform a scan to find bottlenecks
 local function perform(player)
-    -- local player_search = 
---    out("Performing for " .. player.name)
     if STEP_BY_STEP then
         local entity = entityTickIterateNext()
         if entity then
