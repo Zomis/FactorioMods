@@ -13,16 +13,12 @@
 -- /c game.player.print(#game.player.force.recipes)
 -- /c game.player.print(game.player.selected.recipe.category)
 -- /c  local surface = game.player.surface  local count = 0  for c in surface.get_chunks() do    for key, ent in pairs(surface.find_entities_filtered({area={{c.x * 32, c.y * 32}, {c.x * 32 + 32, c.y * 32 + 32}}, force= game.player.force})) do      if ent.type == "assembling-machine" then        count = count + 1      end    end  end  game.player.print(count)
--- MASSIVE PROBLEM: No event when Factories change recipe. See https://forums.factorio.com/viewtopic.php?f=6&t=50485
--- Need to re-scan Factories for recipe changes. Technically only those that have been selected need a check.
--- loop through machines to detect changes.
--- when scanning, add type.
--- keep a LOCAL table of KEY: position -- VALUE: entity + recipe. Check one machine per tick.
+-- x MASSIVE PROBLEM: No event when Factories change recipe. See https://forums.factorio.com/viewtopic.php?f=6&t=50485
+-- x Need to re-scan Factories for recipe changes. Technically only those that have been selected need a check.
+-- x keep a LOCAL table of KEY: position -- VALUE: entity + recipe. Check one machine per tick.
 
--- Checkbox "Rocket" (Does not include satellite)
--- Checkbox "Current research"
 
--- Table with product as key and a list of machines that is producing that as value
+-- x Table with product as key and a list of machines that is producing that as value
 require "entity_tick_iterate"
 
 local STEP_BY_STEP = false
@@ -52,14 +48,14 @@ local function createGUI(player)
     local top = player.gui.top
     if top["missing_perform"] == nil then
         top.add({type = "button", name = "missing_perform", caption = "Perform"})
-        out("Top UI Created for " .. player.name)
+        -- out("Top UI Created for " .. player.name)
     end
 
     local left = player.gui.left
     if left["what_is_missing"] == nil then
         left.add({type = "frame", name = "what_is_missing"})
         left["what_is_missing"].add({type = "flow", name = "panel", direction = "vertical"})
-        out("Left UI Created for " .. player.name)
+        -- out("Left UI Created for " .. player.name)
     end
 
     if not left.what_is_missing.panel["research"] then
@@ -123,6 +119,7 @@ local function removeMachine(entity)
         return
     end
     local pos = txtpos(entity.position)
+    -- out("Remove " .. pos)
     machineRecipes[pos] = nil
     for i, product in ipairs(outputs) do
         local list = machines[product.name] or {}
@@ -140,7 +137,12 @@ local function checkMachine(entity)
         if not machineRecipes[pos] then
             -- out("Add machineRecipes " .. pos)
             machineRecipes[pos] = { entity = entity, recipe = entity.recipe }
-        elseif machineRecipes[pos].recipe ~= entity.recipe then
+        else
+            local intable = machineRecipes[pos].recipe
+            local inentity = entity.recipe
+            if intable == inentity then
+                return
+            end
             local previous = machineRecipes[pos].recipe
             local current = entity.recipe
             machineRecipes[pos] = { entity = entity, recipe = entity.recipe }
@@ -204,7 +206,7 @@ local function onRemoveEntity(event)
 end
 
 local function scanMissing(target, reportTo)
-    out("Scan missing " .. target .. " and report to " .. reportTo.name)
+--    out("Scan missing " .. target .. " and report to " .. reportTo.name)
     local machineList = machines[target] or {}
     local missing = {}
     
@@ -240,14 +242,16 @@ local function scanMissing(target, reportTo)
                     have = current.get_item_count(ingredient.name)
                 end
                 if have < wanted then
-                    missing[ingredient.name] = true
+                    missing[ingredient.name] = entity
                 end
             end
         end
     end
     
-    for missingName, value in pairs(missing) do
-        reportTo.print(target .. " is missing " .. missingName)
+    for missingName, entity in pairs(missing) do
+        local pos = txtpos(entity.position)
+        local playerPos = txtpos(reportTo.position)
+        reportTo.print(target .. " is missing " .. missingName .. " in " .. pos .. " player is at " .. playerPos)
         scanMissing(missingName, reportTo)
     end
 end
@@ -299,10 +303,10 @@ local function onTick()
 end
 
 local function onClick(event)
+    local player = game.players[event.player_index]
     if event.element.name ~= "missing_perform" then
         return
     end
-    local player = game.players[event.player_index]
     perform(player)
 end
 
@@ -333,5 +337,3 @@ function onChangeSelect(event)
     out(str)
 
 end
-
---script.on_event(defines.events.on_selected_entity_changed, onChangeSelect)

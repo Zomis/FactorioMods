@@ -50,7 +50,7 @@ function entityTickIterateNext()
         surfacesToScanIndex = surfaceIndex
         if surfaceIndex then
             entitiesToScan = game.surfaces[surfaceIndex].find_entities_filtered({type = "assembling-machine"})
-            out("Using surfaceIndex " .. tostring(surfaceIndex) .. " contains " .. #entitiesToScan)
+            -- out("Using surfaceIndex " .. tostring(surfaceIndex) .. " contains " .. #entitiesToScan)
             index, entity = next(entitiesToScan, index)
         else
             entitiesToScanIndex = nil
