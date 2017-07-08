@@ -66,6 +66,9 @@ local function createGUI(player)
         flow.add({type = "flow", name = "missing2", direction = "horizontal"})
         flow.missing2.add({type = "button", name = "what_is_missing_delete2", caption = "X"})
         flow.missing2.add({type = "choose-elem-button", name = "wanted", elem_type = "item"})
+        local scroll = flow.missing2.add({type = "scroll-pane", name = "result",
+           vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
+        scroll.add({type = "flow", name = "flow", direction = "horizontal"})
     end
 end
 
@@ -220,7 +223,7 @@ local function onRemoveEntity(event)
     removeMachine(event.entity)
 end
 
-local function scanMissing(target, reportTo)
+local function scanMissing(target, reportTo, guiResult)
     out("Scan missing " .. target .. " and report to " .. reportTo.name)
     local machineList = machines[target] or {}
     local missing = {}
@@ -307,8 +310,14 @@ local function scanMissing(target, reportTo)
     for missingName, entity in pairs(missing) do
         local pos = txtpos(entity.position)
         local playerPos = txtpos(reportTo.position)
+        local id = #guiResult.children
+        
+        prototype = game.item_prototypes[missingName]
+        -- prototype = game.fluid_prototypes[missingName]
+        local spriteName = "item/" .. missingName
+        guiResult.add({type = "sprite-button", name = "missing" .. id, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
         reportTo.print(target .. " is missing " .. missingName .. " in " .. pos .. " player is at " .. playerPos)
-        scanMissing(missingName, reportTo)
+        scanMissing(missingName, reportTo, guiResult)
     end
 end
 
@@ -338,7 +347,9 @@ local function perform(player)
 
     for k, target in pairs(player_search) do
         -- find machines and check what is missing, recursive
-        scanMissing(target, player)
+        panel.missing2.result.flow.clear()
+        local guiResult = panel.missing2.result.flow
+        scanMissing(target, player, guiResult)
     end
 end
 
