@@ -140,7 +140,7 @@ local function checkMachine(entity)
         elseif machineRecipes[pos].recipe ~= entity.recipe then
             local previous = machineRecipes[pos].recipe
             local current = entity.recipe
-            machineRecipes[pos] = entity.recipe
+            machineRecipes[pos] = { entity = entity, recipe = entity.recipe }
             if previous then
                  removeMachine(entity)
                  -- remove from machines
