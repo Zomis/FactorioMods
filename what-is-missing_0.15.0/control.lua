@@ -43,6 +43,16 @@ end
 -- chains:
 --   list of list of outputs that should be produced
 
+local function createMissingFlow(parent, id)
+    local name = "missing" .. id
+    local flow = parent
+    flow.add({type = "flow", name = name, direction = "horizontal"})
+    flow[name].add({type = "button", name = "what_is_missing_delete", caption = "X"})
+    flow[name].add({type = "choose-elem-button", name = "wanted", elem_type = "item"})
+    local scroll = flow[name].add({type = "scroll-pane", name = "result",
+       vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
+    scroll.add({type = "flow", name = "flow", direction = "horizontal"})
+end
 
 local function createGUI(player)
     local top = player.gui.top
@@ -71,12 +81,7 @@ local function createGUI(player)
            vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
         scroll.add({type = "flow", name = "flow", direction = "horizontal"})
         
-        flow.add({type = "flow", name = "missing2", direction = "horizontal"})
-        flow.missing2.add({type = "button", name = "what_is_missing_delete2", caption = "X"})
-        flow.missing2.add({type = "choose-elem-button", name = "wanted", elem_type = "item"})
-        local scroll = flow.missing2.add({type = "scroll-pane", name = "result",
-           vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
-        scroll.add({type = "flow", name = "flow", direction = "horizontal"})
+        createMissingFlow(flow, 2)
     end
 end
 
@@ -369,7 +374,6 @@ local function perform(player)
         return
     end
     local panel = left.what_is_missing.panel
-    local player_search = { }
     panel.missing_research.flow.clear()
     panel.missing_rocket.flow.clear()
     
@@ -427,15 +431,14 @@ local function perform(player)
             scanMissing(missingName, player, panel.missing_rocket.flow)
         end
     end
-    if panel.missing2.wanted.elem_value then
-        table.insert(player_search, panel.missing2.wanted.elem_value)
-    end
-
-    for k, target in pairs(player_search) do
-        -- find machines and check what is missing, recursive
-        panel.missing2.result.flow.clear()
-        local guiResult = panel.missing2.result.flow
-        scanMissing(target, player, guiResult)
+    
+    for name, element in ipairs(panel.children) do
+        if element.wanted and element.wanted.elem_value then
+            local guiResult = element.result.flow
+            guiResult.clear()
+            local target = element.wanted.elem_value
+            scanMissing(target, player, guiResult)
+        end
     end
 end
 
@@ -456,15 +459,41 @@ end
 local function onClick(event)
     local player = game.players[event.player_index]
     if string.find(event.element.name, "what_is_missing_delete") then
-        local length = string.len("what_is_missing_delete")
-        local id = string.sub(event.element.name, length + 1)
-        local missingPanel = player.gui.left.what_is_missing.panel["missing" .. id]
-        missingPanel.wanted.elem_value = nil
+        local missingPanel = event.element.parent
+        missingPanel.destroy()
+        return
     end
     if event.element.name ~= "missing_perform" then
         return
     end
     perform(player)
+end
+
+local function onChosenElementChanged(event)
+    local player = game.players[event.player_index]
+    local parent = event.element.parent -- flow
+    if not player.gui.left.what_is_missing then
+        return
+    end
+    if not parent then
+        return
+    end
+    if string.sub(parent.name, 1, 7) ~= "missing" then
+        return
+    end
+    local panel = player.gui.left.what_is_missing.panel
+    for name, element in ipairs(panel.children) do
+        if element.wanted and not element.wanted.elem_value then
+            -- There is already some row with an empty element, don't add another one.
+            return
+        end
+    end
+    
+    local i = 0
+    while panel["missing" .. i] do
+        i = i + 1
+    end
+    createMissingFlow(player.gui.left.what_is_missing.panel, i)
 end
 
 script.on_init(onInit)
@@ -481,16 +510,4 @@ script.on_event(defines.events.on_entity_died, onRemoveEntity)
 script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
 
-function onChangeSelect(event)
-    local player = game.players[event.player_index]
-    local previous = event.last_entity
-    local str = ""
-    if previous then
-        str = "was " .. previous.name
-    end
-    if player.selected then
-        str = str .. " is now " .. player.selected.name
-    end
-    out(str)
-
-end
+script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
