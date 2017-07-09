@@ -58,10 +58,16 @@ local function createGUI(player)
 
     if not left.what_is_missing.panel["research"] then
         local flow = left.what_is_missing.panel
+        local scroll
         flow.add({type = "checkbox", name = "research", caption = "Current Research", state = false})
-        flow.add({type = "flow", name = "missing0", direction = "horizontal"})
+        scroll = flow.add({type = "scroll-pane", name = "missing_research",
+           vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
+        scroll.add({type = "flow", name = "flow", direction = "horizontal"})
+        
         flow.add({type = "checkbox", name = "rocket", caption = "Rocket", state = false})
-        flow.add({type = "flow", name = "missing1", direction = "horizontal"})
+        scroll = flow.add({type = "scroll-pane", name = "missing_rocket",
+           vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
+        scroll.add({type = "flow", name = "flow", direction = "horizontal"})
         
         flow.add({type = "flow", name = "missing2", direction = "horizontal"})
         flow.missing2.add({type = "button", name = "what_is_missing_delete2", caption = "X"})
@@ -223,8 +229,20 @@ local function onRemoveEntity(event)
     removeMachine(event.entity)
 end
 
-local function scanMissing(target, reportTo, guiResult)
-    out("Scan missing " .. target .. " and report to " .. reportTo.name)
+local function markMissing(data, guiResult)
+    local id = #guiResult.children
+    local spriteName = data.type .. "/" .. data.name
+    local prototype
+    if data.type == "fluid" then
+        prototype = game.fluid_prototypes[data.name]
+    elseif data.type == "item" then
+        prototype = game.item_prototypes[data.name]
+    end
+    guiResult.add({type = "sprite-button", name = "missing" .. id, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
+end
+
+local function scanMissing(target, player, guiResult)
+    out("Scan missing " .. target .. " and report to " .. player.name)
     local machineList = machines[target] or {}
     local missing = {}
     
@@ -260,7 +278,7 @@ local function scanMissing(target, reportTo, guiResult)
                     have = current.get_item_count(ingredient.name)
                 end
                 if have < wanted then
-                    missing[ingredient.name] = entity
+                    missing[ingredient.name] = { name = ingredient.name, type = ingredient.type }
                 end
             end
         end
@@ -278,7 +296,7 @@ local function scanMissing(target, reportTo, guiResult)
             
             local fuel = entity.get_inventory(defines.inventory.fuel)
             if fuel and fuel.is_empty() then
-                missing["FUEL"] = entity
+                missing["coal"] = entity -- TODO: Initialize a variable for some fuel before scanning, if coal does not exist
             end
         
             local ingredients = recipe.ingredients
@@ -301,23 +319,16 @@ local function scanMissing(target, reportTo, guiResult)
                     have = current.get_item_count(ingredient.name)
                 end
                 if have < wanted then
-                    missing[ingredient.name] = entity
+                    missing[ingredient.name] = { name = ingredient.name, type = ingredient.type }
                 end
             end
         end
     end
     
-    for missingName, entity in pairs(missing) do
-        local pos = txtpos(entity.position)
-        local playerPos = txtpos(reportTo.position)
-        local id = #guiResult.children
-        
-        prototype = game.item_prototypes[missingName]
+    for missingName, data in pairs(missing) do
         -- prototype = game.fluid_prototypes[missingName]
-        local spriteName = "item/" .. missingName
-        guiResult.add({type = "sprite-button", name = "missing" .. id, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
-        reportTo.print(target .. " is missing " .. missingName .. " in " .. pos .. " player is at " .. playerPos)
-        scanMissing(missingName, reportTo, guiResult)
+        markMissing(data, guiResult)
+        scanMissing(missingName, player, guiResult)
     end
 end
 
@@ -335,11 +346,56 @@ local function perform(player)
     local left = player.gui.left
     local panel = left.what_is_missing.panel
     local player_search = { }
-    if panel.research.state then
+    panel.missing_research.flow.clear()
+    panel.missing_rocket.flow.clear()
+    
+    if panel.research.state and player.force.current_research then
         -- Scan research (Find labs and check current force research and required stuff)
+        local ingredients = player.force.current_research.research_unit_ingredients
+        local missing = {}
+        for key, ent in pairs(player.surface.find_entities_filtered({ force = player.force, type = "lab"})) do
+            if ent.type == "lab" then
+                local current = ent.get_inventory(defines.inventory.lab_input)
+
+                for i, ingredient in ipairs(ingredients) do
+                    local wanted = ingredient.amount
+                    local have = current.get_item_count(ingredient.name)
+                    -- to support Bob's Mods with Module Labs, check can_insert
+                    if have < wanted and current.can_insert({ name = ingredient.name }) then
+                        missing[ingredient.name] = ent
+                    end
+                end
+            end
+        end
+        for missingName, entity in pairs(missing) do
+            local data = { type = "item", name = missingName }
+            markMissing(data, panel.missing_research.flow)
+            scanMissing(missingName, player, panel.missing_research.flow)
+        end
     end
     if panel.rocket.state then
         -- Scan rocket (Find rocket-silo and check inventory - and recipe?)
+        local missing = {}
+        for key, ent in pairs(player.surface.find_entities_filtered({ force = player.force, type = "rocket-silo"})) do
+            if ent.type == "rocket-silo" then
+                -- local inv = game.player.selected.get_inventory(defines.inventory.rocket_silo_rocket); -- sattelite
+                local ingredients = ent.recipe.ingredients
+                local current = ent.get_inventory(defines.inventory.assembling_machine_input)
+
+                for i, ingredient in ipairs(ingredients) do
+                    local wanted = ingredient.amount
+                    local have = current.get_item_count(ingredient.name)
+                    if have < wanted then
+                        missing[ingredient.name] = ent
+                    end
+                end
+            end
+        end
+        for missingName, entity in pairs(missing) do
+            local data = { type = "item", name = missingName }
+            markMissing(data, panel.missing_rocket.flow)
+            scanMissing(missingName, player, panel.missing_rocket.flow)
+        end
     end
     if panel.missing2.wanted.elem_value then
         table.insert(player_search, panel.missing2.wanted.elem_value)
