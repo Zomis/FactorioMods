@@ -284,7 +284,13 @@ local function scanMissing(target, player, guiResult)
                 available = false
             end
         
-            local ingredients = recipe.ingredients
+            local ingredients
+            if recipe then
+                ingredients = recipe.ingredients
+            else
+                ingredients = {}
+            end
+            
             local current = entity.get_inventory(defines.inventory.assembling_machine_input)
             local fluidBoxCount = 1
             for i, ingredient in ipairs(ingredients) do
