@@ -344,6 +344,9 @@ local function perform(player)
     end
     
     local left = player.gui.left
+    if not left.what_is_missing then
+        return
+    end
     local panel = left.what_is_missing.panel
     local player_search = { }
     panel.missing_research.flow.clear()
@@ -418,7 +421,7 @@ local function onTick()
     end
     if 0 == game.tick % update_interval then
         for k, player in pairs(game.players) do
-            --perform(player)
+            perform(player)
         end
     end
 end
