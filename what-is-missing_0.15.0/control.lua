@@ -22,6 +22,8 @@
 require "entity_tick_iterate"
 
 local STEP_BY_STEP = false
+local ROCKET_PART = "rocket-part"
+local RESEARCH = "RESEARCH"
 
 local machines = {}
 local machineRecipes = {} -- KEY: position, VALUE: entity + recipe. Check one machine per tick
@@ -115,6 +117,14 @@ local function addMachine(entity)
             table.insert(machines[product.name], entity)
         end
     end
+    if entity.type == "rocket-silo" then
+        machines[ROCKET_PART] = machines[ROCKET_PART] or {}
+        table.insert(machines[ROCKET_PART], entity)
+    end
+    if entity.type == "lab" then
+        machines[RESEARCH] = machines[RESEARCH] or {}
+        table.insert(machines[RESEARCH], entity)
+    end
 end
 
 local function removeValueFromList(list, value)
@@ -127,6 +137,17 @@ local function removeValueFromList(list, value)
 end
 
 local function removeMachine(entity)
+    if entity.type == "rocket-silo" then
+        local list = machines[ROCKET_PART] or {}
+        removeValueFromList(list, entity)
+        return
+    end
+    if entity.type == "lab" then
+        local list = machines[RESEARCH] or {}
+        removeValueFromList(list, entity)
+        return
+    end
+
     local outputs = getOutputsForMachine(entity)
     if outputs == nil then
         return
@@ -242,7 +263,7 @@ local function markMissing(data, guiResult)
 end
 
 local function scanMissing(target, player, guiResult)
-    out("Scan missing " .. target .. " and report to " .. player.name)
+    -- out("Scan missing " .. target .. " and report to " .. player.name)
     local machineList = machines[target] or {}
     local missing = {}
     
@@ -356,7 +377,10 @@ local function perform(player)
         -- Scan research (Find labs and check current force research and required stuff)
         local ingredients = player.force.current_research.research_unit_ingredients
         local missing = {}
-        for key, ent in pairs(player.surface.find_entities_filtered({ force = player.force, type = "lab"})) do
+        if not machines[RESEARCH] then
+            machines[RESEARCH] = player.surface.find_entities_filtered({ force = player.force, type = "lab"})
+        end
+        for key, ent in pairs(machines[RESEARCH]) do
             if ent.type == "lab" then
                 local current = ent.get_inventory(defines.inventory.lab_input)
 
@@ -379,7 +403,10 @@ local function perform(player)
     if panel.rocket.state then
         -- Scan rocket (Find rocket-silo and check inventory - and recipe?)
         local missing = {}
-        for key, ent in pairs(player.surface.find_entities_filtered({ force = player.force, type = "rocket-silo"})) do
+        if not machines[ROCKET_PART] then
+            machines[ROCKET_PART] = player.surface.find_entities_filtered({ force = player.force, type = "rocket-silo" })
+        end
+        for key, ent in pairs(machines[ROCKET_PART]) do
             if ent.type == "rocket-silo" then
                 -- local inv = game.player.selected.get_inventory(defines.inventory.rocket_silo_rocket); -- sattelite
                 local ingredients = ent.recipe.ingredients
