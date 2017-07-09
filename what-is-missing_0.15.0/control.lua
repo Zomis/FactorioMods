@@ -455,6 +455,12 @@ end
 
 local function onClick(event)
     local player = game.players[event.player_index]
+    if string.find(event.element.name, "what_is_missing_delete") then
+        local length = string.len("what_is_missing_delete")
+        local id = string.sub(event.element.name, length + 1)
+        local missingPanel = player.gui.left.what_is_missing.panel["missing" .. id]
+        missingPanel.wanted.elem_value = nil
+    end
     if event.element.name ~= "missing_perform" then
         return
     end
