@@ -464,29 +464,8 @@ local function onTick()
     end
 end
 
-local function onClick(event)
-    local player = game.players[event.player_index]
-    if string.find(event.element.name, "what_is_missing_delete") then
-        local missingPanel = event.element.parent
-        missingPanel.destroy()
-        return
-    end
-    if event.element.name ~= "missing_perform" then
-        return
-    end
-    perform(player)
-end
-
-local function onChosenElementChanged(event)
-    local player = game.players[event.player_index]
-    local parent = event.element.parent -- flow
+local function addEmptyMissing(player)
     if not player.gui.left.what_is_missing then
-        return
-    end
-    if not parent then
-        return
-    end
-    if string.sub(parent.name, 1, 7) ~= "missing" then
         return
     end
     local panel = player.gui.left.what_is_missing.panel
@@ -502,6 +481,33 @@ local function onChosenElementChanged(event)
         i = i + 1
     end
     createMissingFlow(player.gui.left.what_is_missing.panel, i)
+end
+
+local function onClick(event)
+    local player = game.players[event.player_index]
+    if string.find(event.element.name, "what_is_missing_delete") then
+        local missingPanel = event.element.parent
+        missingPanel.destroy()
+        addEmptyMissing(player)
+        return
+    end
+    if event.element.name ~= "missing_perform" then
+        return
+    end
+    perform(player)
+end
+
+local function onChosenElementChanged(event)
+    local player = game.players[event.player_index]
+    local parent = event.element.parent -- flow
+    if not parent then
+        return
+    end
+    if string.sub(parent.name, 1, 7) ~= "missing" then
+        return
+    end
+    
+    addEmptyMissing(player)
 end
 
 script.on_init(onInit)
