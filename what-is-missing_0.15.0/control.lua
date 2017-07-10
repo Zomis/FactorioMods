@@ -141,7 +141,7 @@ local function removeValueFromList(list, value)
     end
 end
 
-local function removeMachine(entity)
+local function removeMachine(entity, outputs)
     if entity.type == "rocket-silo" then
         local list = machines[ROCKET_PART] or {}
         removeValueFromList(list, entity)
@@ -153,9 +153,11 @@ local function removeMachine(entity)
         return
     end
 
-    local outputs = getOutputsForMachine(entity)
     if outputs == nil then
-        return
+        outputs = getOutputsForMachine(entity)
+        if not outputs then
+            return
+        end
     end
     local pos = txtpos(entity.position)
     -- out("Remove " .. pos)
@@ -193,7 +195,7 @@ local function checkMachine(entity)
             local current = inentity
             machineRecipes[pos] = { entity = entity, recipe = inentity }
             if previous then
-                removeMachine(entity)
+                removeMachine(entity, previous.products)
                 previous = previous.name
             end
             if current then
