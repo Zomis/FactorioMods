@@ -333,7 +333,7 @@ local function scanMissing(target, player, guiResult)
             
             local fuel = entity.get_inventory(defines.inventory.fuel)
             if fuel and fuel.is_empty() then
-                missing["coal"] = entity -- TODO: Initialize a variable for some fuel before scanning, if coal does not exist
+                missing["coal"] = { name = "coal", type = "item" } -- TODO: Initialize a variable for some fuel before scanning, if coal does not exist
             end
         
             local ingredients
