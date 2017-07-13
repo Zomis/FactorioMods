@@ -142,6 +142,7 @@ end
 local function removeValueFromList(list, value)
     for k, v in pairs(list) do
         if v == value then
+            -- out("Remove value in list at " .. k)
             list[k] = nil
             return
         end
@@ -163,6 +164,7 @@ local function removeMachine(entity, outputs)
     if outputs == nil then
         outputs = getOutputsForMachine(entity)
         if not outputs then
+            -- out("[What is missing] Remove machine: Cannot fetch outputs for machine at " .. txtpos(entity.position))
             return
         end
     end
@@ -170,6 +172,7 @@ local function removeMachine(entity, outputs)
     -- out("Remove " .. pos)
     machineRecipes[pos] = nil
     for i, product in ipairs(outputs) do
+        -- out("Removing from list for " .. product.name)
         local list = machines[product.name] or {}
         removeValueFromList(list, entity)
     end
@@ -205,7 +208,7 @@ local function checkMachine(entity)
                 addMachine(entity)
                 current = current.name
             end
-            out("Changed recipe at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
+            out("[What is missing] Detected recipe change at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
         end
     end
 end    
@@ -272,8 +275,14 @@ local function markMissing(data, guiResult)
     guiResult.add({type = "sprite-button", name = "missing" .. id, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
 end
 
-local function scanMissing(target, player, guiResult)
-    -- out("Scan missing " .. target .. " and report to " .. player.name)
+local function scanMissing(target, player, guiResult, depth)
+    if depth > 20 then
+        out("[What is missing] POSSIBLE STACK OVERFLOW " .. target)
+        -- This happens if there is an infinite loop, such as with bottled stuff.
+        -- Empty bottle, gas bottle, empty bottle...
+        return
+    end
+    -- out("Scan missing " .. target .. " and report to " .. player.name .. " at depth " .. depth)
     local machineList = machines[target] or {}
     local missing = {}
     
@@ -292,6 +301,7 @@ local function scanMissing(target, player, guiResult)
             local ingredients
             if recipe then
                 ingredients = recipe.ingredients
+                -- out("checking machine at " .. txtpos(entity.position) .. " with recipe " .. recipe.name)
             else
                 ingredients = {}
             end
@@ -315,6 +325,7 @@ local function scanMissing(target, player, guiResult)
                     have = current.get_item_count(ingredient.name)
                 end
                 if have < wanted then
+                    -- out("found missing " .. ingredient.name .. " in machine " .. txtpos(entity.position) .. " with recipe " .. recipe.name)
                     missing[ingredient.name] = { name = ingredient.name, type = ingredient.type }
                 end
             end
@@ -362,6 +373,7 @@ local function scanMissing(target, player, guiResult)
                     have = current.get_item_count(ingredient.name)
                 end
                 if have < wanted then
+                    -- out("found missing " .. ingredient.name .. " in furnace " .. txtpos(entity.position) .. " with recipe " .. recipe.name)
                     missing[ingredient.name] = { name = ingredient.name, type = ingredient.type }
                 end
             end
@@ -386,6 +398,7 @@ local function perform(player)
         end
     end
     
+    -- out("Perform for " .. player.name)
     local left = player.gui.left
     if not left.what_is_missing then
         return
@@ -416,9 +429,10 @@ local function perform(player)
             end
         end
         for missingName, entity in pairs(missing) do
+            -- out("Missing research at " .. entity.position.x .. ", " .. entity.position.y .. " player at " .. player.position.x .. ", " .. player.position.y)
             local data = { type = "item", name = missingName }
             markMissing(data, panel.missing_research.flow)
-            scanMissing(missingName, player, panel.missing_research.flow)
+            scanMissing(missingName, player, panel.missing_research.flow, 1)
         end
     end
     if panel.rocket.state then
@@ -445,7 +459,7 @@ local function perform(player)
         for missingName, entity in pairs(missing) do
             local data = { type = "item", name = missingName }
             markMissing(data, panel.missing_rocket.flow)
-            scanMissing(missingName, player, panel.missing_rocket.flow)
+            scanMissing(missingName, player, panel.missing_rocket.flow, 1)
         end
     end
     
@@ -454,13 +468,13 @@ local function perform(player)
             local guiResult = element.result.flow
             guiResult.clear()
             local target = element.wanted.elem_value
-            scanMissing(target, player, guiResult)
+            scanMissing(target, player, guiResult, 1)
         end
     end
 end
 
 local function onTick()
-    if not STEP_BY_STEP then
+    if not STEP_BY_STEP then -- and (0 == game.tick % update_interval) then
         local entity = entityTickIterateNext()
         if entity then
             checkMachine(entity)
