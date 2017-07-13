@@ -272,7 +272,12 @@ local function markMissing(data, guiResult)
     elseif data.type == "item" then
         prototype = game.item_prototypes[data.name]
     end
-    guiResult.add({type = "sprite-button", name = "missing" .. id, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
+    local guiElementName = "missing_" .. data.type .. "_" .. data.name
+    if guiResult[guiElementName] then
+        return false
+    end
+    guiResult.add({type = "sprite-button", name = guiElementName, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
+    return true
 end
 
 local function scanMissing(target, player, guiResult, depth)
@@ -381,9 +386,14 @@ local function scanMissing(target, player, guiResult, depth)
     end
     
     for missingName, data in pairs(missing) do
+        -- local pos = txtpos(entity.position)
+        -- local playerPos = txtpos(player.position)
+        -- local prototype = game.item_prototypes[missingName]
         -- prototype = game.fluid_prototypes[missingName]
-        markMissing(data, guiResult)
-        scanMissing(missingName, player, guiResult)
+        if markMissing(data, guiResult) then
+            -- if we can't mark missing, then it has already been marked as missing and marking it again would cause Stack Overflow
+            scanMissing(missingName, player, guiResult, depth + 1)
+        end
     end
 end
 
