@@ -121,6 +121,13 @@ local function addMachine(entity)
             machines[product.name] = machines[product.name] or {}
             table.insert(machines[product.name], entity)
         end
+        
+        local machineRecipe = entity.recipe
+        if entity.type == "furnace" and entity.recipe == nil then
+            machineRecipe = entity.previous_recipe
+        end
+        -- out("Add machineRecipes " .. pos .. " with recipe " .. (machineRecipe and machineRecipe.name or "nil"))
+        machineRecipes[pos] = { entity = entity, recipe = machineRecipe }
     end
     if entity.type == "rocket-silo" then
         machines[ROCKET_PART] = machines[ROCKET_PART] or {}
@@ -174,21 +181,17 @@ local function checkMachine(entity)
     end
     if entity.type == "assembling-machine" or entity.type == "furnace" then
         local pos = txtpos(entity.position)
-        -- out("Checking " .. pos)
+        -- out("Checking " .. entity.type .. " at " .. pos)
         if not machineRecipes[pos] then
-            -- out("Add machineRecipes " .. pos)
-            local machineRecipe = entity.recipe
-            if entity.type == "furnace" and entity.recipe == nil then
-                machineRecipe = entity.previous_recipe
-            end
-            machineRecipes[pos] = { entity = entity, recipe = machineRecipe }
+            addMachine(entity)
         else
             local intable = machineRecipes[pos].recipe
             local inentity = entity.recipe
             if entity.type == "furnace" and entity.recipe == nil then
                 inentity = entity.previous_recipe
             end
-            if intable == inentity then
+            -- out("Already exists, comparing " .. tostring(inentity) .. " with stored " .. tostring(intable))
+            if intable == inentity then -- compare names instead of tables?
                 return
             end
             local previous = machineRecipes[pos].recipe
@@ -333,7 +336,13 @@ local function scanMissing(target, player, guiResult)
                 missing["coal"] = entity -- TODO: Initialize a variable for some fuel before scanning, if coal does not exist
             end
         
-            local ingredients = recipe.ingredients
+            local ingredients
+            if recipe then
+                ingredients = recipe.ingredients
+                -- out("checking furnace at " .. txtpos(entity.position) .. " with recipe " .. recipe.name)
+            else
+                ingredients = {}
+            end
             local current = entity.get_inventory(defines.inventory.furnace_source)
             local fluidBoxCount = 1
             for i, ingredient in ipairs(ingredients) do

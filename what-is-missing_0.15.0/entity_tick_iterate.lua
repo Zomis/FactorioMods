@@ -2,6 +2,7 @@ local entitiesToScan = {}
 local entitiesToScanIndex = nil
 local surfacesToScan = {}
 local surfacesToScanIndex = nil
+local typeToScan = "assembling-machine"
 
 local function out(txt)
   debug = true
@@ -49,11 +50,17 @@ function entityTickIterateNext()
         local surfaceIndex = scan()
         surfacesToScanIndex = surfaceIndex
         if surfaceIndex then
-            entitiesToScan = game.surfaces[surfaceIndex].find_entities_filtered({type = "assembling-machine"})
+            entitiesToScan = game.surfaces[surfaceIndex].find_entities_filtered({type = typeToScan})
             -- out("Using surfaceIndex " .. tostring(surfaceIndex) .. " contains " .. #entitiesToScan)
             index, entity = next(entitiesToScan, index)
         else
             entitiesToScanIndex = nil
+            if typeToScan == "assembling-machine" then
+                typeToScan = "furnace"
+            else
+                typeToScan = "assembling-machine"
+            end
+            -- out("Switching type to " .. typeToScan)
             return nil
         end
     end
