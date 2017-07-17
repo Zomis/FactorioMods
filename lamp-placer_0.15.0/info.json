@@ -1,0 +1,11 @@
+{
+    "name": "lamp-placer",
+    "version": "0.15.0",
+    "title": "Lamp Placer",
+    "author": "Zomis",
+    "contact": "zomis2k@hotmail.com",
+    "homepage": "https://github.com/Zomis/FactorioMods",
+    "factorio_version": "0.15",
+    "dependencies": ["base >= 0.15"],
+    "description": "Select a dark area that has electricity and let there be lamps."
+}
