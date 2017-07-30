@@ -1,5 +1,8 @@
 #!/usr/bin/env groovy
 
+@Library('ZomisJenkins')
+import net.zomis.jenkins.Duga
+
 import java.util.regex.Pattern
 
 node {
@@ -53,9 +56,13 @@ node {
         files++
     }
     
-    println totalWarnings + ' warnings in ' + files + ' files'
+    def resultMessage = totalWarnings + ' warnings in ' + files + ' files'
+    println resultMessage
 
     if (maxExitStatus > 1) {
-        error('Lua Validation failed')
+        new Duga().dugaResult('Lua Validation FAILED. Exit status ' + maxExitStatus + '. ' + resultMessage)
+        error('Lua Validation failed with status ' + maxExitStatus)
+    } else {
+        new Duga().dugaResult(resultMessage)
     }
 }
