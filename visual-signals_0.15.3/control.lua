@@ -216,6 +216,9 @@ local function onClick(event)
     local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
     for k, v in pairs(combinatorsToUI) do
       if v.entity.force.name == player.force.name then
+        local shown = guiRoot["panel" .. k] ~= nil
+        out("checking if player has " .. k .. ": " .. tostring(shown))
+        tableui.add({type = "checkbox", name = "gui_signal_display_shown" .. k, caption = "", state = shown})
         tableui.add({type = "textfield", name = "gui_signal_display_nameEdit" .. k, text = v.title or ""})
 
         local circuit = v.entity.get_circuit_network(defines.wire_type.red)
@@ -224,9 +227,6 @@ local function onClick(event)
         end
 
         CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
-        local shown = guiRoot["panel" .. k] ~= nil
-        out("checking if player has " .. k .. ": " .. tostring(shown))
-        tableui.add({type = "checkbox", name = "gui_signal_display_shown" .. k, caption = "Show", state = shown})
       end
     end
 
