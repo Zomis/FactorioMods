@@ -6,6 +6,11 @@ import net.zomis.jenkins.Duga
 import groovy.json.JsonSlurper
 import java.util.regex.Pattern
 
+@NonCPS
+def slurpJson(json) {
+  return new JsonSlurper().parseText(json)
+}
+
 node {
     deleteDir()
     def myPath = pwd()
@@ -25,7 +30,7 @@ node {
     stage('Scan info.json')
     for (def json : infoJsonFiles) {
         println "Found info.json: " + json.path
-        def data = new JsonSlurper().parseText(readFile(json.path))
+        def data = slurpJson(readFile(json.path))
 
         mods[data.name] = data.version
         modNames += data.name + " (currently " + data.version + ")\n"
