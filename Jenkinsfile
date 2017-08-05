@@ -3,6 +3,7 @@
 @Library('ZomisJenkins')
 import net.zomis.jenkins.Duga
 
+import groovy.json.JsonSlurper
 import java.util.regex.Pattern
 
 node {
