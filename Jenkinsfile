@@ -115,7 +115,7 @@ node {
         dir(newDir) {
           sh 'find ./ -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \\;'
         }
-        sh 'git rm ' + oldDir
+        sh 'git rm -r ' + oldDir
         sh 'git add ' + newDir
         sh 'git commit -m"Release ' + mod + " version " + params.releaseVersion + '"'
         sh 'git tag ' + mod + '-' + params.releaseVersion
