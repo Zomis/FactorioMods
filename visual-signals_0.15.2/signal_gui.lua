@@ -1,6 +1,6 @@
 function CreateSignalGuiPanel(parent, signals, name)
   local gui = parent.add({type = "flow", direction = "horizontal", name = name})
-  
+
   if signals ~= nil then
     UpdateSignalGuiPanel(gui, signals)
   end
@@ -9,7 +9,7 @@ end
 
 local suffixChars = { "", "k", "M", "G", "T", "P", "E" }
 
-function CountString(count)
+local function CountString(count)
   local absValue = math.abs(count)
   local prefix = ""
   if count < 0 then
@@ -20,7 +20,7 @@ function CountString(count)
     absValue = absValue / 1000
     suffix = suffix + 1
   end
-  
+
   local str = tostring(absValue)
   if absValue < 10 then
     return prefix .. string.sub(str, 1, 3) .. suffixChars[suffix]
@@ -52,7 +52,7 @@ local function UpdateSingleSignal(gui, signal)
   gui.valueLabel.caption = CountString(signal.count)
 end
 
-function DestroyExcessGui(gui, count)
+local function DestroyExcessGui(gui, count)
   while gui["signal" .. count] do
     gui["signal" .. count].destroy()
     count = count + 1
@@ -68,7 +68,7 @@ function UpdateSignalGuiPanel(gui, circuit_network)
     DestroyExcessGui(gui, count)
     return
   end
-  for k, v in pairs(circuit_network.signals) do
+  for _, v in ipairs(circuit_network.signals) do
     if not gui["signal" .. count] then
       local signalGUI = gui.add({type = "flow", direction = "vertical", name = "signal" .. count})
       signalGUI.add({type = "sprite-button", name = "icon", style = "slot_button_style", sprite=""})
@@ -80,4 +80,3 @@ function UpdateSignalGuiPanel(gui, circuit_network)
   end
   DestroyExcessGui(gui, count)
 end
-

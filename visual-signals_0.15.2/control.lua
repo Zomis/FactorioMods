@@ -12,7 +12,7 @@ local update_interval = 30
 
 --Helper method for my debugging while coding
 local function out(txt)
-  debug = false
+  local debug = false
   if debug then
     game.print(txt)
   end
@@ -33,9 +33,10 @@ end
 local function createGUI(uicomb, id, player)
   local top = player.gui.top
   if top["visual_signals"] == nil then
-    top.add({type = "sprite-button", name = "visual_signals", style = "slot_button_style", sprite = "item/gui-signal-display"})
+    top.add({type = "sprite-button", name = "visual_signals",
+      style = "slot_button_style", sprite = "item/gui-signal-display"})
   end
-  
+
   local left = player.gui.left
   if left["gui_signal_display"] == nil then
     left.add({type = "frame", name = "gui_signal_display"})
@@ -51,7 +52,6 @@ local function createGUI(uicomb, id, player)
   return newGui
 end
 
---We add all the belts in the game to our data
 local function onInit()
   if not global.fum_uic then
     global.fum_uic = {}
@@ -67,19 +67,18 @@ local function onInit()
       v.ui = v[2]
     end
     if not v.entity or not v.entity.valid then
-        table.insert(toRemove, key)
+        table.insert(toRemove, k)
     end
   end
-  for k, v in pairs(toRemove) do
+  for k, _ in pairs(toRemove) do
     destroyCombinator(k)
   end
-  
 end
 
 --We store which belts are in the world for next time
 local function onLoad()
   combinatorsToUI = global.fum_uic
-end 
+end
 
 --Destroys a gui and removes from table
 local function destroyGui(entity)
@@ -106,7 +105,7 @@ function destroyCombinator(key)
     local uicomb = combinatorsToUI[key]
     out("destroy " .. key .. " value " .. tostring(uicomb))
     combinatorsToUI[key] = nil
-    for k, player in pairs(game.players) do
+    for _, player in pairs(game.players) do
       local centerpane = player.gui.left
       if centerpane["gui_signal_display"] then
         if centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key] then
@@ -127,12 +126,12 @@ local function onPlaceEntity(event)
     local uicomb = {entity = event.created_entity, title = "Signal Display " .. id}
     combinatorsToUI[id] = uicomb
     if event.robot then
-      for k, player in pairs(event.robot.force.players) do
+      for _, player in pairs(event.robot.force.players) do
         createGUI(uicomb, id, player)
       end
     else
-      local player = game.players[event.player_index]
-      for k, player in pairs(player.force.players) do
+      local placingPlayer = game.players[event.player_index]
+      for _, player in pairs(placingPlayer.force.players) do
         createGUI(uicomb, id, player)
       end
     end
@@ -163,7 +162,7 @@ local function updateUICombinator(key, uicomb)
     circuit = entity.get_circuit_network(defines.wire_type.green)
   end
   local force = entity.force
-  for k, player in ipairs(force.players) do
+  for _, player in ipairs(force.players) do
     if player.gui.left["gui_signal_display"] and player.gui.left["gui_signal_display"]["gui_signal_panel"] then
       local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
       if guiRoot["panel" .. key] then
@@ -177,7 +176,7 @@ end
 
 local function onTick()
   if 0 == game.tick % update_interval then
-    for k, v in pairs(combinatorsToUI) do
+    for k, _ in pairs(combinatorsToUI) do
       local updateOK = updateUICombinator(k, combinatorsToUI[k])
       if not updateOK then
         out("Removed something, skipping the rest")
@@ -214,37 +213,33 @@ local function onClick(event)
     local frameRoot = player.gui.center.add({type = "frame", name = "gui_signal_displayUI"})
     local frame = frameRoot.add({type = "scroll-pane", name = "gui_signal_scroll", style = "gui_signal_display_list"})
     local tableui = frame.add({type = "table", name = "table", colspan = 3})
-    for k, v in pairs(combinatorsToUI) do
-      out("combinatorsToUI has " .. k)
-    end
     local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
-    for k, v in pairs(guiRoot.children) do
-      out("player has " .. v.name)
-    end
     for k, v in pairs(combinatorsToUI) do
       if v.entity.force.name == player.force.name then
         tableui.add({type = "textfield", name = "gui_signal_display_nameEdit" .. k, text = v.title or ""})
-      
+
         local circuit = v.entity.get_circuit_network(defines.wire_type.red)
         if not circuit then
           circuit = v.entity.get_circuit_network(defines.wire_type.green)
         end
-      
+
         CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
         local shown = guiRoot["panel" .. k] ~= nil
         out("checking if player has " .. k .. ": " .. tostring(shown))
         tableui.add({type = "checkbox", name = "gui_signal_display_shown" .. k, caption = "Show", state = shown})
       end
     end
-    
+
     -- search
     -- general settings, show/hide left panel
-    
+
     -- name
     -- signals
     -- show/hide
     -- show/hide condition
---    local list = frame.add({type = "scroll-pane", name = "list", vertical_scroll_policy = "always", horizontal_scroll_policy = "auto", style = "gui_signal_display_ui_list"})
+--    local list = frame.add({type = "scroll-pane", name = "list",
+--      vertical_scroll_policy = "always", horizontal_scroll_policy = "auto",
+--      style = "gui_signal_display_ui_list"})
   end
 end
 
@@ -260,7 +255,7 @@ local function onPlayerChangedForce(event)
     return
   end
   local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
-  for k, v in pairs(combinatorsToUI) do
+  for k, _ in pairs(combinatorsToUI) do
     if guiRoot["panel" .. k] then
       guiRoot["panel" .. k].destroy()
     end
@@ -278,9 +273,9 @@ local function onTextChange(event)
       return
     end
     uicomb.title = event.element.text
-    for k, p in pairs(game.players) do
-      if player.gui.left["gui_signal_display"] and player.gui.left["gui_signal_display"]["gui_signal_panel"] then
-        local rootGUI = player.gui.left["gui_signal_display"]["gui_signal_panel"]
+    for _, p in pairs(game.players) do
+      if p.gui.left["gui_signal_display"] and p.gui.left["gui_signal_display"]["gui_signal_panel"] then
+        local rootGUI = p.gui.left["gui_signal_display"]["gui_signal_panel"]
         if rootGUI["panel" .. id] then
           rootGUI["panel" .. id]["panel_label"].caption = uicomb.title
         end
