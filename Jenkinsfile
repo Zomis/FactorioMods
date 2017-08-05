@@ -4,7 +4,6 @@
 import net.zomis.jenkins.Duga
 
 import java.util.regex.Pattern
-import java.util.File
 
 node {
     deleteDir()
@@ -12,14 +11,14 @@ node {
     def duga = new Duga()
 
     def dirs = findFiles(glob: '*/info.json')
-    def files = []
+    def infoJsonFiles = []
     for (def file : dirs) {
-        files.add(file)
+        infoJsonFiles.add(file)
     }
     println dirs
     def mods = [:]
     def modNames = "\n"
-    for (def json : files) {
+    for (def json : infoJsonFiles) {
         def data = new JsonSlurper().parseText(readFile(json.path))
 
         mods[data.name] = data.version
@@ -50,7 +49,7 @@ node {
     println 'Files found: ' + luaFiles
     def maxExitStatus = 0
     def totalWarnings = 0
-    def files = 0
+    def fileCount = 0
     def fileList = []
 
     // Avoid some not-serializable problem by putting a non-serializable list in a serializable one
@@ -78,7 +77,7 @@ node {
             def match = matcher.group(1)
             totalWarnings += Integer.parseInt(match)
         }
-        files++
+        fileCount++
     }
 
     stage('Report')
