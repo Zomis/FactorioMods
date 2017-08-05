@@ -22,13 +22,16 @@ node {
     println dirs
     def mods = [:]
     def modNames = "\n"
+    stage('Scan info.json')
     for (def json : infoJsonFiles) {
+        println "Found info.json: " + json.path
         def data = new JsonSlurper().parseText(readFile(json.path))
 
         mods[data.name] = data.version
         modNames += data.name + " (currently " + data.version + ")\n"
     }
 
+    println "All info.json files found, update parameters"
     properties([parameters([
       choice(choices: modNames, description: 'Mod to release', name: 'releaseMod'),
       string(defaultValue: "", description: 'Version to release', name: 'releaseVersion'),
@@ -82,7 +85,7 @@ node {
     }
 
     stage('Report')
-    def resultMessage = totalWarnings + ' warnings in ' + files + ' files'
+    def resultMessage = totalWarnings + ' warnings in ' + fileCount + ' files'
     println resultMessage
 
     if (maxExitStatus > 1) {
