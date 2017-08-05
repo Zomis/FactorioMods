@@ -4,10 +4,32 @@
 import net.zomis.jenkins.Duga
 
 import java.util.regex.Pattern
+import java.util.File
 
 node {
     deleteDir()
     def myPath = pwd()
+    def duga = new Duga()
+
+    def dirs = findFiles(glob: '*/info.json')
+    def files = []
+    for (def file : dirs) {
+        files.add(file)
+    }
+    println dirs
+    def mods = [:]
+    def modNames = "\n"
+    for (def json : files) {
+        def data = new JsonSlurper().parseText(readFile(json.path))
+
+        mods[data.name] = data.version
+        modNames += data.name + " (currently " + data.version + ")\n"
+    }
+
+    properties([parameters([
+      choice(choices: modNames, description: 'Mod to release', name: 'releaseMod'),
+      string(defaultValue: "", description: 'Version to release', name: 'releaseVersion'),
+    ])])
 
     stage('Checkout')
     checkout scm
@@ -30,19 +52,19 @@ node {
     def totalWarnings = 0
     def files = 0
     def fileList = []
-    
+
     // Avoid some not-serializable problem by putting a non-serializable list in a serializable one
     for (file in luaFiles) {
         fileList.add(file)
     }
-    
+
     stage('Luacheck')
     for (file in fileList) {
         if (file.path.startsWith('luacheck-')) {
             continue
         }
         println 'Scanning file ' + file.path
-            
+
         def exitStatus = sh(script: './luacheck-' + LUA_CHECK + '/bin/luacheck ' + file.path + ' > build_out.txt',
             returnStatus: true)
         if (exitStatus > maxExitStatus) {
@@ -58,15 +80,46 @@ node {
         }
         files++
     }
-    
+
     stage('Report')
     def resultMessage = totalWarnings + ' warnings in ' + files + ' files'
     println resultMessage
 
     if (maxExitStatus > 1) {
-        new Duga().dugaResult('Lua Validation FAILED. Exit status ' + maxExitStatus + '. ' + resultMessage)
+        duga.dugaResult('Lua Validation FAILED. Exit status ' + maxExitStatus + '. ' + resultMessage)
         error('Lua Validation failed with status ' + maxExitStatus)
     } else {
-        new Duga().dugaResult(resultMessage)
+        duga.dugaResult(resultMessage)
+    }
+
+    if (params.releaseMod != '' && params.releaseVersion != '') {
+      def mod = params.releaseMod.substring(0, params.releaseMod.indexOf(' ('))
+      def oldVersion = mods[mod]
+      def releaseString = "$mod to version $params.releaseVersion (previous: $oldVersion)"
+      stage('Release?') {
+        duga.dugaResult("Ready to release $mod version $params.releaseVersion (previous version was $oldVersion). Awaiting confirmation")
+        timeout(time: 5, unit: 'MINUTES') {
+            input message: "Release $releaseString ? (tag, build artifact and publish in Jenkins, prepare with new version)"
+        }
+      }
+      stage('Release') {
+        duga.dugaResult("Starting release of $mod version $params.releaseVersion")
+        def oldDir = mod + '_' + oldVersion
+        def newDir = mod + '_' + params.releaseVersion
+        sh 'git checkout ' + env.BRANCH_NAME
+        sh 'git reset --hard HEAD'
+        sh 'mv ' + oldDir + ' ' + newDir
+        dir(newDir) {
+          sh 'find ./ -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \;'
+        }
+        sh 'git rm ' + oldDir
+        sh 'git add ' + newDir
+        sh 'git commit -m"Release ' + mod + " version " + params.releaseVersion + '"'
+        sh 'git tag ' + mod + '-' + params.releaseVersion
+        zip(zipFile: newDir + '.zip', glob: newDir + '/**')
+        archiveArtifacts(artifacts: newDir + '.zip')
+        sh 'git push'
+        duga.dugaResult("$mod version $params.releaseVersion is ready for uploaded to https://mods.factorio.com/mods/zomis/" + mod)
+      }
     }
 }
