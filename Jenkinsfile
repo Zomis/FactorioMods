@@ -11,6 +11,9 @@ node {
     def myPath = pwd()
     def duga = new Duga()
 
+    stage('Checkout')
+    checkout scm
+
     def dirs = findFiles(glob: '*/info.json')
     def infoJsonFiles = []
     for (def file : dirs) {
@@ -30,9 +33,6 @@ node {
       choice(choices: modNames, description: 'Mod to release', name: 'releaseMod'),
       string(defaultValue: "", description: 'Version to release', name: 'releaseVersion'),
     ])])
-
-    stage('Checkout')
-    checkout scm
 
     println findFiles(glob: '*')
 
