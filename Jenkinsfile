@@ -110,7 +110,7 @@ node {
         sh 'git reset --hard HEAD'
         sh 'mv ' + oldDir + ' ' + newDir
         dir(newDir) {
-          sh 'find ./ -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \;'
+          sh 'find ./ -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \\;'
         }
         sh 'git rm ' + oldDir
         sh 'git add ' + newDir
