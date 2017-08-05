@@ -9,10 +9,12 @@ node {
     deleteDir()
     def myPath = pwd()
 
+    stage('Checkout')
     checkout scm
 
     println findFiles(glob: '*')
 
+    stage('Setup Luacheck')
     def LUA_CHECK = '0.20.0'
     def luaCheckDir = fileExists('luacheck-' + LUA_CHECK)
     if (!luaCheckDir) {
@@ -34,6 +36,7 @@ node {
         fileList.add(file)
     }
     
+    stage('Luacheck')
     for (file in fileList) {
         if (file.path.startsWith('luacheck-')) {
             continue
@@ -56,6 +59,7 @@ node {
         files++
     }
     
+    stage('Report')
     def resultMessage = totalWarnings + ' warnings in ' + files + ' files'
     println resultMessage
 
