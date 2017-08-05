@@ -75,6 +75,9 @@ node {
 
         def exitStatus = sh(script: './luacheck-' + LUA_CHECK + '/bin/luacheck ' + file.path + ' > build_out.txt',
             returnStatus: true)
+        if (exitStatus > 1) {
+          duga.dugaResult('ERROR: ' + file.path + ' resulted in exit status ' + exitStatus)
+        }
         if (exitStatus > maxExitStatus) {
             maxExitStatus = exitStatus
         }
