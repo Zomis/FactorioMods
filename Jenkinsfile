@@ -16,33 +16,35 @@ node {
     def myPath = pwd()
     def duga = new Duga()
 
-    stage('Checkout')
-    checkout scm
-
-    def dirs = findFiles(glob: '*/info.json')
     def infoJsonFiles = []
-    for (def file : dirs) {
-        infoJsonFiles.add(file)
-    }
-    println dirs
     def mods = [:]
     def modNames = "\n"
-    stage('Scan info.json')
-    for (def json : infoJsonFiles) {
-        println "Found info.json: " + json.path
-        def data = slurpJson(readFile(json.path))
-
-        mods[data.name] = data.version
-        modNames += data.name + " (currently " + data.version + ")\n"
+    stage('Checkout') {
+      checkout scm
+      def dirs = findFiles(glob: '*/info.json')
+      for (def file : dirs) {
+          infoJsonFiles.add(file)
+      }
+      println dirs
     }
 
-    println "All info.json files found, update parameters"
-    properties([parameters([
-      choice(choices: modNames, description: 'Mod to release', name: 'releaseMod'),
-      string(defaultValue: "", description: 'Version to release', name: 'releaseVersion'),
-    ])])
+    stage('Scan info.json') {
+      for (def json : infoJsonFiles) {
+          println "Found info.json: " + json.path
+          def data = slurpJson(readFile(json.path))
 
-    println findFiles(glob: '*')
+          mods[data.name] = data.version
+          modNames += data.name + " (currently " + data.version + ")\n"
+      }
+      println "All info.json files found, update parameters"
+      properties([parameters([
+        choice(choices: modNames, description: 'Mod to release', name: 'releaseMod'),
+        string(defaultValue: "", description: 'Version to release', name: 'releaseVersion'),
+      ])])
+
+      println findFiles(glob: '*')
+    }
+
 
     stage('Setup Luacheck')
     def LUA_CHECK = '0.20.0'
