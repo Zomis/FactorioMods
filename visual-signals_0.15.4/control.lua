@@ -157,16 +157,14 @@ local function updateUICombinator(key, uicomb)
     destroyGui(entity)
     return false
   end
-  local circuit = entity.get_circuit_network(defines.wire_type.red)
-  if not circuit then
-    circuit = entity.get_circuit_network(defines.wire_type.green)
-  end
+  local circuit_red = entity.get_circuit_network(defines.wire_type.red)
+  local circuit_green = entity.get_circuit_network(defines.wire_type.green)
   local force = entity.force
   for _, player in ipairs(force.players) do
     if player.gui.left["gui_signal_display"] and player.gui.left["gui_signal_display"]["gui_signal_panel"] then
       local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
       if guiRoot["panel" .. key] then
-        UpdateSignalGuiPanel(guiRoot["panel" .. key].signals, circuit)
+        UpdateSignalGuiPanel(guiRoot["panel" .. key].signals, circuit_red, circuit_green)
       end
     end
   end

@@ -59,16 +59,8 @@ local function DestroyExcessGui(gui, count)
   end
 end
 
-function UpdateSignalGuiPanel(gui, circuit_network)
-  if not gui then
-    return
-  end
-  local count = 1
-  if not circuit_network or not circuit_network.signals then
-    DestroyExcessGui(gui, count)
-    return
-  end
-  for _, v in ipairs(circuit_network.signals) do
+local function addSignalsToGui(signals, gui, count)
+  for _, v in ipairs(signals) do
     if not gui["signal" .. count] then
       local signalGUI = gui.add({type = "flow", direction = "vertical", name = "signal" .. count})
       signalGUI.add({type = "sprite-button", name = "icon", style = "slot_button_style", sprite=""})
@@ -77,6 +69,20 @@ function UpdateSignalGuiPanel(gui, circuit_network)
     local signalUI = gui["signal" .. count]
     UpdateSingleSignal(signalUI, v)
     count = count + 1
+  end
+  return count
+end
+
+function UpdateSignalGuiPanel(gui, circuit_network_1, circuit_network_2)
+  if not gui then
+    return
+  end
+  local count = 1
+  if circuit_network_1 and circuit_network_1.signals then
+    count = addSignalsToGui(circuit_network_1.signals, gui, count)
+  end
+  if circuit_network_2 and circuit_network_2.signals then
+    count = addSignalsToGui(circuit_network_2.signals, gui, count)
   end
   DestroyExcessGui(gui, count)
 end
