@@ -44,15 +44,13 @@ local function on_player_selected_area(event)
     end
     local player = game.players[event.player_index]
     local surface = player.surface
-    local destroyed_info = {}
-    local area = event.area
-    
+
     -- local searchEntities = event.entities
     local searchEntities = surface.find_entities({ { event.area.left_top.x - EXTRA, event.area.left_top.y - EXTRA },
       { event.area.right_bottom.x + EXTRA, event.area.right_bottom.y + EXTRA } })
-    
+
     local lamps = {}
-    
+
     local electricity = {}
     for _, entity in ipairs(searchEntities) do
         if entity.type == "electric-pole" then
@@ -62,7 +60,7 @@ local function on_player_selected_area(event)
             table.insert(lamps, entity)
         end
     end
-    
+
     local placables = 0
     local electricities = 0
     local noLamps = 0
@@ -81,14 +79,16 @@ local function on_player_selected_area(event)
                     local lampFound = findLamp(lamps, x, y)
                     if not lampFound then
                         noLamps = noLamps + 1
-                        local newLamp = surface.create_entity({ name = "entity-ghost", inner_name = "small-lamp", expires = false, position = { x, y }, force = force })
+                        local newLamp = surface.create_entity({ name = "entity-ghost",
+                          inner_name = "small-lamp", expires = false, position = { x, y }, force = force })
                         table.insert(lamps, newLamp)
                     end
                 end
             end
         end
     end
-    player.print("Placed " .. noLamps .. " lamps on " .. placables .. " placable positions. " .. electricities .. " of which had electricity.")
+    player.print("Placed " .. noLamps .. " lamps on " .. placables ..
+     " placable positions. " .. electricities .. " of which had electricity.")
 end
 
 script.on_event(defines.events.on_player_selected_area, on_player_selected_area)
