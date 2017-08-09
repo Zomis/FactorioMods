@@ -1,8 +1,7 @@
-function CreateSignalGuiPanel(parent, signals, name)
+function CreateSignalGuiPanel(parent, circuit_red, circuit_green, name)
   local gui = parent.add({type = "flow", direction = "horizontal", name = name})
-
-  if signals ~= nil then
-    UpdateSignalGuiPanel(gui, signals)
+  if circuit_red or circuit_green then
+    UpdateSignalGuiPanel(gui, circuit_red, circuit_green)
   end
   return gui
 end

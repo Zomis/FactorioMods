@@ -48,7 +48,7 @@ local function createGUI(uicomb, id, player)
     style = "gui_signal_display_scroll"
   })
   newGui.add({type = "label", name = "panel_label", caption = uicomb.title})
-  CreateSignalGuiPanel(newGui, nil, "signals")
+  CreateSignalGuiPanel(newGui, nil, nil, "signals")
   return newGui
 end
 
@@ -219,12 +219,9 @@ local function onClick(event)
         tableui.add({type = "checkbox", name = "gui_signal_display_shown" .. k, caption = "", state = shown})
         tableui.add({type = "textfield", name = "gui_signal_display_nameEdit" .. k, text = v.title or ""})
 
-        local circuit = v.entity.get_circuit_network(defines.wire_type.red)
-        if not circuit then
-          circuit = v.entity.get_circuit_network(defines.wire_type.green)
-        end
-
-        CreateSignalGuiPanel(tableui, circuit, "signals" .. k)
+        local circuit_red = v.entity.get_circuit_network(defines.wire_type.red)
+        local circuit_green = v.entity.get_circuit_network(defines.wire_type.green)
+        CreateSignalGuiPanel(tableui, circuit_red, circuit_green, "signals" .. k)
       end
     end
 
