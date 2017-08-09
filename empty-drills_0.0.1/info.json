@@ -1,9 +1,0 @@
-{
-    "name": "empty-drills",
-    "version": "0.0.1",
-    "title": "Empty Drills",
-    "author": "Zomis",
-    "description": "Find Mining Drills that no longer produce any resources",
-    "homepage": "https://github.com/Zomis/FactorioMods",
-    "dependencies": ["base >= 0.12.12"]
-}
