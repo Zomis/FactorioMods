@@ -56,9 +56,8 @@ end
 
 local function createGUI(player)
     local top = player.gui.top
-    if top["missing_perform"] == nil then
-        top.add({type = "button", name = "missing_perform", caption = "Perform"})
-        -- out("Top UI Created for " .. player.name)
+    if top["missing_perform"] ~= nil then
+      top["missing_perform"].destroy()
     end
 
     local left = player.gui.left
