@@ -60,6 +60,7 @@ node {
     println 'Files found: ' + luaFiles
     def maxExitStatus = 0
     def totalWarnings = 0
+    def filesWithWarnings = 0
     def fileCount = 0
     def fileList = []
 
@@ -89,13 +90,17 @@ node {
         def matcher = txt =~ /(\d+) warning/
         if (matcher.find()) {
             def match = matcher.group(1)
-            totalWarnings += Integer.parseInt(match)
+            def warnings = Integer.parseInt(match)
+            totalWarnings += warnings
+            if (warnings > 0) {
+              filesWithWarnings++
+            }
         }
         fileCount++
     }
 
     stage('Report')
-    def resultMessage = totalWarnings + ' warnings in ' + fileCount + ' files'
+    def resultMessage = "Scanned $fileCount files. $totalWarnings found in $filesWithWarnings files."
     println resultMessage
 
     if (maxExitStatus > 1) {
