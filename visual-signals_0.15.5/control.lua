@@ -43,11 +43,12 @@ local function createGUI(uicomb, id, player)
     left["gui_signal_display"].add({type = "flow", name = "gui_signal_panel", direction = "vertical"})
   end
 
-  local newGui = left["gui_signal_display"]["gui_signal_panel"].add({
+  local panelBox = left["gui_signal_display"]["gui_signal_panel"]
+  panelBox.add({type = "label", name = "label" .. id, caption = uicomb.title})
+  local newGui = panelBox.add({
     type = "scroll-pane", name = "panel" .. id, vertical_scroll_policy = "never", horizontal_scroll_policy = "auto",
     style = "gui_signal_display_scroll"
   })
-  newGui.add({type = "label", name = "panel_label", caption = uicomb.title})
   CreateSignalGuiPanel(newGui, nil, nil, "signals")
   return newGui
 end
@@ -189,6 +190,9 @@ local function onClickShownCheckbox(event)
   local length = string.len("gui_signal_display_shown")
   local id = string.sub(event.element.name, length + 1)
   local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
+  if guiRoot["label" .. id] then
+    guiRoot["label" .. id].destroy()
+  end
   if guiRoot["panel" .. id] then
     guiRoot["panel" .. id].destroy()
   else
@@ -271,7 +275,12 @@ local function onTextChange(event)
     for _, p in pairs(game.players) do
       if p.gui.left["gui_signal_display"] and p.gui.left["gui_signal_display"]["gui_signal_panel"] then
         local rootGUI = p.gui.left["gui_signal_display"]["gui_signal_panel"]
-        if rootGUI["panel" .. id] then
+        if rootGUI["label" .. id] then
+          -- After 0.15.6
+          rootGUI["label" .. id].caption = uicomb.title
+        end
+        if rootGUI["panel" .. id] and rootGUI["panel" .. id]["panel_label"] then
+          -- Before 0.15.6
           rootGUI["panel" .. id]["panel_label"].caption = uicomb.title
         end
       end
