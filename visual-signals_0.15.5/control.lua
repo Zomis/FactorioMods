@@ -52,7 +52,7 @@ local function createGUI(uicomb, id, player)
   return newGui
 end
 
-function destroyCombinator(key)
+local function destroyCombinator(key)
     local uicomb = combinatorsToUI[key]
     out("destroy " .. key .. " value " .. tostring(uicomb))
     combinatorsToUI[key] = nil
