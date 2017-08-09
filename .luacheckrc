@@ -9,7 +9,7 @@ files["visual-signals_*/control.lua"] = {
     "CreateSignalGuiPanel", "UpdateSignalGuiPanel"
   }
 }
-files["visual-signals_*/entity_tick_iterate.lua"] = {
+files["visual-signals_*/signal_gui.lua"] = {
   globals = {
     "CreateSignalGuiPanel", "UpdateSignalGuiPanel"
   }

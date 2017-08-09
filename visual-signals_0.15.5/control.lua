@@ -52,6 +52,24 @@ local function createGUI(uicomb, id, player)
   return newGui
 end
 
+function destroyCombinator(key)
+    local uicomb = combinatorsToUI[key]
+    out("destroy " .. key .. " value " .. tostring(uicomb))
+    combinatorsToUI[key] = nil
+    for _, player in pairs(game.players) do
+      local centerpane = player.gui.left
+      if centerpane["gui_signal_display"] then
+        if centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key] then
+          centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key].destroy()
+        end
+
+        if #centerpane["gui_signal_display"]["gui_signal_panel"].children == 0 then
+          centerpane["gui_signal_display"].destroy()
+        end
+      end
+    end
+end
+
 local function onInit()
   if not global.fum_uic then
     global.fum_uic = {}
@@ -99,24 +117,6 @@ local function destroyGui(entity)
       return
     end
   end
-end
-
-function destroyCombinator(key)
-    local uicomb = combinatorsToUI[key]
-    out("destroy " .. key .. " value " .. tostring(uicomb))
-    combinatorsToUI[key] = nil
-    for _, player in pairs(game.players) do
-      local centerpane = player.gui.left
-      if centerpane["gui_signal_display"] then
-        if centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key] then
-          centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key].destroy()
-        end
-
-        if #centerpane["gui_signal_display"]["gui_signal_panel"].children == 0 then
-          centerpane["gui_signal_display"].destroy()
-        end
-      end
-    end
 end
 
 --When we place a new gui-signal-display, it's stored. Value is {entity, ui}
