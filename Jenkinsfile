@@ -99,15 +99,16 @@ node {
         fileCount++
     }
 
-    stage('Report')
-    def resultMessage = "Scanned $fileCount files. $totalWarnings found in $filesWithWarnings files."
-    println resultMessage
+    stage('Report') {
+      def resultMessage = "Scanned $fileCount files. $totalWarnings warnings found in $filesWithWarnings files."
+      println resultMessage
 
-    if (maxExitStatus > 1) {
-        duga.dugaResult('Lua Validation FAILED. Exit status ' + maxExitStatus + '. ' + resultMessage)
-        error('Lua Validation failed with status ' + maxExitStatus)
-    } else {
-        duga.dugaResult(resultMessage)
+      if (maxExitStatus > 1) {
+          duga.dugaResult('Lua Validation FAILED. Exit status ' + maxExitStatus + '. ' + resultMessage)
+          error('Lua Validation failed with status ' + maxExitStatus)
+      } else {
+          duga.dugaResult(resultMessage)
+      }
     }
 
     if (params.releaseMod != '' && params.releaseVersion != '') {
