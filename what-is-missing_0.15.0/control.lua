@@ -12,7 +12,7 @@
 
 -- /c game.player.print(#game.player.force.recipes)
 -- /c game.player.print(game.player.selected.recipe.category)
--- /c  local surface = game.player.surface  local count = 0  for c in surface.get_chunks() do    for key, ent in pairs(surface.find_entities_filtered({area={{c.x * 32, c.y * 32}, {c.x * 32 + 32, c.y * 32 + 32}}, force= game.player.force})) do      if ent.type == "assembling-machine" then        count = count + 1      end    end  end  game.player.print(count)
+
 -- x MASSIVE PROBLEM: No event when Factories change recipe. See https://forums.factorio.com/viewtopic.php?f=6&t=50485
 -- x Need to re-scan Factories for recipe changes. Technically only those that have been selected need a check.
 -- x keep a LOCAL table of KEY: position -- VALUE: entity + recipe. Check one machine per tick.
@@ -31,7 +31,7 @@ local machineRecipes = {} -- KEY: position, VALUE: entity + recipe. Check one ma
 local update_interval = 60
 
 local function out(txt)
-  debug = true
+  local debug = true
   if debug then
     game.print(txt)
   end
@@ -75,12 +75,12 @@ local function createGUI(player)
         scroll = flow.add({type = "scroll-pane", name = "missing_research",
            vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
         scroll.add({type = "flow", name = "flow", direction = "horizontal"})
-        
+
         flow.add({type = "checkbox", name = "rocket", caption = "Rocket", state = false})
         scroll = flow.add({type = "scroll-pane", name = "missing_rocket",
            vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
         scroll.add({type = "flow", name = "flow", direction = "horizontal"})
-        
+
         createMissingFlow(flow, 2)
     end
 end
@@ -121,7 +121,7 @@ local function addMachine(entity)
             machines[product.name] = machines[product.name] or {}
             table.insert(machines[product.name], entity)
         end
-        
+
         local machineRecipe = entity.recipe
         if entity.type == "furnace" and entity.recipe == nil then
             machineRecipe = entity.previous_recipe
@@ -211,7 +211,7 @@ local function checkMachine(entity)
             out("[What is missing] Detected recipe change at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
         end
     end
-end    
+end
 
 -- Add all assembling machines and furnaces in the game to our machines table
 local function onInit()
@@ -247,7 +247,7 @@ end
 local function onLoad()
     machines = global.machines
     machineRecipes = global.machineRecipes
-end 
+end
 
 -- When we place a new entity, we need to add it to our list of machines
 local function onPlaceEntity(event)
@@ -290,7 +290,7 @@ local function scanMissing(target, player, guiResult, depth)
     -- out("Scan missing " .. target .. " and report to " .. player.name .. " at depth " .. depth)
     local machineList = machines[target] or {}
     local missing = {}
-    
+
     for j, entity in pairs(machineList) do
         if entity.valid and entity.type == "assembling-machine" then
             local awaitingOutput = entity.get_inventory(defines.inventory.assembling_machine_output)
@@ -302,7 +302,7 @@ local function scanMissing(target, player, guiResult, depth)
                 -- TODO: Check for multiple outputs. Consider oil refinery with full light oil for example. Or Uranium 238.
                 available = false
             end
-        
+
             local ingredients
             if recipe then
                 ingredients = recipe.ingredients
@@ -310,7 +310,7 @@ local function scanMissing(target, player, guiResult, depth)
             else
                 ingredients = {}
             end
-            
+
             local current = entity.get_inventory(defines.inventory.assembling_machine_input)
             local fluidBoxCount = 1
             for i, ingredient in ipairs(ingredients) do
@@ -318,7 +318,7 @@ local function scanMissing(target, player, guiResult, depth)
                     break
                 end
                 local wanted = ingredient.amount
-                
+
                 local have = 0
                 if ingredient.type == "fluid" then
                     local fluidBox = entity.fluidbox[fluidBoxCount]
@@ -346,12 +346,12 @@ local function scanMissing(target, player, guiResult, depth)
                 -- Is there any FURNACE recipe that has multiple outputs?
                 available = false
             end
-            
+
             local fuel = entity.get_inventory(defines.inventory.fuel)
             if fuel and fuel.is_empty() then
                 missing["coal"] = { name = "coal", type = "item" } -- TODO: Initialize a variable for some fuel before scanning, if coal does not exist
             end
-        
+
             local ingredients
             if recipe then
                 ingredients = recipe.ingredients
@@ -366,7 +366,7 @@ local function scanMissing(target, player, guiResult, depth)
                     break
                 end
                 local wanted = ingredient.amount
-                
+
                 local have = 0
                 if ingredient.type == "fluid" then
                     local fluidBox = entity.fluidbox[fluidBoxCount]
@@ -384,7 +384,7 @@ local function scanMissing(target, player, guiResult, depth)
             end
         end
     end
-    
+
     for missingName, data in pairs(missing) do
         -- local pos = txtpos(entity.position)
         -- local playerPos = txtpos(player.position)
@@ -407,7 +407,7 @@ local function perform(player)
             checkMachine(entity)
         end
     end
-    
+
     -- out("Perform for " .. player.name)
     local left = player.gui.left
     if not left.what_is_missing then
@@ -416,7 +416,7 @@ local function perform(player)
     local panel = left.what_is_missing.panel
     panel.missing_research.flow.clear()
     panel.missing_rocket.flow.clear()
-    
+
     if panel.research.state and player.force.current_research then
         -- Scan research (Find labs and check current force research and required stuff)
         local ingredients = player.force.current_research.research_unit_ingredients
@@ -472,7 +472,7 @@ local function perform(player)
             scanMissing(missingName, player, panel.missing_rocket.flow, 1)
         end
     end
-    
+
     for name, element in ipairs(panel.children) do
         if element.wanted and element.wanted.elem_value then
             local guiResult = element.result.flow
@@ -508,7 +508,7 @@ local function addEmptyMissing(player)
             return
         end
     end
-    
+
     local i = 0
     while panel["missing" .. i] do
         i = i + 1
@@ -539,7 +539,7 @@ local function onChosenElementChanged(event)
     if string.sub(parent.name, 1, 7) ~= "missing" then
         return
     end
-    
+
     addEmptyMissing(player)
 end
 

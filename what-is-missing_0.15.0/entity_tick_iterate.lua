@@ -5,7 +5,7 @@ local surfacesToScanIndex = nil
 local typeToScan = "assembling-machine"
 
 local function out(txt)
-  debug = true
+  local debug = true
   if debug then
     game.print(txt)
   end
@@ -67,4 +67,3 @@ function entityTickIterateNext()
     entitiesToScanIndex = index
     return entity
 end
-
