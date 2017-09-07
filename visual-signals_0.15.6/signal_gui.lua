@@ -1,11 +1,3 @@
-function CreateSignalGuiPanel(parent, circuit_red, circuit_green, name)
-  local gui = parent.add({type = "flow", direction = "horizontal", name = name})
-  if circuit_red or circuit_green then
-    UpdateSignalGuiPanel(gui, circuit_red, circuit_green)
-  end
-  return gui
-end
-
 local suffixChars = { "", "k", "M", "G", "T", "P", "E" }
 
 local function CountString(count)
@@ -72,7 +64,7 @@ local function addSignalsToGui(signals, gui, count)
   return count
 end
 
-function UpdateSignalGuiPanel(gui, circuit_network_1, circuit_network_2)
+local function UpdateSignalGuiPanel(gui, circuit_network_1, circuit_network_2)
   if not gui then
     return
   end
@@ -85,3 +77,13 @@ function UpdateSignalGuiPanel(gui, circuit_network_1, circuit_network_2)
   end
   DestroyExcessGui(gui, count)
 end
+
+local function CreateSignalGuiPanel(parent, circuit_red, circuit_green, name)
+  local gui = parent.add({type = "flow", direction = "horizontal", name = name})
+  if circuit_red or circuit_green then
+    UpdateSignalGuiPanel(gui, circuit_red, circuit_green)
+  end
+  return gui
+end
+
+return { UpdateSignalGuiPanel = UpdateSignalGuiPanel, CreateSignalGuiPanel = CreateSignalGuiPanel }
