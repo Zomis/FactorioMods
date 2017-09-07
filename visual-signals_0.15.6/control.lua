@@ -63,6 +63,9 @@ local function destroyCombinator(key)
         if centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key] then
           centerpane["gui_signal_display"]["gui_signal_panel"]["panel" .. key].destroy()
         end
+        if centerpane["gui_signal_display"]["gui_signal_panel"]["label" .. key] then
+          centerpane["gui_signal_display"]["gui_signal_panel"]["label" .. key].destroy()
+        end
 
         if #centerpane["gui_signal_display"]["gui_signal_panel"].children == 0 then
           centerpane["gui_signal_display"].destroy()
@@ -94,7 +97,24 @@ local function onInit()
   end
 end
 
---We store which belts are in the world for next time
+local function onConfigurationChanged(data)
+  -- Migration code to fix #27 in version 0.15.6
+  for _, player in pairs(game.players) do
+    local pane = player.gui.left
+    if pane["gui_signal_display"] then
+      local parent = pane["gui_signal_display"]["gui_signal_panel"]
+      for _, element_name in ipairs(parent.children_names) do
+        if string.find(element_name, "label") then
+          local key = string.sub(element_name, 6)
+          if not parent["panel" .. key] then
+            parent["label" .. key].destroy()
+          end
+        end
+      end
+    end
+  end
+end
+
 local function onLoad()
   combinatorsToUI = global.fum_uic
 end
@@ -289,7 +309,7 @@ local function onTextChange(event)
 end
 
 script.on_init(onInit)
-script.on_configuration_changed(onInit)
+script.on_configuration_changed(onConfigurationChanged)
 script.on_load(onLoad)
 
 script.on_event(defines.events.on_built_entity, onPlaceEntity)
