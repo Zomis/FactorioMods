@@ -207,7 +207,9 @@ local function checkMachine(entity)
                 addMachine(entity)
                 current = current.name
             end
-            out("[What is missing] Detected recipe change at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
+            if entity.type == "assembling-machine" then
+              out("[What is missing] Detected recipe change at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
+            end
         end
     end
 end
