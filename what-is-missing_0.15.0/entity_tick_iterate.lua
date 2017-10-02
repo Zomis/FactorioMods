@@ -44,12 +44,35 @@ local function scan()
 --    return {}
 end
 
+local scan_delay = 3600
+local last_scan = 0
+local wait = false
+
 function entityTickIterateNext()
-    local index, entity = next(entitiesToScan, entitiesToScanIndex)
+  -- Use time constraint to not scan too often (to avoid lag)
+  -- If next is not nil, then scan it
+  local index, entity
+  if not wait then
+    index, entity = next(entitiesToScan, entitiesToScanIndex)
+  end
+  if index then
+    entitiesToScanIndex = index
+    return entity
+  end
+  wait = true
+  if last_scan + scan_delay > game.tick then
+    -- Skip checking to avoid lag.
+    return nil
+  end
+  wait = false
+  last_scan = game.tick
+--  out("TIME " .. last_scan)
     if not index then
+--      out("No index at tick " .. game.tick)
         local surfaceIndex = scan()
         surfacesToScanIndex = surfaceIndex
         if surfaceIndex then
+--          out("Scan " .. typeToScan .. " on " .. surfaceIndex .. " at tick " .. game.tick)
             entitiesToScan = game.surfaces[surfaceIndex].find_entities_filtered({type = typeToScan})
             -- out("Using surfaceIndex " .. tostring(surfaceIndex) .. " contains " .. #entitiesToScan)
             index, entity = next(entitiesToScan, index)
