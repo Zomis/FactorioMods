@@ -629,6 +629,18 @@ local function onChosenElementChanged(event)
     if string.sub(parent.name, 1, 7) ~= "missing" then
         return
     end
+    -- Find out which table index belongs to element. This would be easier if there was a `event.previous_value`
+    local id = tonumber(string.sub(parent.name, string.len("missing") + 1))
+    local tableIndex = 0
+    local left = player.gui.left["what_is_missing"]
+    for i = 1, id do
+      if left.panel["missing" .. i] then
+        tableIndex = tableIndex + 1
+      end
+    end
+    local old_value = tostring(playerDatas[event.player_index].wanted[tableIndex])
+    -- Update player configuration for the found tableIndex
+    playerDatas[event.player_index].wanted[tableIndex] = event.element.elem_value
 
     addEmptyMissing(player)
 end
