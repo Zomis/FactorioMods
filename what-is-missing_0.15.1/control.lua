@@ -522,7 +522,8 @@ local function perform(player)
             machines[ROCKET_PART] = player.surface.find_entities_filtered({ force = player.force, type = "rocket-silo" })
         end
         for _, ent in pairs(machines[ROCKET_PART]) do
-            if ent.type == "rocket-silo" then
+          -- check if rocket_silo_rocket inventory exists to avoid scanning if there is already a rocket
+            if ent.type == "rocket-silo" and ent.get_inventory(defines.inventory.rocket_silo_rocket) == nil then
                 -- local inv = game.player.selected.get_inventory(defines.inventory.rocket_silo_rocket); -- sattelite
                 local ingredients = ent.get_recipe().ingredients
                 local current = ent.get_inventory(defines.inventory.assembling_machine_input)
