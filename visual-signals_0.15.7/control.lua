@@ -34,7 +34,7 @@ local function createGUI(uicomb, id, player)
   local top = player.gui.top
   if top["visual_signals"] == nil then
     top.add({type = "sprite-button", name = "visual_signals",
-      style = "slot_button_style", sprite = "item/gui-signal-display"})
+      style = "slot_button", sprite = "item/gui-signal-display"})
   end
 
   local left = player.gui.left

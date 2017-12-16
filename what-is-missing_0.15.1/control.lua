@@ -277,7 +277,7 @@ local function markMissing(data, guiResult)
     if guiResult[guiElementName] then
         return false
     end
-    guiResult.add({type = "sprite-button", name = guiElementName, style = "slot_button_style", sprite = spriteName, tooltip = prototype.localised_name})
+    guiResult.add({type = "sprite-button", name = guiElementName, style = "slot_button", sprite = spriteName, tooltip = prototype.localised_name})
     return true
 end
 

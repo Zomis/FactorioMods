@@ -54,7 +54,7 @@ local function addSignalsToGui(signals, gui, count)
   for _, v in ipairs(signals) do
     if not gui["signal" .. count] then
       local signalGUI = gui.add({type = "flow", direction = "vertical", name = "signal" .. count})
-      signalGUI.add({type = "sprite-button", name = "icon", style = "slot_button_style", sprite=""})
+      signalGUI.add({type = "sprite-button", name = "icon", style = "slot_button", sprite=""})
       signalGUI.add({type = "label", name = "valueLabel"})
     end
     local signalUI = gui["signal" .. count]
