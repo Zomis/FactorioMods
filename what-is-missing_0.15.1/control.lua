@@ -70,6 +70,15 @@ local function createGUI(player, fromConfig)
       top["missing_perform"].destroy()
     end
 
+    if top["what_is_missing"] == nil then
+      top.add({
+        type = "button",
+        name = "what_is_missing",
+        caption = "WiM",
+        style = "what_is_missing_small_button"
+      })
+    end
+
     local left = player.gui.left
     if left["what_is_missing"] == nil then
         left.add({type = "frame", name = "what_is_missing"})
@@ -580,6 +589,14 @@ end
 
 local function onClick(event)
     local player = game.players[event.player_index]
+    if event.element.name == "what_is_missing" then
+      if player.gui.left["what_is_missing"] then
+        player.gui.left["what_is_missing"].destroy()
+      else
+        createGUI(player, playerDatas[event.player_index])
+      end
+      return
+    end
     if string.find(event.element.name, "what_is_missing_delete") then
         local missingPanel = event.element.parent
         missingPanel.destroy()
