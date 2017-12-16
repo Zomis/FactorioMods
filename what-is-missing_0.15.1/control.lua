@@ -709,7 +709,7 @@ end
 
 local function onConfigurationChanged(data)
   -- Migration code to also save world name for saved machines (fix #30) in 0.16
-  local old_version = data.mod_changes["what-is-missing"].old_version
+  local old_version = data.mod_changes["what-is-missing"] and data.mod_changes["what-is-missing"].old_version
   if not old_version then
     return
   end
