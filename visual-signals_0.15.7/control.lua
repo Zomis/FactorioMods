@@ -232,6 +232,10 @@ local function onClick(event)
   if player.gui.center["gui_signal_displayUI"] then
     player.gui.center["gui_signal_displayUI"].destroy()
   else
+    if not player.gui.left["gui_signal_display"] then
+      player.print("There are no GUI Signal Displays")
+      return
+    end
     local frameRoot = player.gui.center.add({type = "frame", name = "gui_signal_displayUI"})
     local frame = frameRoot.add({type = "scroll-pane", name = "gui_signal_scroll", style = "gui_signal_display_list"})
     local tableui = frame.add({type = "table", name = "table", column_count = 3})
