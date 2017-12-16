@@ -645,6 +645,21 @@ local function onChosenElementChanged(event)
     addEmptyMissing(player)
 end
 
+local function onCheckboxClick(event)
+  local player = game.players[event.player_index]
+  local wim = player.gui.left["what_is_missing"]
+  if not wim then
+    return
+  end
+  local element = event.element
+  if element == wim.panel.research then
+    playerDatas[event.player_index].research = element.state
+  end
+  if element == wim.panel.rocket then
+    playerDatas[event.player_index].rocket = element.state
+  end
+end
+
 script.on_init(onInit)
 script.on_configuration_changed(onInit)
 script.on_load(onLoad)
@@ -660,6 +675,7 @@ script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
 
 script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
+script.on_event(defines.events.on_gui_checked_state_changed, onCheckboxClick)
 
 local function onSelectedEntityChanged(event)
   -- event.last_entity, event.player_index
