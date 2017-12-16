@@ -177,14 +177,19 @@ local function removeMachine(entity, outputs)
     end
 end
 
-local function checkMachine(entity)
+local function checkMachine(entity, debug)
     if not entity.valid then
         return
     end
     if entity.type == "assembling-machine" or entity.type == "furnace" then
         local pos = txtpos(entity.position)
-        -- out("Checking " .. entity.type .. " at " .. pos)
+        if debug then
+          out("Checking " .. entity.type .. " at " .. pos)
+        end
         if not machineRecipes[pos] then
+            if debug then
+              out("Add machine " .. pos)
+            end
             addMachine(entity)
         else
             local intable = machineRecipes[pos].recipe
@@ -192,7 +197,9 @@ local function checkMachine(entity)
             if entity.type == "furnace" and inentity == nil then
                 inentity = entity.previous_recipe
             end
-            -- out("Already exists, comparing " .. tostring(inentity) .. " with stored " .. tostring(intable))
+            if debug then
+              out("Already exists, comparing " .. tostring(inentity) .. " with stored " .. tostring(intable))
+            end
             if intable == inentity then -- compare names instead of tables?
                 return
             end
@@ -200,10 +207,16 @@ local function checkMachine(entity)
             local current = inentity
             machineRecipes[pos] = { entity = entity, recipe = inentity }
             if previous then
+                if debug then
+                  out("Remove machine " .. previous.name)
+                end
                 removeMachine(entity, previous.products)
                 previous = previous.name
             end
             if current then
+                if debug then
+                  out("Add machine " .. current.name)
+                end
                 addMachine(entity)
                 current = current.name
             end
