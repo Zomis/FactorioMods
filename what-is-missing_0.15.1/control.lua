@@ -305,7 +305,7 @@ local function scanMissing(target, player, guiResult, depth)
     local machineList = machines[target] or {}
     local missing = {}
 
-    for j, entity in pairs(machineList) do
+    for _, entity in pairs(machineList) do
         if entity.valid and entity.type == "assembling-machine" then
             local awaitingOutput = entity.get_inventory(defines.inventory.assembling_machine_output)
             local recipe = entity.get_recipe()
@@ -327,7 +327,7 @@ local function scanMissing(target, player, guiResult, depth)
 
             local current = entity.get_inventory(defines.inventory.assembling_machine_input)
             local fluidBoxCount = 1
-            for i, ingredient in ipairs(ingredients) do
+            for _, ingredient in ipairs(ingredients) do
                 if not available then
                     break
                 end
@@ -375,7 +375,7 @@ local function scanMissing(target, player, guiResult, depth)
             end
             local current = entity.get_inventory(defines.inventory.furnace_source)
             local fluidBoxCount = 1
-            for i, ingredient in ipairs(ingredients) do
+            for _, ingredient in ipairs(ingredients) do
                 if not available then
                     break
                 end
@@ -416,8 +416,7 @@ local function perform(player)
     if STEP_BY_STEP then
         local entity = entityTickIterateNext()
         if entity then
-            local str = txtpos(entity.position)
-            -- out("Found entity " .. str)
+            -- out("Found entity " .. txtpos(entity.position))
             checkMachine(entity)
         end
     end
@@ -438,11 +437,11 @@ local function perform(player)
         if not machines[RESEARCH] then
             machines[RESEARCH] = player.surface.find_entities_filtered({ force = player.force, type = "lab"})
         end
-        for key, ent in pairs(machines[RESEARCH]) do
+        for _, ent in pairs(machines[RESEARCH]) do
             if ent.type == "lab" then
                 local current = ent.get_inventory(defines.inventory.lab_input)
 
-                for i, ingredient in ipairs(ingredients) do
+                for _, ingredient in ipairs(ingredients) do
                     local wanted = ingredient.amount
                     local have = current.get_item_count(ingredient.name)
                     -- to support Bob's Mods with Module Labs, check can_insert
@@ -453,6 +452,7 @@ local function perform(player)
             end
         end
         for missingName, entity in pairs(missing) do
+          -- Possibly use 'entity' to make it possible to click and show which entity is missing something
             -- out("Missing research at " .. entity.position.x .. ", " .. entity.position.y .. " player at " .. player.position.x .. ", " .. player.position.y)
             local data = { type = "item", name = missingName }
             markMissing(data, panel.missing_research.flow)
@@ -465,13 +465,13 @@ local function perform(player)
         if not machines[ROCKET_PART] then
             machines[ROCKET_PART] = player.surface.find_entities_filtered({ force = player.force, type = "rocket-silo" })
         end
-        for key, ent in pairs(machines[ROCKET_PART]) do
+        for _, ent in pairs(machines[ROCKET_PART]) do
             if ent.type == "rocket-silo" then
                 -- local inv = game.player.selected.get_inventory(defines.inventory.rocket_silo_rocket); -- sattelite
                 local ingredients = ent.recipe.ingredients
                 local current = ent.get_inventory(defines.inventory.assembling_machine_input)
 
-                for i, ingredient in ipairs(ingredients) do
+                for _, ingredient in ipairs(ingredients) do
                     local wanted = ingredient.amount
                     local have = current.get_item_count(ingredient.name)
                     if have < wanted then
@@ -481,13 +481,14 @@ local function perform(player)
             end
         end
         for missingName, entity in pairs(missing) do
+          -- Possibly use 'entity' to make it possible to click and show which entity is missing something
             local data = { type = "item", name = missingName }
             markMissing(data, panel.missing_rocket.flow)
             scanMissing(missingName, player, panel.missing_rocket.flow, 1)
         end
     end
 
-    for name, element in ipairs(panel.children) do
+    for _, element in ipairs(panel.children) do
         if element.wanted and element.wanted.elem_value then
             local guiResult = element.result.flow
             guiResult.clear()
@@ -505,7 +506,7 @@ local function onTick()
         end
     end
     if 0 == game.tick % update_interval then
-        for k, player in pairs(game.players) do
+        for _, player in pairs(game.players) do
             perform(player)
         end
     end
@@ -516,7 +517,7 @@ local function addEmptyMissing(player)
         return
     end
     local panel = player.gui.left.what_is_missing.panel
-    for name, element in ipairs(panel.children) do
+    for _, element in ipairs(panel.children) do
         if element.wanted and not element.wanted.elem_value then
             -- There is already some row with an empty element, don't add another one.
             return
