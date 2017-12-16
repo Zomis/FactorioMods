@@ -684,7 +684,6 @@ script.on_event(defines.events.on_entity_died, onRemoveEntity)
 script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
 
-script.on_event(defines.events.on_player_joined_game, onPlayerJoin)
 script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
 script.on_event(defines.events.on_gui_checked_state_changed, onCheckboxClick)
 
