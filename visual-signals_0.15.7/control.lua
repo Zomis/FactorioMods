@@ -77,22 +77,6 @@ local function onInit()
     global.fum_uic = {}
   end
   combinatorsToUI = global.fum_uic
-
-  local toRemove = {}
-  for k, v in pairs(combinatorsToUI) do
-    if v[1] then
-      v.entity = v[1]
-    end
-    if v[2] then
-      v.ui = v[2]
-    end
-    if not v.entity or not v.entity.valid then
-        table.insert(toRemove, k)
-    end
-  end
-  for k, _ in pairs(toRemove) do
-    destroyCombinator(k)
-  end
 end
 
 local function onConfigurationChanged(data)
