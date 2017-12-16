@@ -282,7 +282,7 @@ local function markMissing(data, guiResult)
 end
 
 local function scanMissing(target, player, guiResult, depth)
-    if depth > 20 then
+    if depth > 50 then
         out("[What is missing] POSSIBLE STACK OVERFLOW " .. target)
         -- This happens if there is an infinite loop, such as with bottled stuff.
         -- Empty bottle, gas bottle, empty bottle...
