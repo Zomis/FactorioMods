@@ -3,6 +3,7 @@ data:extend({
     type = "constant-combinator",
     name = "gui-signal-display",
     icon = "__visual-signals__/graphics/icons/constant-combinator.png",
+    icon_size = 32,
     flags = {"placeable-neutral", "player-creation"},
     minable = {hardness = 0.2, mining_time = 0.5, result = "gui-signal-display"},
     max_health = 150,
@@ -181,14 +182,12 @@ data:extend({
   }
 })
 
-
---item
-
 data:extend({
 	{
     type = "item",
     name = "gui-signal-display",
     icon = "__visual-signals__/graphics/icons/constant-combinator.png",
+    icon_size = 32,
     flags = { "goes-to-quickbar" },
     subgroup = "circuit-network",
     place_result="gui-signal-display",

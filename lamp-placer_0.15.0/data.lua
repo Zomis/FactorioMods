@@ -3,6 +3,7 @@ data:extend({
     type = "selection-tool",
     name = "lamp-placer",
     icon = "__lamp-placer__/graphics/lamp-placer.png",
+    icon_size = 32,
     flags = {"goes-to-quickbar"},
     subgroup = "tool",
     order = "c[automated-construction]-b[deconstruction-planner]",
