@@ -524,7 +524,7 @@ local function perform(player)
         for _, ent in pairs(machines[ROCKET_PART]) do
             if ent.type == "rocket-silo" then
                 -- local inv = game.player.selected.get_inventory(defines.inventory.rocket_silo_rocket); -- sattelite
-                local ingredients = ent.recipe.ingredients
+                local ingredients = ent.get_recipe().ingredients
                 local current = ent.get_inventory(defines.inventory.assembling_machine_input)
 
                 for _, ingredient in ipairs(ingredients) do
