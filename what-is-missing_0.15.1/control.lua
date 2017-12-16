@@ -27,6 +27,7 @@ local RESEARCH = "RESEARCH"
 
 local machines = {}
 local machineRecipes = {} -- KEY: position, VALUE: entity + recipe. Check one machine per tick
+local playerDatas = {} -- KEY: Player index, VALUE: research (bool), rocket (bool), wanted (array of string)
 
 local update_interval = 60
 
@@ -45,19 +46,6 @@ local function worldAndPos(entity, key)
   return entity.surface.name .. txtpos(entity.position)
 end
 
-local function onConfigurationChanged(data)
-  -- Migration code to also save world name for saved machines (fix #30) in 0.16
-  local old_version = data.mod_changes["what-is-missing"].old_version
-  if old_version and string.sub(old_version, 1, string.len("0.15")) == "0.15" then
-    local newMachineRecipes = {}
-    for key, savedMachine in pairs(machineRecipes) do
-      local entity = savedMachine.entity
-      newMachineRecipes[worldAndPos(entity, key)] = savedMachine
-    end
-    machineRecipes = newMachineRecipes
-    global.machineRecipes = newMachineRecipes
-  end
-end
 -- player left GUI
 -- Satellite
 -- Low Density, Solar Panel, Accumulator, Radar, Processing Unit, Rocket Fuel
@@ -73,9 +61,10 @@ local function createMissingFlow(parent, id)
     local scroll = flow[name].add({type = "scroll-pane", name = "result",
        vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
     scroll.add({type = "flow", name = "flow", direction = "horizontal"})
+    return flow[name]
 end
 
-local function createGUI(player)
+local function createGUI(player, fromConfig)
     local top = player.gui.top
     if top["missing_perform"] ~= nil then
       top["missing_perform"].destroy()
@@ -91,18 +80,57 @@ local function createGUI(player)
     if not left.what_is_missing.panel["research"] then
         local flow = left.what_is_missing.panel
         local scroll
-        flow.add({type = "checkbox", name = "research", caption = "Current Research", state = false})
+        local configResearch = fromConfig and fromConfig.research
+        local configRocket = fromConfig and fromConfig.rocket
+        flow.add({type = "checkbox", name = "research", caption = "Current Research", state = configResearch})
         scroll = flow.add({type = "scroll-pane", name = "missing_research",
            vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
         scroll.add({type = "flow", name = "flow", direction = "horizontal"})
 
-        flow.add({type = "checkbox", name = "rocket", caption = "Rocket", state = false})
+        flow.add({type = "checkbox", name = "rocket", caption = "Rocket", state = configRocket})
         scroll = flow.add({type = "scroll-pane", name = "missing_rocket",
            vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
         scroll.add({type = "flow", name = "flow", direction = "horizontal"})
 
-        createMissingFlow(flow, 2)
+        if fromConfig then
+          for index, wanted in pairs(fromConfig.wanted) do
+            local guiFlow = createMissingFlow(flow, index)
+            guiFlow.wanted.elem_value = wanted
+          end
+          createMissingFlow(flow, #fromConfig.wanted + 1)
+        else
+          createMissingFlow(flow, 2)
+        end
     end
+end
+
+local function savePlayerSettingsFromGUI()
+  -- 0.16 changed style name to "slot_button"
+  playerDatas = {}
+  for _, player in pairs(game.players) do
+    local pane = player.gui.left["what_is_missing"]
+    if pane and pane.panel then
+      local playerConfig = {
+        research = pane.panel.research.state,
+        rocket = pane.panel.rocket.state,
+        wanted = {}
+      }
+      for _, element_name in ipairs(pane.panel.children_names) do
+        if string.sub(element_name, 1, 7) == "missing" then
+          local missingPanel = pane.panel[element_name]
+          if missingPanel.wanted and missingPanel.wanted.elem_value ~= nil then
+            game.print(missingPanel.wanted.elem_value)
+            table.insert(playerConfig.wanted, missingPanel.wanted.elem_value)
+            -- missingPanel.wanted.style = "slot_button"
+          end
+        end
+      end
+      pane.destroy()
+      createGUI(player, playerConfig)
+      playerDatas[player.index] = playerConfig
+    end
+  end
+  global.playerDatas = playerDatas
 end
 
 local function getOutputsForMachine(entity)
@@ -274,11 +302,13 @@ local function onInit()
     end
     global.machines = machines
     global.machineRecipes = machineRecipes
+    global.playerDatas = playerDatas
 end
 
 local function onLoad()
     machines = global.machines
     machineRecipes = global.machineRecipes
+    playerDatas = global.playerDatas or {}
 end
 
 -- When we place a new entity, we need to add it to our list of machines
@@ -609,6 +639,27 @@ local function onGuiClosed(event)
   end
   -- player_index, gui_type, entity, item, equipment, other_player, element
 end
+
+local function onConfigurationChanged(data)
+  -- Migration code to also save world name for saved machines (fix #30) in 0.16
+  local old_version = data.mod_changes["what-is-missing"].old_version
+  if not old_version then
+    return
+  end
+  if string.sub(old_version, 1, string.len("0.15")) == "0.15" then
+    if not global.playerDatas then
+      savePlayerSettingsFromGUI()
+    end
+    local newMachineRecipes = {}
+    for key, savedMachine in pairs(machineRecipes) do
+      local entity = savedMachine.entity
+      newMachineRecipes[worldAndPos(entity, key)] = savedMachine
+    end
+    machineRecipes = newMachineRecipes
+    global.machineRecipes = newMachineRecipes
+  end
+end
+
 script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
 script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
 script.on_event(defines.events.on_gui_closed, onGuiClosed)
