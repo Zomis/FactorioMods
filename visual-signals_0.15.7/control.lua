@@ -9,8 +9,6 @@ local SignalGui = require "signal_gui"
 local combinatorsToUI = {}
 local update_interval = 30
 
-
---Helper method for my debugging while coding
 local function out(txt)
   local debug = false
   if debug then
@@ -205,7 +203,10 @@ local function onTick()
   end
 end
 
-local function onClickShownCheckbox(event)
+local function onCheckboxClick(event)
+  if not string.find(event.element.name, "gui_signal_display_shown") then
+    return
+  end
   local player = game.players[event.player_index]
   local length = string.len("gui_signal_display_shown")
   local id = string.sub(event.element.name, length + 1)
@@ -222,9 +223,6 @@ local function onClickShownCheckbox(event)
 end
 
 local function onClick(event)
-  if string.find(event.element.name, "gui_signal_display_shown") then
-    onClickShownCheckbox(event)
-  end
   if event.element.name ~= "visual_signals" then
     return
   end
@@ -324,6 +322,7 @@ script.on_event(defines.events.on_robot_pre_mined, onRemoveEntity)
 script.on_event(defines.events.on_entity_died, onRemoveEntity)
 
 script.on_event(defines.events.on_tick, onTick)
+script.on_event(defines.events.on_gui_checked_state_changed, onCheckboxClick)
 script.on_event(defines.events.on_gui_click, onClick)
 
 script.on_event(defines.events.on_player_changed_force, onPlayerChangedForce)
