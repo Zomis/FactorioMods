@@ -86,13 +86,13 @@ end
 
 function getOutputsForMachine(entity)
     if entity.type == "assembling-machine" then
-        local recipe = entity.recipe
+        local recipe = entity.get_recipe()
         if recipe then
             return recipe.products
         end
     end
     if entity.type == "furnace" then
-        local recipe = entity.recipe
+        local recipe = entity.get_recipe()
         if recipe then
             return recipe.products
         elseif entity.previous_recipe then
@@ -121,8 +121,8 @@ local function addMachine(entity)
             table.insert(machines[product.name], entity)
         end
 
-        local machineRecipe = entity.recipe
-        if entity.type == "furnace" and entity.recipe == nil then
+        local machineRecipe = entity.get_recipe()
+        if entity.type == "furnace" and machineRecipe == nil then
             machineRecipe = entity.previous_recipe
         end
         -- out("Add machineRecipes " .. pos .. " with recipe " .. (machineRecipe and machineRecipe.name or "nil"))
@@ -188,8 +188,8 @@ local function checkMachine(entity)
             addMachine(entity)
         else
             local intable = machineRecipes[pos].recipe
-            local inentity = entity.recipe
-            if entity.type == "furnace" and entity.recipe == nil then
+            local inentity = entity.get_recipe()
+            if entity.type == "furnace" and inentity == nil then
                 inentity = entity.previous_recipe
             end
             -- out("Already exists, comparing " .. tostring(inentity) .. " with stored " .. tostring(intable))
@@ -295,7 +295,7 @@ local function scanMissing(target, player, guiResult, depth)
     for j, entity in pairs(machineList) do
         if entity.valid and entity.type == "assembling-machine" then
             local awaitingOutput = entity.get_inventory(defines.inventory.assembling_machine_output)
-            local recipe = entity.recipe
+            local recipe = entity.get_recipe()
             local available = true
             if not awaitingOutput.is_empty() then
                 -- entity not empty, probably waiting for something to be output.
@@ -338,7 +338,7 @@ local function scanMissing(target, player, guiResult, depth)
         end
         if entity.valid and entity.type == "furnace" then
             local awaitingOutput = entity.get_inventory(defines.inventory.furnace_result)
-            local recipe = entity.recipe or entity.previous_recipe
+            local recipe = entity.get_recipe() or entity.previous_recipe
             local available = true
             if not awaitingOutput.is_empty() then
                 -- entity not empty, probably waiting for something to be output.
