@@ -32,7 +32,7 @@ local playerDatas = {} -- KEY: Player index, VALUE: research (bool), rocket (boo
 local update_interval = 60
 
 local function out(txt)
-  local debug = true
+  local debug = false
   if debug then
     game.print(txt)
   end
@@ -128,7 +128,7 @@ local function savePlayerSettingsFromGUI()
         if string.sub(element_name, 1, 7) == "missing" then
           local missingPanel = pane.panel[element_name]
           if missingPanel.wanted and missingPanel.wanted.elem_value ~= nil then
-            game.print(missingPanel.wanted.elem_value)
+            out(missingPanel.wanted.elem_value)
             table.insert(playerConfig.wanted, missingPanel.wanted.elem_value)
             -- missingPanel.wanted.style = "slot_button"
           end
@@ -590,6 +590,7 @@ end
 local function removeTableValue(theTable, value)
   for index, currValue in ipairs(theTable) do
     if currValue == value then
+      out("Delete " .. currValue .. " at index " .. index)
       table.remove(theTable, index)
       return
     end
