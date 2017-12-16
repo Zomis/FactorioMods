@@ -317,7 +317,9 @@ end
 local function onLoad()
     machines = global.machines
     machineRecipes = global.machineRecipes
-    playerDatas = global.playerDatas or {}
+    if global.playerDatas then
+      playerDatas = global.playerDatas
+    end
 end
 
 -- When we place a new entity, we need to add it to our list of machines
@@ -672,7 +674,6 @@ local function onCheckboxClick(event)
 end
 
 script.on_init(onInit)
-script.on_configuration_changed(onInit)
 script.on_load(onLoad)
 
 script.on_event(defines.events.on_built_entity, onPlaceEntity)
@@ -708,6 +709,10 @@ local function onGuiClosed(event)
 end
 
 local function onConfigurationChanged(data)
+  if not global.playerDatas then
+    global.playerDatas = playerDatas
+  end
+
   -- Migration code to also save world name for saved machines (fix #30) in 0.16
   local old_version = data.mod_changes["what-is-missing"] and data.mod_changes["what-is-missing"].old_version
   if not old_version then
