@@ -326,10 +326,26 @@ local function onTextChange(event)
   end
 end
 
+local function onGuiOpened(event)
+  local player = game.players[event.player_index]
+  if event.gui_type ~= defines.gui_type.entity then
+    return
+  end
+  local entity = event.entity
+  if entity.name == "gui-signal-display" then
+    for _, uicomb in pairs(combinatorsToUI) do
+      if uicomb.entity and uicomb.entity.valid and uicomb.entity == entity then
+        player.print("You opened GUI Signal Display with name " .. uicomb.title)
+      end
+    end
+  end
+end
+
 script.on_init(onInit)
 script.on_configuration_changed(onConfigurationChanged)
 script.on_load(onLoad)
 
+script.on_event(defines.events.on_gui_opened, onGuiOpened)
 script.on_event(defines.events.on_built_entity, onPlaceEntity)
 script.on_event(defines.events.on_robot_built_entity, onPlaceEntity)
 
