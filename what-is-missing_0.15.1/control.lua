@@ -587,6 +587,15 @@ local function addEmptyMissing(player)
     createMissingFlow(player.gui.left.what_is_missing.panel, i)
 end
 
+local function removeTableValue(theTable, value)
+  for index, currValue in ipairs(theTable) do
+    if currValue == value then
+      table.remove(theTable, index)
+      return
+    end
+  end
+end
+
 local function onClick(event)
     local player = game.players[event.player_index]
     if event.element.name == "what_is_missing" then
@@ -599,6 +608,8 @@ local function onClick(event)
     end
     if string.find(event.element.name, "what_is_missing_delete") then
         local missingPanel = event.element.parent
+        local playerConfig = playerDatas[event.player_index]
+        removeTableValue(playerConfig.wanted, missingPanel.wanted.elem_value)
         missingPanel.destroy()
         addEmptyMissing(player)
         return
