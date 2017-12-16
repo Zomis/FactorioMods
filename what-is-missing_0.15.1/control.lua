@@ -84,7 +84,7 @@ local function createGUI(player)
     end
 end
 
-function getOutputsForMachine(entity)
+local function getOutputsForMachine(entity)
     if entity.type == "assembling-machine" then
         local recipe = entity.get_recipe()
         if recipe then
@@ -115,7 +115,7 @@ local function addMachine(entity)
         if outputs == nil then
             return
         end
-        for i, product in ipairs(outputs) do
+        for _, product in ipairs(outputs) do
             -- TODO: consider product.type ?
             machines[product.name] = machines[product.name] or {}
             table.insert(machines[product.name], entity)
@@ -170,7 +170,7 @@ local function removeMachine(entity, outputs)
     local pos = txtpos(entity.position)
     -- out("Remove " .. pos)
     machineRecipes[pos] = nil
-    for i, product in ipairs(outputs) do
+    for _, product in ipairs(outputs) do
         -- out("Removing from list for " .. product.name)
         local list = machines[product.name] or {}
         removeValueFromList(list, entity)
@@ -221,7 +221,8 @@ local function checkMachine(entity, debug)
                 current = current.name
             end
             if entity.type == "assembling-machine" then
-              out("[What is missing] Detected recipe change at " .. pos .. " from " .. tostring(previous) .. " to " .. tostring(current))
+              out("[What is missing] Detected recipe change at " .. pos ..
+                " from " .. tostring(previous) .. " to " .. tostring(current))
             end
         end
     end
@@ -229,14 +230,14 @@ end
 
 -- Add all assembling machines and furnaces in the game to our machines table
 local function onInit()
-    for forceIndex, f in pairs(game.forces) do
-        for surfaceIndex, surface in pairs(game.surfaces) do
-            for key, ent in pairs(surface.find_entities_filtered({ force = f, type = "assembling-machine"})) do
+    for _, f in pairs(game.forces) do
+        for _, surface in pairs(game.surfaces) do
+            for _, ent in pairs(surface.find_entities_filtered({ force = f, type = "assembling-machine"})) do
                 if ent.type == "assembling-machine" then
                     addMachine(ent)
                 end
             end
-            for key, ent in pairs(surface.find_entities_filtered({ force = f, type = "furnace"})) do
+            for _, ent in pairs(surface.find_entities_filtered({ force = f, type = "furnace"})) do
                 if ent.type == "furnace" then
                     addMachine(ent)
                 end
@@ -278,7 +279,6 @@ local function onRemoveEntity(event)
 end
 
 local function markMissing(data, guiResult)
-    local id = #guiResult.children
     local spriteName = data.type .. "/" .. data.name
     local prototype
     if data.type == "fluid" then
@@ -594,4 +594,3 @@ end
 script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
 script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
 script.on_event(defines.events.on_gui_closed, onGuiClosed)
-
