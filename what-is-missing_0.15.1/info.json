@@ -1,11 +1,11 @@
 {
-    "name": "what-is-missing",
-    "version": "0.15.1",
-    "title": "What is missing",
-    "author": "Zomis",
-    "contact": "zomis2k@hotmail.com",
-    "homepage": "https://github.com/Zomis/FactorioMods",
-    "factorio_version": "0.15",
-    "dependencies": ["base >= 0.15"],
-    "description": "Choose what you want to produce and this will tell you the main cause why you are not making more of it."
+  "name": "what-is-missing",
+  "version": "0.15.1",
+  "title": "What is missing",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.16",
+  "dependencies": ["base >= 0.16"],
+  "description": "Choose what you want to produce and this will tell you the main cause why you are not making more of it."
 }

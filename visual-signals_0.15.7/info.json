@@ -1,11 +1,11 @@
 {
-    "name": "visual-signals",
-    "version": "0.15.7",
-    "title": "Visual Signals",
-    "author": "Zomis",
-    "contact": "zomis2k@hotmail.com",
-    "homepage": "https://github.com/Zomis/FactorioMods",
-    "factorio_version": "0.15",
-    "dependencies": ["base >= 0.15"],
-    "description": "Allows you to keep track of chosen circuit networks on the left hand side in your GUI. Originally a fork of CircuitsUI by Fumelgo."
+  "name": "visual-signals",
+  "version": "0.15.7",
+  "title": "Visual Signals",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.16",
+  "dependencies": ["base >= 0.16"],
+  "description": "Allows you to keep track of chosen circuit networks on the left hand side in your GUI. Originally a fork of CircuitsUI by Fumelgo."
 }
