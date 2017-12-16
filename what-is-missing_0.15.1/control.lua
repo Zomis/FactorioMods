@@ -89,8 +89,8 @@ local function createGUI(player, fromConfig)
     if not left.what_is_missing.panel["research"] then
         local flow = left.what_is_missing.panel
         local scroll
-        local configResearch = fromConfig and fromConfig.research
-        local configRocket = fromConfig and fromConfig.rocket
+        local configResearch = fromConfig and fromConfig.research or false
+        local configRocket = fromConfig and fromConfig.rocket or false
         flow.add({type = "checkbox", name = "research", caption = "Current Research", state = configResearch})
         scroll = flow.add({type = "scroll-pane", name = "missing_research",
            vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
