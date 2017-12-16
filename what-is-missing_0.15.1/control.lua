@@ -597,7 +597,14 @@ local function removeTableValue(theTable, value)
   end
 end
 
+local function addPlayerDataIfEmpty(player_index)
+  if not playerDatas[player_index] then
+    playerDatas[player_index] = { research = false, rocket = false, wanted = {} }
+  end
+end
+
 local function onClick(event)
+  addPlayerDataIfEmpty(event.player_index)
     local player = game.players[event.player_index]
     if event.element.name == "what_is_missing" then
       if player.gui.left["what_is_missing"] then
@@ -622,6 +629,7 @@ local function onClick(event)
 end
 
 local function onChosenElementChanged(event)
+  addPlayerDataIfEmpty(event.player_index)
     local player = game.players[event.player_index]
     local parent = event.element.parent -- flow
     if not parent then
@@ -647,6 +655,7 @@ local function onChosenElementChanged(event)
 end
 
 local function onCheckboxClick(event)
+  addPlayerDataIfEmpty(event.player_index)
   local player = game.players[event.player_index]
   local wim = player.gui.left["what_is_missing"]
   if not wim then
@@ -675,6 +684,7 @@ script.on_event(defines.events.on_entity_died, onRemoveEntity)
 script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
 
+script.on_event(defines.events.on_player_joined_game, onPlayerJoin)
 script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
 script.on_event(defines.events.on_gui_checked_state_changed, onCheckboxClick)
 
