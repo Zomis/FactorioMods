@@ -37,6 +37,27 @@ local function out(txt)
   end
 end
 
+local function txtpos(pos)
+  return "{" .. pos["x"] .. ", " .. pos["y"] .."}"
+end
+
+local function worldAndPos(entity, key)
+  return entity.surface.name .. txtpos(entity.position)
+end
+
+local function onConfigurationChanged(data)
+  -- Migration code to also save world name for saved machines (fix #30) in 0.16
+  local old_version = data.mod_changes["what-is-missing"].old_version
+  if old_version and string.sub(old_version, 1, string.len("0.15")) == "0.15" then
+    local newMachineRecipes = {}
+    for key, savedMachine in pairs(machineRecipes) do
+      local entity = savedMachine.entity
+      newMachineRecipes[worldAndPos(entity, key)] = savedMachine
+    end
+    machineRecipes = newMachineRecipes
+    global.machineRecipes = newMachineRecipes
+  end
+end
 -- player left GUI
 -- Satellite
 -- Low Density, Solar Panel, Accumulator, Radar, Processing Unit, Rocket Fuel
@@ -102,13 +123,9 @@ local function getOutputsForMachine(entity)
     return nil
 end
 
-local function txtpos(pos)
-  return "{" .. pos["x"] .. ", " .. pos["y"] .."}"
-end
-
 local function addMachine(entity)
     if entity.type == "assembling-machine" or entity.type == "furnace" then
-        local pos = txtpos(entity.position)
+        local pos = worldAndPos(entity)
         -- out("Add " .. pos)
         -- checkMachine(entity)
         local outputs = getOutputsForMachine(entity)
@@ -167,7 +184,7 @@ local function removeMachine(entity, outputs)
             return
         end
     end
-    local pos = txtpos(entity.position)
+    local pos = worldAndPos(entity)
     -- out("Remove " .. pos)
     machineRecipes[pos] = nil
     for _, product in ipairs(outputs) do
@@ -182,7 +199,7 @@ local function checkMachine(entity, debug)
         return
     end
     if entity.type == "assembling-machine" or entity.type == "furnace" then
-        local pos = txtpos(entity.position)
+        local pos = worldAndPos(entity)
         if debug then
           out("Checking " .. entity.type .. " at " .. pos)
         end
@@ -595,3 +612,4 @@ end
 script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
 script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
 script.on_event(defines.events.on_gui_closed, onGuiClosed)
+script.on_configuration_changed(onConfigurationChanged)
