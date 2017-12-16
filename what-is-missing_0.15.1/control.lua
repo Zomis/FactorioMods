@@ -559,3 +559,26 @@ script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_click, onClick)
 
 script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
+
+local function onSelectedEntityChanged(event)
+  -- event.last_entity, event.player_index
+  if event.last_entity then
+    checkMachine(event.last_entity)
+  end
+end
+
+local function onPasteSettings(event)
+  checkMachine(event.destination)
+  -- event.player_index, source, destination
+end
+
+local function onGuiClosed(event)
+  if event.gui_type == defines.gui_type.entity then
+    checkMachine(event.entity)
+  end
+  -- player_index, gui_type, entity, item, equipment, other_player, element
+end
+script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
+script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
+script.on_event(defines.events.on_gui_closed, onGuiClosed)
+
