@@ -234,7 +234,7 @@ local function onClick(event)
   else
     local frameRoot = player.gui.center.add({type = "frame", name = "gui_signal_displayUI"})
     local frame = frameRoot.add({type = "scroll-pane", name = "gui_signal_scroll", style = "gui_signal_display_list"})
-    local tableui = frame.add({type = "table", name = "table", colspan = 3})
+    local tableui = frame.add({type = "table", name = "table", column_count = 3})
     local guiRoot = player.gui.left["gui_signal_display"]["gui_signal_panel"]
     for k, v in pairs(combinatorsToUI) do
       if v.entity.force.name == player.force.name then
