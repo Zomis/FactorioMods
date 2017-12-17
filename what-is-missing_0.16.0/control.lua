@@ -259,7 +259,7 @@ local function checkMachine(entity, debug)
             local previous = machineRecipes[pos].recipe
             local current = inentity
             machineRecipes[pos] = { entity = entity, recipe = inentity }
-            if previous then
+            if previous and previous.valid then
                 if debug then
                   out("Remove machine " .. previous.name)
                 end
