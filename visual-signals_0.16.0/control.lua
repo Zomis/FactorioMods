@@ -94,7 +94,6 @@ local function onConfigurationChanged(data)
         if panel.signals then
           for _, el in ipairs(panel.signals.children_names) do
             local signalElement = panel.signals[el].icon
-            game.print(signalElement.name .. " of type " .. signalElement.type)
             if signalElement.type == "sprite-button" then
               signalElement.style = "slot_button"
             end
