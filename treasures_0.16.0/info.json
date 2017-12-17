@@ -1,0 +1,11 @@
+{
+  "name": "treasures",
+  "version": "0.16.0",
+  "title": "Treasures",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.16",
+  "dependencies": ["base >= 0.16"],
+  "description": "Encourage exploration even more by placing random chests of treasures on the map"
+}
