@@ -710,7 +710,7 @@ end
 
 local function onConfigurationChanged(data)
   if not global.playerDatas then
-    global.playerDatas = playerDatas
+    savePlayerSettingsFromGUI()
   end
 
   -- Migration code to also save world name for saved machines (fix #30) in 0.16
@@ -719,13 +719,15 @@ local function onConfigurationChanged(data)
     return
   end
   if string.sub(old_version, 1, string.len("0.15")) == "0.15" then
-    if not global.playerDatas then
-      savePlayerSettingsFromGUI()
-    end
     local newMachineRecipes = {}
     for key, savedMachine in pairs(machineRecipes) do
       local entity = savedMachine.entity
-      newMachineRecipes[worldAndPos(entity, key)] = savedMachine
+      if entity.valid then
+        -- game.print("migrate " .. key .. " to " .. worldAndPos(entity, key))
+        newMachineRecipes[worldAndPos(entity, key)] = savedMachine
+      else
+        game.print("[What is missing] Removing invalid entity in table " .. key)
+      end
     end
     machineRecipes = newMachineRecipes
     global.machineRecipes = newMachineRecipes
