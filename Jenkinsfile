@@ -125,6 +125,8 @@ node {
         duga.dugaResult("Starting release of $mod version $params.releaseVersion")
         def oldDir = mod + '_' + oldVersion
         def newDir = mod + '_' + params.releaseVersion
+
+        sh 'git remote set-url origin git@github.com:Zomis/FactorioMods.git'
         sh 'git checkout ' + env.BRANCH_NAME
         sh 'git reset --hard HEAD'
         sh 'mv ' + oldDir + ' ' + newDir
