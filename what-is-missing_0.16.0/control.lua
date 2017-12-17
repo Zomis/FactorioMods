@@ -108,7 +108,7 @@ local function createGUI(player, fromConfig)
           end
           createMissingFlow(flow, #fromConfig.wanted + 1)
         else
-          createMissingFlow(flow, 2)
+          createMissingFlow(flow, 1)
         end
     end
 end
@@ -128,7 +128,6 @@ local function savePlayerSettingsFromGUI()
         if string.sub(element_name, 1, 7) == "missing" then
           local missingPanel = pane.panel[element_name]
           if missingPanel.wanted and missingPanel.wanted.elem_value ~= nil then
-            out(missingPanel.wanted.elem_value)
             table.insert(playerConfig.wanted, missingPanel.wanted.elem_value)
             -- missingPanel.wanted.style = "slot_button"
           end
@@ -583,7 +582,7 @@ local function addEmptyMissing(player)
         end
     end
 
-    local i = 0
+    local i = 1
     while panel["missing" .. i] do
         i = i + 1
     end
