@@ -1,10 +1,8 @@
 -- Use item tags. When removing an item, save its tags, when placing item use tags if any exist. Use the config string as the tag
 -- /c local t = game.player.selected.get_control_behavior().parameters.parameters[1].signal; for i, v in pairs(t) do game.print(i .. " = " .. v) end
 
-local logic = require "logic"
 local gui = require "gui"
 local model = require "model"
-local perform = model.perform
 local advanced_combinators = {}
 local runtime_combinators = {}
 
@@ -19,7 +17,7 @@ local function txtpos(pos)
   return "{" .. pos["x"] .. ", " .. pos["y"] .."}"
 end
 
-local function worldAndPos(entity, key)
+local function worldAndPos(entity)
   return entity.surface.name .. txtpos(entity.position)
 end
 
@@ -48,8 +46,10 @@ local function onPlaceEntity(event)
     advanced_combinators[worldAndPos(entity)] = {
       entity = event.created_entity,
       updatePeriod = 1,
-      config = "1:virtual/signal-A = mod(add(previous(1),const(1)),const(60))\n2:virtual/signal-B = current(1)\n3:virtual/signal-C = add(green(this,item/iron-plate),red(this,item/copper-plate))"
-      -- config = "iron-plate = sum(const(20), green(this, copper-plate))"
+      config =
+        "1:virtual/signal-A = mod(add(previous(1),const(1)),const(60))\n" ..
+        "2:virtual/signal-B = current(1)\n" ..
+        "3:virtual/signal-C = add(green(this,item/iron-plate),red(this,item/copper-plate))"
     }
     updateConfiguration(entity)
   end
@@ -68,7 +68,7 @@ local function onTick()
   end
 end
 
-function onGuiOpened(event)
+local function onGuiOpened(event)
   local player = game.players[event.player_index]
   if event.gui_type ~= defines.gui_type.entity then
     return
