@@ -4,8 +4,9 @@
 -- result_value = func(func(a), func(20))
 
 -- Basic Mathematics
-virtual/signal-a = green(this,item/iron-plate)
-virtual/signal-a = sum(array(green(this, iron-plate), green(this, copper-plate)))
+virtual/signal-A = green(this,item/iron-plate)
+virtual/signal-B = add(green(this,iron-plate),green(this,copper-plate))
+virtual/signal-B = add(green(this,iron-plate),red(this,copper-plate))
 
 iron_plate = sum(green)
 copper_plate = avg(green.iron_plate, green.copper_plate)

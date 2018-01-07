@@ -27,9 +27,27 @@ local function parseCalculation(text, advanced_combinator, entity)
     end
 
     local params = {}
+    local unfinished_params = ""
     for param in string.gmatch(parameters, "[^,]+") do
-      game.print("Found param: " .. param)
-      table.insert(params, param)
+      -- Count number of parenthesis to make nested functions work. A workaround because I am lazy and don't implement a real parser
+      -- A trick to count number of occourences, see https://stackoverflow.com/a/11158158/1310566
+      local actual_param = unfinished_params .. param
+      local _, start_params = string.gsub(actual_param, "%(", "")
+      local _, end_params = string.gsub(actual_param, "%)", "")
+
+      if start_params == end_params then
+        if start_params > 0 then
+          -- We need to parse next level as well
+          local param_function = parseCalculation(actual_param, advanced_combinator, entity)
+          table.insert(params, param_function)
+        else
+          table.insert(params, actual_param)
+        end
+        game.print("Found param: " .. actual_param)
+        unfinished_params = ""
+      else
+        unfinished_params = unfinished_params .. param .. ","
+      end
     end
     return fnc.parse(params, entity)
   end
@@ -52,14 +70,18 @@ local function parse(advanced_combinator, entity)
 
     local result_value = string.sub(command, equalsIndex + 3)
     local result_function = parseCalculation(result_value, advanced_combinator, entity)
-    local result_index = command_index
-    local command_function = function(ent, result)
-      local count = result_function(ent)
-      table.insert(result, {signal = signal, count = count, index = result_index })
+    if type(result_function) == "function" then
+      local result_index = command_index
+      local command_function = function(ent, result)
+        local count = result_function(ent)
+        table.insert(result, {signal = signal, count = count, index = result_index })
+      end
+      table.insert(commands, command_function)
+      command_index = command_index + 1
+      game.print("Parsed: " .. result_signal .. " = " .. result_value)
+    else -- type should be table
+      game.print("Error: " .. result_function.error .. " when parsing command " .. command)
     end
-    table.insert(commands, command_function)
-    command_index = command_index + 1
-    game.print("Parsed: " .. result_signal .. " = " .. result_value)
   end
 
   return function(entity)

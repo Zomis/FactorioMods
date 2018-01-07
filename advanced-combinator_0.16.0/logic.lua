@@ -13,7 +13,17 @@ local function resolve_entity(entity, target)
 end
 
 local logic = {
-
+  add = {
+    parameters = { "number", "number" },
+    result = "number",
+    parse = function(params)
+      local param1 = params[1]
+      local param2 = params[2]
+      return function(context)
+        return param1(context) + param2(context)
+      end
+    end
+  },
   sum = {
     parameters = { "array" },
     result = "number",

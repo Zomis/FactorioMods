@@ -48,7 +48,7 @@ local function onPlaceEntity(event)
     advanced_combinators[worldAndPos(entity)] = {
       entity = event.created_entity,
       updatePeriod = 1,
-      config = "item/iron-plate = const(20)\nvirtual/signal-A = green(this,item/iron-plate)"
+      config = "item/iron-plate = const(20)\nvirtual/signal-A = green(this,item/iron-plate)\nvirtual/signal-B = add(const(20),green(this,item/copper-plate))"
       -- config = "iron-plate = sum(const(20), green(this, copper-plate))"
     }
     updateConfiguration(entity)
