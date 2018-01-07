@@ -1,8 +1,12 @@
--- TODO: Also specify index ? Or generate that dynamically? Allow multiple indexes to specify same signal which then gets summed by Factorio?
+-- Also specify index ? generate dynamically for now. Allow multiple indexes to specify same signal which then gets summed by Factorio?
+-- To be able to use "local state variables" it is needed to be able to specify index
 
 -- result_value = func(func(a), func(20))
 
 -- Basic Mathematics
+virtual/signal-a = green(this,item/iron-plate)
+virtual/signal-a = sum(array(green(this, iron-plate), green(this, copper-plate)))
+
 iron_plate = sum(green)
 copper_plate = avg(green.iron_plate, green.copper_plate)
 signal_a = avg(red)
@@ -16,9 +20,16 @@ stone = mod(add(stone, 1), 10)
 
 -- Get data from nearby entities or the game
 signal_b = entityData(top, rocket_parts)
-signal_a = sum(circuit_network_green(this))
-signal_a = sum(circuit_network_red(top))
+signal_a = sum(network(this, red))
+signal_a = sum(network(top, green))
 signal_h = gameData(tick)
+
+-- Current game time in ticks, hours, minutes, seconds
+1:virtual/signal-t = gameData(tick)
+2:virtual/signal-s = div(this(1), 60)
+3:virtual/signal-h = div(this(2), 3600)
+4:virtual/signal-m = mod(div(this(2), 60), 60)
+2:virtual/signal-s = mod(this(2), 60)
 
 -- Also use types
 typeof(max(top.green)) = const(1)
@@ -31,6 +42,7 @@ if(red.coal < 20) copper_plate = 0
 
 -- Filtering
 signal_b = filter(red, array(iron_plate, copper_plate, signal_a))
+signal_c = filter(red, predicate("==", 20)) -- filter all values that fulfill a criteria
 
 if tick time % 5322 == 0 then signal_l = 0
 

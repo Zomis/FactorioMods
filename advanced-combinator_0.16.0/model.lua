@@ -21,7 +21,7 @@ local function parseCalculation(text, advanced_combinator, entity)
     local parameters = string.sub(text, find + 1, string.len(text) - 1)
     game.print("parsing " .. function_name .. " with parameters " .. parameters)
 
-    local fnc = logic[function_name]
+    local fnc = logic.logic[function_name]
     if not fnc then
       return { error = "No such function name: " .. function_name }
     end
@@ -31,7 +31,7 @@ local function parseCalculation(text, advanced_combinator, entity)
       game.print("Found param: " .. param)
       table.insert(params, param)
     end
-    return fnc.parse(params)
+    return fnc.parse(params, entity)
   end
 end
 
@@ -48,11 +48,7 @@ local function parse(advanced_combinator, entity)
       return
     end
     local result_signal = string.sub(command, 1, equalsIndex - 1)
-    local split = string.find(result_signal, "/")
-
-    local signal_type = string.sub(result_signal, 1, split - 1)
-    local signal_name = string.sub(result_signal, split + 1)
-    local signal = { type = signal_type, name = signal_name }
+    local signal = logic.resolve_signalID(result_signal)
 
     local result_value = string.sub(command, equalsIndex + 3)
     local result_function = parseCalculation(result_value, advanced_combinator, entity)
