@@ -99,6 +99,29 @@ local logic = {
       return function() return value end
     end
   },
+  current = {
+    parameters = { "string" },
+    result = "number",
+    parse = function(params)
+      local index = tonumber(params[1])
+      return function(entity, current)
+        if not current[index] then
+          return 0
+        end
+        return current[index].count
+      end
+    end
+  },
+  previous = {
+    parameters = { "string" },
+    result = "number",
+    parse = function(params)
+      local index = tonumber(params[1])
+      return function(entity, current)
+        return entity.get_control_behavior().get_signal(index).count
+      end
+    end
+  },
   array = {
     parameters = { "number" },
     varargs = true,
