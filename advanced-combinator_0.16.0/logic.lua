@@ -39,8 +39,19 @@ local logic = {
     parse = function(params)
       local param1 = params[1]
       local param2 = params[2]
-      return function(context)
-        return param1(context) + param2(context)
+      return function(entity, current)
+        return param1(entity, current) + param2(entity, current)
+      end
+    end
+  },
+  mod = {
+    parameters = { "number", "number" },
+    result = "number",
+    parse = function(params)
+      local param1 = params[1]
+      local param2 = params[2]
+      return function(entity, current)
+        return param1(entity, current) % param2(entity, current)
       end
     end
   },
