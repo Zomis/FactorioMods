@@ -55,7 +55,6 @@ end
 
 local function parse(advanced_combinator, entity)
   local commands = {}
-  local command_index = 1
   for command in string.gmatch(advanced_combinator.config, "[^\n]+") do
     -- table.insert(commands, command)
     -- a = const(20)
@@ -65,6 +64,11 @@ local function parse(advanced_combinator, entity)
       game.print("Parse error in " .. command)
       return
     end
+    local colon = string.find(command, ":")
+    local target_index = tonumber(string.sub(command, 1, colon - 1))
+    command = string.sub(command, colon + 1)
+    equalsIndex = string.find(command, " = ")
+
     local result_signal = string.sub(command, 1, equalsIndex - 1)
     local signal = logic.resolve_signalID(result_signal)
 
@@ -73,11 +77,10 @@ local function parse(advanced_combinator, entity)
     if type(result_function) == "function" then
       local result_index = command_index
       local command_function = function(ent, result)
-        local count = result_function(ent)
-        table.insert(result, {signal = signal, count = count, index = result_index })
+        local count = result_function(ent, result)
+        result[target_index] = { signal = signal, count = count, index = target_index }
       end
       table.insert(commands, command_function)
-      command_index = command_index + 1
       game.print("Parsed: " .. result_signal .. " = " .. result_value)
     else -- type should be table
       game.print("Error: " .. result_function.error .. " when parsing command " .. command)

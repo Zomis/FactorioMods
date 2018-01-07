@@ -1,20 +1,16 @@
--- Also specify index ? generate dynamically for now. Allow multiple indexes to specify same signal which then gets summed by Factorio?
--- To be able to use "local state variables" it is needed to be able to specify index
-
--- result_value = func(func(a), func(20))
+-- 1:result_value = func(func(a), func(20))
 
 -- Basic Mathematics
 virtual/signal-A = green(this,item/iron-plate)
 virtual/signal-B = add(green(this,iron-plate),green(this,copper-plate))
 virtual/signal-B = add(green(this,iron-plate),red(this,copper-plate))
 
-iron_plate = sum(green)
-copper_plate = avg(green.iron_plate, green.copper_plate)
-signal_a = avg(red)
-cooper_plate = add(red.copper_plate, red.iron_plate)
-signal_b = div(top.copper_plate, bottom.oil)
-signal_a = avg(top.green)
-signal_a = count(top)
+iron_plate = sum(network(this,green))
+copper_plate = avg(array(green(this,item/iron_plate),green(this,item/copper_plate)))
+signal_a = avg(network(this,red))
+signal_b = div(green(top,item/copper_plate),red(bottom,fluid/oil))
+signal_a = avg(network(top,green))
+signal_a = count(network(top,green))
 
 -- More complicated Mathematics
 stone = mod(add(stone, 1), 10)
@@ -26,11 +22,13 @@ signal_a = sum(network(top, green))
 signal_h = gameData(tick)
 
 -- Current game time in ticks, hours, minutes, seconds
+1:virtual/signal-c = add(previous(1),const(1))
+
 1:virtual/signal-t = gameData(tick)
-2:virtual/signal-s = div(this(1), 60)
-3:virtual/signal-h = div(this(2), 3600)
-4:virtual/signal-m = mod(div(this(2), 60), 60)
-2:virtual/signal-s = mod(this(2), 60)
+2:virtual/signal-s = div(current(1), 60)
+3:virtual/signal-h = div(current(2), 3600)
+4:virtual/signal-m = mod(div(current(2), 60), 60)
+2:virtual/signal-s = mod(current(2), 60)
 
 -- Also use types
 typeof(max(top.green)) = const(1)
