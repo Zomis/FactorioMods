@@ -12,6 +12,26 @@ local function resolve_entity(entity, target)
   return { error = "Unable to resolve: " .. target }
 end
 
+local function item_from_network(wire_type)
+  return function(params, entity)
+   local target = params[1]
+   local signal_id = resolve_signalID(params[2])
+   local resolved = resolve_entity(entity, target)
+
+   return function()
+     if not resolved.valid then
+       -- invalidate this, it needs to be reparsed, or removed if there is no such entity at all
+       return { error = "Invalid target entity" }
+     end
+     local network = resolved.get_circuit_network(wire_type)
+     if not network then
+       return 0
+     end
+     return network.get_signal(signal_id)
+   end
+ end
+end
+
 local logic = {
   add = {
     parameters = { "number", "number" },
@@ -53,23 +73,12 @@ local logic = {
   green = {
     parameters = { "entity", "signal-id" },
     result = "number",
-    parse = function(params, entity)
-      local target = params[1]
-      local signal_id = resolve_signalID(params[2])
-      local resolved = resolve_entity(entity, target)
-
-      return function()
-        if not resolved.valid then
-          -- invalidate this, it needs to be reparsed, or removed if there is no such entity at all
-          return { error = "Invalid target entity" }
-        end
-        local network = resolved.get_circuit_network(defines.wire_type.green)
-        if not network then
-          return 0
-        end
-        return network.get_signal(signal_id)
-      end
-    end
+    parse = item_from_network(defines.wire_type.green)
+  },
+  red = {
+    parameters = { "entity", "signal-id" },
+    result = "number",
+    parse = item_from_network(defines.wire_type.red)
   },
   const = {
     parameters = { "string" },
