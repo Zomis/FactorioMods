@@ -1,18 +1,26 @@
+
+
 local logic = {
 
   sum = {
-    type = "function",
-    parameters = "array",
+    parameters = { "array" },
     result = "number",
-    func = function()
+    parse = function()
+    end
+  },
+  const = {
+    parameters = { "string" },
+    result = "number",
+    parse = function(params)
+      local value = tonumber(params[1])
+      return function() return value end
     end
   },
   array = {
-    type = "function",
-    parameters = "number",
+    parameters = { "number" },
     varargs = true,
     result = "array",
-    func = function()
+    parse = function()
     end
   }
 

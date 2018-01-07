@@ -39,7 +39,7 @@ local function updateConfiguration(entity)
     game.print("Can't update configuration of a non-advanced-combinator")
     return
   end
-  runtime_combinators[worldAndPos(entity)] = model.parse(advanced_combinators[worldAndPos(entity)])
+  runtime_combinators[worldAndPos(entity)] = model.parse(advanced_combinators[worldAndPos(entity)], entity)
 end
 
 local function onPlaceEntity(event)
@@ -48,7 +48,7 @@ local function onPlaceEntity(event)
     advanced_combinators[worldAndPos(entity)] = {
       entity = event.created_entity,
       updatePeriod = 1,
-      config = "iron-plate = const(20)\ncopper-plate = const(10)"
+      config = "item/iron-plate = const(20)\nitem/copper-plate = const(10)"
       -- config = "iron-plate = sum(const(20), green(this, copper-plate))"
     }
     updateConfiguration(entity)
