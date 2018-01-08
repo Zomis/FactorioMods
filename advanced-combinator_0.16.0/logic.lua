@@ -45,6 +45,42 @@ local logic = {
       end
     end
   },
+  sub = {
+    description = "Subtract second value from first value",
+    parameters = { "number", "number" },
+    result = "number",
+    parse = function(params)
+      local param1 = params[1]
+      local param2 = params[2]
+      return function(entity, current)
+        return param1(entity, current) - param2(entity, current)
+      end
+    end
+  },
+  mult = {
+    description = "Multiply two numbers",
+    parameters = { "number", "number" },
+    result = "number",
+    parse = function(params)
+      local param1 = params[1]
+      local param2 = params[2]
+      return function(entity, current)
+        return param1(entity, current) * param2(entity, current)
+      end
+    end
+  },
+  div = {
+    description = "Divide first number by second number",
+    parameters = { "number", "number" },
+    result = "number",
+    parse = function(params)
+      local param1 = params[1]
+      local param2 = params[2]
+      return function(entity, current)
+        return param1(entity, current) / param2(entity, current)
+      end
+    end
+  },
   mod = {
     description = "Return the remainder of a division between two numbers",
     parameters = { "number", "number" },
