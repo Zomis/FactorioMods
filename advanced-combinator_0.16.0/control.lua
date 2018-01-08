@@ -78,6 +78,11 @@ local function onGuiOpened(event)
   end
 end
 
+local function onClick(event)
+  local player = game.players[event.player_index]
+  gui.click(player, event.element, updateConfiguration)
+end
+
 script.on_init(onInit)
 script.on_load(onLoad)
 
@@ -90,6 +95,7 @@ script.on_event(defines.events.on_entity_died, onRemoveEntity)
 
 script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_opened, onGuiOpened)
+script.on_event(defines.events.on_gui_click, onClick)
 
 
 --script.on_event(defines.events.on_gui_click, onClick)
