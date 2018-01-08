@@ -3,23 +3,11 @@
 
 local gui = require "gui"
 local model = require "model"
+local common = require "common"
+local out = common.out
+local worldAndPos = common.worldAndPos
 local advanced_combinators = {}
 local runtime_combinators = {}
-
-local function out(txt)
-  local debug = false
-  if debug then
-    game.print(txt)
-  end
-end
-
-local function txtpos(pos)
-  return "{" .. pos["x"] .. ", " .. pos["y"] .."}"
-end
-
-local function worldAndPos(entity)
-  return entity.surface.name .. txtpos(entity.position)
-end
 
 local function onInit()
   global.advanced_combinators = {}
