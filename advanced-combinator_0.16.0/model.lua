@@ -19,7 +19,6 @@ local function parseCalculation(text, advanced_combinator, entity)
   if find then
     local function_name = string.sub(text, 1, find - 1)
     local parameters = string.sub(text, find + 1, string.len(text) - 1)
-    game.print("parsing " .. function_name .. " with parameters " .. parameters)
 
     local fnc = logic.logic[function_name]
     if not fnc then
@@ -43,7 +42,6 @@ local function parseCalculation(text, advanced_combinator, entity)
         else
           table.insert(params, actual_param)
         end
-        game.print("Found param: " .. actual_param)
         unfinished_params = ""
       else
         unfinished_params = unfinished_params .. param .. ","
@@ -61,8 +59,7 @@ local function parse(advanced_combinator, entity)
 
     local equalsIndex = string.find(command, " = ")
     if not equalsIndex then
-      game.print("Parse error in " .. command)
-      return
+      return { error = "Parse error in " .. command }
     end
     local colon = string.find(command, ":")
     local target_index = tonumber(string.sub(command, 1, colon - 1))
@@ -81,9 +78,8 @@ local function parse(advanced_combinator, entity)
         result[target_index] = { signal = signal, count = count, index = target_index }
       end
       table.insert(commands, command_function)
-      game.print("Parsed: " .. result_signal .. " = " .. result_value)
     else -- type should be table
-      game.print("Error: " .. result_function.error .. " when parsing command " .. command)
+      return { error = result_function.error .. " when parsing command " .. command }
     end
   end
 
