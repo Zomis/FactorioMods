@@ -34,6 +34,7 @@ end
 
 local logic = {
   add = {
+    description = "Add two values together",
     parameters = { "number", "number" },
     result = "number",
     parse = function(params)
@@ -45,6 +46,7 @@ local logic = {
     end
   },
   mod = {
+    description = "Return the remainder of a division between two numbers",
     parameters = { "number", "number" },
     result = "number",
     parse = function(params)
@@ -56,12 +58,14 @@ local logic = {
     end
   },
   sum = {
+    description = "",
     parameters = { "array" },
     result = "number",
     parse = function()
     end
   },
   network = {
+    description = "",
     parameters = { "entity", "wire-color" },
     result = "array",
     parse = function(params, entity)
@@ -82,16 +86,19 @@ local logic = {
     end
   },
   green = {
+    description = "Return the value of a signal in the green circuit network of an entity",
     parameters = { "entity", "signal-id" },
     result = "number",
     parse = item_from_network(defines.wire_type.green)
   },
   red = {
+    description = "Return the value of a signal in the red circuit network of an entity",
     parameters = { "entity", "signal-id" },
     result = "number",
     parse = item_from_network(defines.wire_type.red)
   },
   const = {
+    description = "A constant value",
     parameters = { "string" },
     result = "number",
     parse = function(params)
@@ -100,6 +107,7 @@ local logic = {
     end
   },
   current = {
+    description = "A previously calculated value in the current iteration",
     parameters = { "string" },
     result = "number",
     parse = function(params)
@@ -113,6 +121,7 @@ local logic = {
     end
   },
   previous = {
+    description = "The calculated value of the last iteration",
     parameters = { "string" },
     result = "number",
     parse = function(params)
@@ -123,6 +132,7 @@ local logic = {
     end
   },
   array = {
+    description = "",
     parameters = { "number" },
     varargs = true,
     result = "array",

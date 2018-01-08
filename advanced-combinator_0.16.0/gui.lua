@@ -8,6 +8,14 @@ local function openGUI(player, entity)
 
   -- types: wire-color (green / red), number(+const?), entity (top/this/left/right/bottom), array...
 
+  -- Header: Title(?), update frequency, re-parse button, close GUI button
+  -- List:
+  -- - index
+  -- - signal-type (may be functions...)
+  -- - value (functions...)
+  -- Calculate button to calculate current value, show all calculated steps (for debugging)
+
+
 end
 
 return { openGUI = openGUI }

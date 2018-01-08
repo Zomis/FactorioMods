@@ -49,7 +49,8 @@ local function onPlaceEntity(event)
       config =
         "1:virtual/signal-A = mod(add(previous(1),const(1)),const(60))\n" ..
         "2:virtual/signal-B = current(1)\n" ..
-        "3:virtual/signal-C = add(green(this,item/iron-plate),red(this,item/copper-plate))"
+        "3:virtual/signal-C = add(green(this,item/iron-plate),red(this,item/copper-plate))\n" ..
+        "4:virtual/signal-D = add(previous(4),green(this,item/iron-plate))"
     }
     updateConfiguration(entity)
   end

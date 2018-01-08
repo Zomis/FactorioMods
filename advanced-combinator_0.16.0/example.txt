@@ -23,8 +23,9 @@ signal_h = gameData(tick)
 
 -- Current game time in ticks, hours, minutes, seconds
 1:virtual/signal-c = add(previous(1),const(1))
+2:virtual/signal-D = gameData(daytime) -- also: darkness, wind_speed, wind_orientation, wind_orientation_change, peaceful_mode, freeze_daytime, ticks_per_day, dusk, dawn, evening, morning
 
-1:virtual/signal-t = gameData(tick)
+1:virtual/signal-t = gameData(tick) -- also: speed, players, active_mods?, connected_players, #item_prototypes?
 2:virtual/signal-s = div(current(1), 60)
 3:virtual/signal-h = div(current(2), 3600)
 4:virtual/signal-m = mod(div(current(2), 60), 60)
@@ -33,15 +34,29 @@ signal_h = gameData(tick)
 -- Also use types
 typeof(max(top.green)) = const(1)
 typeof(min(top.green)) = const(2)
+1:virtual/signal-L = green(this,typeof(min(network(this,red))))
 
 -- If-else statements
 coal = if(stone, "==", const(0), const(1), const(0)) -- if (stone == 0) then coal = 1 else coal = 0
 if(red.coal > 100) copper_plate = 1
 if(red.coal < 20) copper_plate = 0
 
+-- Random
+1:virtual/signal-R = if(current(2),==,const(1),random(1,100))
+
 -- Filtering
 signal_b = filter(red, array(iron_plate, copper_plate, signal_a))
 signal_c = filter(red, predicate("==", 20)) -- filter all values that fulfill a criteria
+
+-- Find number of... (check speed!!)
+1:virtual/signal-A = surface.find_enemy_units(radius)
+2:virtual/signal-B = surface.count_entities_filtered (can be used to detect nearby train, car, etc.)
+3:virtual/signal-C = surface.get_pollution(position)
+4:virtual/signal-P = power usage...
+5:virtual/signal-S = force.item_production_statistics...
+6:virtual/signal-C = #surface.get_chunks()
+surface.get_resource_counts() ?
+
 
 if tick time % 5322 == 0 then signal_l = 0
 
