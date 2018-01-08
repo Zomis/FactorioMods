@@ -90,6 +90,9 @@ local function parse(advanced_combinator, entity)
   return function(entity)
     local control = entity.get_control_behavior()
     local result = {}
+--    table.insert(result, {signal = { type = "virtual", name = "signal-A" }, count = 42, index = 1 })
+--    table.insert(result, {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 1 })
+--    result[4] = {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 4 }
     for _, command in ipairs(commands) do
       command(entity, result)
     end

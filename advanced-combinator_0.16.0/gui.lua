@@ -43,7 +43,21 @@ local function openGUI(player, advanced_combinator)
   editor.style.width = 400
   editor.style.height = 400
 
+  local commands = {}
+
   -- add(add(green(this,item/iron-plate),red(this,item/copper-plate)),current(1))
+-- COMBO_BOX '(' COMBO_BOX '(' COMBO_BOX '(' ENUM_DROP_DOWN ', ' SIGNAL_SELECT ')' ')'  ')'
+-- Use http://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.tooltip on all COMBO_BOX
+
+  -- POTENTIAL OUTPUT for easier debugging
+  -- green(this,item/iron-plate) gives 42
+  -- add(add(42,red(this,item/copper-plate)),current(1))
+  -- red(this,item/copper-plate) gives 21
+  -- add(add(42,21),current(1))
+  -- add(42,21) gives 63
+  -- current(1) gives 2
+  -- add(63,2) gives 65
+
   -- { func = "add", params = { { func = "add", params = { {}, {} } }, { func = "current", params = { 1 } } } }
 
 

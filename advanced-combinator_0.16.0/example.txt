@@ -1,3 +1,11 @@
+-- TODO: array (returns number-array), network (returns signal-array), avg, sum, count
+-- TODO: min, max, typeof, valueof (returns signal)
+-- TODO: use typeof as signal type and set to = const(42)
+-- TODO: if, entityData
+-- TODO: top/left/right/bottom (entity resolve)
+-- TODO: random(1,100)
+
+
 -- 1:result_value = func(func(a), func(20))
 
 -- Basic Mathematics
