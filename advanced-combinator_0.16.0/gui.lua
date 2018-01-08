@@ -6,14 +6,12 @@ local function click(player, element, update_callback)
     return
   end
   if element == player_current.gui.header.apply_button then
-    player.print("Apply clicked")
     player_current.combinator.updatePeriod = tonumber(player_current.gui.header.update_frequency.text)
     player_current.combinator.config = player_current.gui.commands.text
     update_callback(player_current.combinator.entity)
     return
   end
   if element == player_current.gui.header.close_button then
-    player.print("Close")
     player_current.gui.destroy()
     current[player.index] = nil
   end

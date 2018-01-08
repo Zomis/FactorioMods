@@ -59,9 +59,13 @@ local function parse(advanced_combinator, entity)
 
     local equalsIndex = string.find(command, " = ")
     if not equalsIndex then
-      return { error = "Parse error in " .. command }
+      return { error = "Missing ' = ' in " .. command }
     end
     local colon = string.find(command, ":")
+    if not colon then
+      return { error = "Missing ':' in " .. command }
+    end
+
     local target_index = tonumber(string.sub(command, 1, colon - 1))
     command = string.sub(command, colon + 1)
     equalsIndex = string.find(command, " = ")
