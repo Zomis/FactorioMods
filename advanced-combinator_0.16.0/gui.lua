@@ -27,6 +27,10 @@ local function print_recursive_table(data, indentation)
   end
 end
 
+local function add_calculation_gui(gui, model)
+
+end
+
 local function openGUI(player, advanced_combinator, runtime)
   if player.gui.center["advancedCombinatorUI"] then
     player.gui.center["advancedCombinatorUI"].destroy()
@@ -54,6 +58,20 @@ local function openGUI(player, advanced_combinator, runtime)
   editor.style.height = 400
 
   print_recursive_table(runtime, "data")
+
+  local list = frame
+  for k, command in ipairs(runtime.commands) do
+    local flow = list.add({ type = "flow", name = "command" .. k, direction = "horizontal" })
+    local index_box = flow.add({ type = "textfield", name = "index_box", text = command.index })
+    index_box.tooltip = { "", "The index to use on the constant combinator" }
+    index_box.style.width = 30
+
+    local signal_result = flow.add({ type = "choose-elem-button", name = "signal_result", elem_type = "signal", signal = command.signal_result })
+
+    local calculation = flow.add({ type = "flow", name = "calculation", direction = "horizontal" })
+    add_calculation_gui(calculation, command.calculation)
+
+  end
 
   -- add(add(green(this,item/iron-plate),red(this,item/copper-plate)),current(1))
 -- COMBO_BOX '(' COMBO_BOX '(' COMBO_BOX '(' ENUM_DROP_DOWN ', ' SIGNAL_SELECT ')' ')'  ')'
