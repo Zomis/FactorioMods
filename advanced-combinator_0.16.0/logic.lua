@@ -167,6 +167,28 @@ local logic = {
       end
     end
   },
+  gameData = {
+    description = "Get data from current game",
+    parameters = { "game-data" },
+    result = "number",
+    parse = function(params)
+      local param = params[1]
+      return function(entity, current)
+        return game[param]
+      end
+    end
+  },
+  surfaceData = {
+    description = "Get data from current surface",
+    parameters = { "surface-data" },
+    result = "number",
+    parse = function(params)
+      local param = params[1]
+      return function(entity, current)
+        return entity.surface[param]
+      end
+    end
+  },
   array = {
     description = "",
     parameters = { "number" },
