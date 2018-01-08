@@ -17,7 +17,17 @@ local function click(player, element, update_callback)
   end
 end
 
-local function openGUI(player, advanced_combinator)
+local function print_recursive_table(data, indentation)
+  for k,v in pairs(data) do
+    if type(v) == "table" then
+      print_recursive_table(v, indentation .. "." .. k)
+    elseif type(v) ~= "function" then
+      game.print(indentation .. "[" .. k .. "]" .. " = " .. tostring(v))
+    end
+  end
+end
+
+local function openGUI(player, advanced_combinator, runtime)
   if player.gui.center["advancedCombinatorUI"] then
     player.gui.center["advancedCombinatorUI"].destroy()
   end
@@ -43,7 +53,7 @@ local function openGUI(player, advanced_combinator)
   editor.style.width = 400
   editor.style.height = 400
 
-  local commands = {}
+  print_recursive_table(runtime, "data")
 
   -- add(add(green(this,item/iron-plate),red(this,item/copper-plate)),current(1))
 -- COMBO_BOX '(' COMBO_BOX '(' COMBO_BOX '(' ENUM_DROP_DOWN ', ' SIGNAL_SELECT ')' ')'  ')'

@@ -72,7 +72,8 @@ local function onGuiOpened(event)
   if entity.name == "advanced-combinator" then
     local advanced_combinator = advanced_combinators[worldAndPos(entity)]
     if advanced_combinator.entity and advanced_combinator.entity.valid and advanced_combinator.entity == entity then
-      gui.openGUI(player, advanced_combinator)
+      local runtime = runtime_combinators[worldAndPos(entity)]
+      gui.openGUI(player, advanced_combinator, runtime)
     end
   end
 end

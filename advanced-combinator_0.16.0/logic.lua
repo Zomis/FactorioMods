@@ -41,7 +41,7 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1(entity, current) + param2(entity, current)
+        return param1.func(entity, current) + param2.func(entity, current)
       end
     end
   },
@@ -53,7 +53,7 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1(entity, current) - param2(entity, current)
+        return param1.func(entity, current) - param2.func(entity, current)
       end
     end
   },
@@ -65,7 +65,7 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1(entity, current) * param2(entity, current)
+        return param1.func(entity, current) * param2.func(entity, current)
       end
     end
   },
@@ -77,7 +77,7 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1(entity, current) / param2(entity, current)
+        return param1.func(entity, current) / param2.func(entity, current)
       end
     end
   },
@@ -89,7 +89,7 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1(entity, current) % param2(entity, current)
+        return param1.func(entity, current) % param2.func(entity, current)
       end
     end
   },

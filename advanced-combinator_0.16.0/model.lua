@@ -11,7 +11,7 @@ end
 
 
 local function perform(advanced_combinator, runtime_combinator)
-  runtime_combinator(advanced_combinator.entity)
+  runtime_combinator.func(advanced_combinator.entity)
 end
 
 local function parseCalculation(text, advanced_combinator, entity)
@@ -47,8 +47,10 @@ local function parseCalculation(text, advanced_combinator, entity)
         unfinished_params = unfinished_params .. param .. ","
       end
     end
-    return fnc.parse(params, entity)
+    local func = fnc.parse(params, entity)
+    return { name = function_name, params = params, func = func }
   end
+  return { error = "No parenthesis found in " .. text }
 end
 
 local function parse(advanced_combinator, entity)
@@ -75,29 +77,30 @@ local function parse(advanced_combinator, entity)
 
     local result_value = string.sub(command, equalsIndex + 3)
     local result_function = parseCalculation(result_value, advanced_combinator, entity)
-    if type(result_function) == "function" then
+    if result_function.func then
       local result_index = command_index
       local command_function = function(ent, result)
-        local count = result_function(ent, result)
+        local count = result_function.func(ent, result)
         result[target_index] = { signal = signal, count = count, index = target_index }
       end
-      table.insert(commands, command_function)
+      table.insert(commands, { signal_result = signal, index = target_index, calculation = result_function, func = command_function })
     else -- type should be table
       return { error = result_function.error .. " when parsing command " .. command }
     end
   end
 
-  return function(entity)
+  local perform_function = function(entity)
     local control = entity.get_control_behavior()
     local result = {}
 --    table.insert(result, {signal = { type = "virtual", name = "signal-A" }, count = 42, index = 1 })
 --    table.insert(result, {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 1 })
 --    result[4] = {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 4 }
     for _, command in ipairs(commands) do
-      command(entity, result)
+      command.func(entity, result)
     end
     control.parameters = { parameters = result }
   end
+  return { commands = commands, func = perform_function }
 end
 
 return { perform = perform, parse = parse }
