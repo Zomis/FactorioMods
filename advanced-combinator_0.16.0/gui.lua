@@ -1,3 +1,5 @@
+local logic = require "logic"
+local common = require "common"
 local current = {}
 
 local function click(player, element, update_callback)
@@ -18,6 +20,10 @@ local function click(player, element, update_callback)
 end
 
 local function print_recursive_table(data, indentation)
+  if type(data) ~= "table" then
+    game.print(indentation .. tostring(data))
+    return
+  end
   for k,v in pairs(data) do
     if type(v) == "table" then
       print_recursive_table(v, indentation .. "." .. k)
@@ -27,8 +33,65 @@ local function print_recursive_table(data, indentation)
   end
 end
 
-local function add_calculation_gui(gui, model)
+local function find_functions_for_type(type)
+  local result = {}
+  for name, data in pairs(logic.logic) do
+    if data.result == type then
+      table.insert(result, name)
+    end
+  end
+  return result
+end
 
+local enum_types = {
+  ["game-data"] = {
+    "tick", "speed"
+    --, "players"--, active_mods?, connected_players, #item_prototypes?
+  },
+  ["surface-data"] = {
+    "daytime", "darkness", "wind_speed", "wind_orientation", "wind_orientation_change", "ticks_per_day", "dusk", "dawn", "evening", "morning"
+    -- "peaceful_mode", "freeze_daytime",
+  },
+  ["entity"] = { "this", "top", "left", "right", "bottom" },
+  ["wire-color"] = { "green", "red" }
+}
+
+local function add_calculation_gui(gui, model, expected_result)
+  if expected_result == "string" then
+    local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
+    textfield.style.width = 50
+    return
+  end
+  if enum_types[expected_result] then
+    local items = enum_types[expected_result]
+    local selected_index = common.table_indexof(items, model)
+    gui.add({ type = "drop-down", name = "enum_value", items = items, selected_index = selected_index })
+    return
+  end
+  game.print("add_calculation_gui for " .. expected_result .. " model:")
+  print_recursive_table(model, "")
+
+  -- model.name, model.params[1], model.params[2]
+  local data = logic.logic[model.name]
+
+  local flow = gui.add({ type = "flow", name = "flow", direction = "horizontal" })
+  local function_options = find_functions_for_type(expected_result)
+  local selected_index = common.table_indexof(function_options, model.name)
+  local function_name = flow.add({ type = "drop-down", name = "function_name", items = function_options, selected_index = selected_index })
+  function_name.tooltip = data.description
+  flow.add({ type = "label", name = "start_parenthesis", caption = "(" })
+
+  print_recursive_table(data, "logic for " .. model.name)
+  local params_count = #data.parameters
+  for i=1,params_count do
+    local param_flow = flow.add({ type = "flow", name = "param" .. i, direction = "horizontal" })
+    local type = data.parameters[i]
+    add_calculation_gui(param_flow, model.params[i], type)
+    if i < params_count then
+      flow.add({ type = "label", name = "comma" .. i, caption = ", " })
+    end
+  end
+  flow.add({ type = "label", name = "end_parenthesis", caption = ")" })
 end
 
 local function openGUI(player, advanced_combinator, runtime)
@@ -69,7 +132,7 @@ local function openGUI(player, advanced_combinator, runtime)
     local signal_result = flow.add({ type = "choose-elem-button", name = "signal_result", elem_type = "signal", signal = command.signal_result })
 
     local calculation = flow.add({ type = "flow", name = "calculation", direction = "horizontal" })
-    add_calculation_gui(calculation, command.calculation)
+    add_calculation_gui(calculation, command.calculation, "number")
 
   end
 
