@@ -216,6 +216,10 @@ local function change_verified(player, player_current, element)
 
   -- Parse GUI to create multi-line string
   -- if DROPDOWN: Parse multi-line string to re-create GUI?
+  if element.name == "commands" then
+    -- It should be possible to copy/paste and edit the multiline string
+    return
+  end
   if element.type == "drop-down" and element.name == "function_name" then
     local new_function_name = element.get_item(element.selected_index)
     local logic_data = logic.logic[new_function_name]
