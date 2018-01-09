@@ -1,5 +1,10 @@
+local common = require "common"
+
 local function resolve_signalID(type_and_name)
   local split = string.find(type_and_name, "/")
+  if not split then
+    return nil
+  end
   local signal_type = string.sub(type_and_name, 1, split - 1)
   local signal_name = string.sub(type_and_name, split + 1)
   return { type = signal_type, name = signal_name }
@@ -9,7 +14,7 @@ local function resolve_entity(entity, target)
   if target == "this" then
     return entity
   end
-  return { error = "Unable to resolve: " .. target }
+  error("Unable to resolve entity: " .. target)
 end
 
 local function item_from_network(wire_type)
@@ -31,6 +36,19 @@ local function item_from_network(wire_type)
    end
  end
 end
+
+local enum_types = {
+  ["game-data"] = {
+    "tick", "speed"
+    --, "players"--, active_mods?, connected_players, #item_prototypes?
+  },
+  ["surface-data"] = {
+    "daytime", "darkness", "wind_speed", "wind_orientation", "wind_orientation_change", "ticks_per_day", "dusk", "dawn", "evening", "morning"
+    -- "peaceful_mode", "freeze_daytime",
+  },
+  ["entity"] = { "this", "top", "left", "right", "bottom" },
+  ["wire-color"] = { "green", "red" }
+}
 
 local logic = {
   add = {
@@ -123,28 +141,28 @@ local logic = {
   },
   green = {
     description = "Return the value of a signal in the green circuit network of an entity",
-    parameters = { "entity", "signal-id" },
+    parameters = { "entity", "string-signal" },
     result = "number",
     parse = item_from_network(defines.wire_type.green)
   },
   red = {
     description = "Return the value of a signal in the red circuit network of an entity",
-    parameters = { "entity", "signal-id" },
+    parameters = { "entity", "string-signal" },
     result = "number",
     parse = item_from_network(defines.wire_type.red)
   },
   signal_type = {
     description = "A constant signal type",
     parameters = { "string-signal" },
-    result = "signal-id",
+    result = "signal-type",
     parse = function(params)
       local value = resolve_signalID(params[1])
       return function() return value end
     end
   },
   const = {
-    description = "A constant value",
-    parameters = { "string" },
+    description = "A constant number",
+    parameters = { "string-number" },
     result = "number",
     parse = function(params)
       local value = tonumber(params[1])
@@ -153,7 +171,7 @@ local logic = {
   },
   current = {
     description = "A previously calculated value in the current iteration",
-    parameters = { "string" },
+    parameters = { "string-number" },
     result = "number",
     parse = function(params)
       local index = tonumber(params[1])
@@ -167,7 +185,7 @@ local logic = {
   },
   previous = {
     description = "The calculated value of the last iteration",
-    parameters = { "string" },
+    parameters = { "string-number" },
     result = "number",
     parse = function(params)
       local index = tonumber(params[1])
@@ -206,10 +224,58 @@ local logic = {
     parse = function()
     end
   }
-
-
-
 }
 
+local function parse(data, params, entity)
+  -- type check parameters
+  for i, param_type in ipairs(data.parameters) do
+    local param_value = params[i]
+    if enum_types[param_type] then
+      local index_of = common.table_indexof(enum_types[param_type], param_value)
+      if not index_of then
+        error("No such enum value '" .. param_value .. "' in type " .. param_type)
+      end
+    elseif param_type == "string-number" then
+      if not tonumber(param_value) then
+        error("'" .. param_value .. "' is not a number")
+      end
+    elseif param_type == "string-signal" then
+      if game then
+        local signal = resolve_signalID(param_value)
+        if not signal then
+          error("No such signal: " .. param_value)
+        end
+        if signal.type == "fluid" then
+          if not game.fluid_prototypes[signal.name] then
+            error("No such signal: " .. param_value)
+          end
+        elseif signal.type == "item" then
+          if not game.item_prototypes[signal.name] then
+            error("No such signal: " .. param_value)
+          end
+        elseif signal.type == "virtual" then
+          if not game.virtual_signal_prototypes[signal.name] then
+            error("No such signal: " .. param_value)
+          end
+        else
+          error("No such signal type: " .. param_value)
+        end
+      end
+    else
+      if type(param_value) ~= "table" then
+        error("Unable to validate parameter " .. tostring(param_value) .. " of expected type " .. param_type)
+      end
+      if game then
+        common.out("No validation for type " .. param_type)
+      end
+    end
+  end
+  return data.parse(params, entity)
+end
 
-return { logic = logic, resolve_signalID = resolve_signalID }
+return {
+  logic = logic,
+  resolve_signalID = resolve_signalID,
+  enum_types = enum_types,
+  parse = parse
+}

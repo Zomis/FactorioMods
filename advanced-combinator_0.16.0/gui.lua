@@ -29,19 +29,6 @@ local function find_functions_for_type(type)
   return result
 end
 
-local enum_types = {
-  ["game-data"] = {
-    "tick", "speed"
-    --, "players"--, active_mods?, connected_players, #item_prototypes?
-  },
-  ["surface-data"] = {
-    "daytime", "darkness", "wind_speed", "wind_orientation", "wind_orientation_change", "ticks_per_day", "dusk", "dawn", "evening", "morning"
-    -- "peaceful_mode", "freeze_daytime",
-  },
-  ["entity"] = { "this", "top", "left", "right", "bottom" },
-  ["wire-color"] = { "green", "red" }
-}
-
 local function add_parameters_gui(parameters_gui, logic_data, model, add_calculation_gui)
   common.print_recursive_table(logic_data, "logic for " .. model.name)
   local params_count = #logic_data.parameters
@@ -56,18 +43,18 @@ local function add_parameters_gui(parameters_gui, logic_data, model, add_calcula
 end
 
 local function add_calculation_gui(gui, model, expected_result)
-  if expected_result == "string" then
+  if expected_result == "string-number" then
     local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
     textfield.style.width = 50
     return
   end
-  if expected_result == "signal-id" then
+  if expected_result == "string-signal" then
     local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
     textfield.style.width = 50
     return
   end
-  if enum_types[expected_result] then
-    local items = enum_types[expected_result]
+  if logic.enum_types[expected_result] then
+    local items = logic.enum_types[expected_result]
     local selected_index = common.table_indexof(items, model)
     gui.add({ type = "drop-down", name = "enum_value", items = items, selected_index = selected_index })
     return
@@ -169,12 +156,12 @@ local function get_default_model(function_name, advanced_combinator)
   local params = {}
 
   for _, param_type in ipairs(data.parameters) do
-    if param_type == "string" then
+    if param_type == "string-number" then
       table.insert(params, "1")
     elseif param_type == "string-signal" then
       table.insert(params, "virtual/signal-0")
-    elseif enum_types[param_type] then
-      table.insert(params, enum_types[param_type][1])
+    elseif logic.enum_types[param_type] then
+      table.insert(params, logic.enum_types[param_type][1])
     elseif param_type == "number" then
       table.insert(params, { name = "const", params = { "1" } })
     elseif param_type == "signal-id" then
@@ -185,7 +172,7 @@ local function get_default_model(function_name, advanced_combinator)
 
 
   local entity = advanced_combinator.entity
-  return { name = function_name, params = params, func = data.parse(params, entity) }
+  return { name = function_name, params = params, func = logic.parse(data, params, entity) }
 end
 
 local function gui_command_to_string(element)
@@ -204,7 +191,7 @@ local function gui_command_to_string(element)
   elseif element.type == "label" then
     return common.trim(element.caption)
   end
-  game.print("Unknown element type: " .. element.type)
+  common.out("[Advanced Combinator] Warning: Unknown element type " .. element.type)
 end
 
 local function change_verified(player, player_current, element)
@@ -235,9 +222,6 @@ local function change_verified(player, player_current, element)
     end
     -- Recreate new parameters GUI
     add_parameters_gui(parameters_sibling, logic_data, model, add_calculation_gui)
-  elseif element.type == "choose-elem-button" then
-  elseif element.type == "textfield" then
-
   end
   -- Update multiline string
   local multiline_string = ""
@@ -256,7 +240,6 @@ local function change_verified(player, player_current, element)
   end
 
   player_current.gui.commands.text = multiline_string
-
 end
 
 local function change(player, element)

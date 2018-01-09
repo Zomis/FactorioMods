@@ -1,14 +1,5 @@
+local common = require "common"
 local logic = require "logic"
-
-local function txtpos(pos)
-  return "{" .. pos["x"] .. ", " .. pos["y"] .."}"
-end
-
-local function worldAndPos(entity, key)
-  return entity.surface.name .. txtpos(entity.position)
-end
-
-
 
 local function perform(advanced_combinator, runtime_combinator)
   runtime_combinator.func(advanced_combinator.entity)
@@ -20,9 +11,9 @@ local function parseCalculation(text, advanced_combinator, entity)
     local function_name = string.sub(text, 1, find - 1)
     local parameters = string.sub(text, find + 1, string.len(text) - 1)
 
-    local fnc = logic.logic[function_name]
-    if not fnc then
-      return { error = "No such function name: " .. function_name }
+    local logic_data = logic.logic[function_name]
+    if not logic_data then
+      error("No such function name: " .. function_name)
     end
 
     local params = {}
@@ -47,10 +38,10 @@ local function parseCalculation(text, advanced_combinator, entity)
         unfinished_params = unfinished_params .. param .. ","
       end
     end
-    local func = fnc.parse(params, entity)
+    local func = logic.parse(logic_data, params, entity)
     return { name = function_name, params = params, func = func }
   end
-  return { error = "No parenthesis found in " .. text }
+  return error("No parenthesis found in " .. text)
 end
 
 local function parse(advanced_combinator, entity)
@@ -61,11 +52,11 @@ local function parse(advanced_combinator, entity)
 
     local equalsIndex = string.find(command, " = ")
     if not equalsIndex then
-      return { error = "Missing ' = ' in " .. command }
+      error("Missing ' = ' in " .. command)
     end
     local colon = string.find(command, ":")
     if not colon then
-      return { error = "Missing ':' in " .. command }
+      error("Missing ':' in " .. command)
     end
 
     local target_index = tonumber(string.sub(command, 1, colon - 1))
@@ -85,7 +76,7 @@ local function parse(advanced_combinator, entity)
       end
       table.insert(commands, { signal_result = signal, index = target_index, calculation = result_function, func = command_function })
     else -- type should be table
-      return { error = result_function.error .. " when parsing command " .. command }
+      error("Unexpected result when parsing command " .. command)
     end
   end
 

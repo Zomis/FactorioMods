@@ -4,8 +4,6 @@
 local gui = require "gui"
 local model = require "model"
 local common = require "common"
-local out = common.out
-local worldAndPos = common.worldAndPos
 local advanced_combinators = {}
 local runtime_combinators = {}
 
@@ -16,7 +14,15 @@ end
 local function onLoad()
   advanced_combinators = global.advanced_combinators
   for k, v in pairs(advanced_combinators) do
-    runtime_combinators[k] = model.parse(v)
+    local status, result = pcall(function()
+      return model.parse(v, v.entity)
+    end)
+    if status then
+      runtime_combinators[k] = result
+    else
+      v.entity.force.print("[Advanced Combinator] Unable to parse combinator at " ..
+        common.worldAndPos(v.entity) .. ": " .. result)
+    end
   end
 end
 
@@ -25,13 +31,23 @@ local function updateConfiguration(entity)
     game.print("Can't update configuration of a non-advanced-combinator")
     return
   end
-  runtime_combinators[worldAndPos(entity)] = model.parse(advanced_combinators[worldAndPos(entity)], entity)
+  local status, result = pcall(function()
+    return model.parse(advanced_combinators[common.worldAndPos(entity)], entity)
+  end)
+  if status then
+    runtime_combinators[common.worldAndPos(entity)] = result
+    entity.force.print("[Advanced Combinator] Updated Advanced Combinator at " ..
+      common.worldAndPos(entity))
+  else
+    entity.force.print("[Advanced Combinator] Error parsing combinator at " ..
+      common.worldAndPos(entity) .. result)
+  end
 end
 
 local function onPlaceEntity(event)
   local entity = event.created_entity
   if entity.name == "advanced-combinator" then
-    advanced_combinators[worldAndPos(entity)] = {
+    advanced_combinators[common.worldAndPos(entity)] = {
       entity = event.created_entity,
       updatePeriod = 1,
       config =
@@ -52,7 +68,7 @@ end
 
 local function onRemoveEntity(event)
   local entity = event.entity
-  advanced_combinators[worldAndPos(entity)] = nil
+  advanced_combinators[common.worldAndPos(entity)] = nil
 end
 
 local function onTick()
@@ -70,9 +86,9 @@ local function onGuiOpened(event)
   end
   local entity = event.entity
   if entity.name == "advanced-combinator" then
-    local advanced_combinator = advanced_combinators[worldAndPos(entity)]
+    local advanced_combinator = advanced_combinators[common.worldAndPos(entity)]
     if advanced_combinator.entity and advanced_combinator.entity.valid and advanced_combinator.entity == entity then
-      local runtime = runtime_combinators[worldAndPos(entity)]
+      local runtime = runtime_combinators[common.worldAndPos(entity)]
       gui.openGUI(player, advanced_combinator, runtime)
     end
   end
