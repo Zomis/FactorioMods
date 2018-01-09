@@ -1,4 +1,3 @@
-local common = require "common"
 local logic = require "logic"
 
 local function perform(advanced_combinator, runtime_combinator)
@@ -69,7 +68,6 @@ local function parse(advanced_combinator, entity)
     local result_value = string.sub(command, equalsIndex + 3)
     local result_function = parseCalculation(result_value, advanced_combinator, entity)
     if result_function.func then
-      local result_index = command_index
       local command_function = function(ent, result)
         local count = result_function.func(ent, result)
         result[target_index] = { signal = signal, count = count, index = target_index }
@@ -80,14 +78,14 @@ local function parse(advanced_combinator, entity)
     end
   end
 
-  local perform_function = function(entity)
+  local perform_function = function(ent)
     local control = entity.get_control_behavior()
     local result = {}
 --    table.insert(result, {signal = { type = "virtual", name = "signal-A" }, count = 42, index = 1 })
 --    table.insert(result, {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 1 })
 --    result[4] = {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 4 }
     for _, command in ipairs(commands) do
-      command.func(entity, result)
+      command.func(ent, result)
     end
     control.parameters = { parameters = result }
   end

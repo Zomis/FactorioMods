@@ -1,5 +1,5 @@
--- Use item tags. When removing an item, save its tags, when placing item use tags if any exist. Use the config string as the tag
--- /c local t = game.player.selected.get_control_behavior().parameters.parameters[1].signal; for i, v in pairs(t) do game.print(i .. " = " .. v) end
+-- Use item tags. When removing an item, save its tags,
+-- when placing item use tags if any exist. Use the config string as the tag
 
 local gui = require "gui"
 local model = require "model"

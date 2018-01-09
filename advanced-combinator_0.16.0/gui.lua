@@ -194,7 +194,7 @@ local function gui_command_to_string(element)
   common.out("[Advanced Combinator] Warning: Unknown element type " .. element.type)
 end
 
-local function change_verified(player, player_current, element)
+local function change_verified(player_current, element)
   -- We have verified that the element clicked is in the heirarchy
 
   -- DROPDOWN: Wipe children and rebuild
@@ -214,7 +214,7 @@ local function change_verified(player, player_current, element)
     local parameters_sibling = element.parent["parameters"]
     -- Destroy children of the parameters element
     local children = {}
-    for k, v in pairs(parameters_sibling.children) do
+    for _, v in pairs(parameters_sibling.children) do
       table.insert(children, v)
     end
     for _, v in ipairs(children) do
@@ -251,7 +251,7 @@ local function change(player, element)
   local el = element
   while el.parent do
     if el.parent == expected_gui then
-      change_verified(player, player_current, element)
+      change_verified(player_current, element)
     end
     el = el.parent
   end

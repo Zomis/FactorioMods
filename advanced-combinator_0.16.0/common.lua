@@ -31,7 +31,7 @@ local function print_recursive_table(data, indentation)
 end
 
 -- http://lua-users.org/wiki/CommonFunctions
-function trim(s)
+local function trim(s)
   -- from PiL2 20.4
   return (s:gsub("^%s*(.-)%s*$", "%1"))
 end

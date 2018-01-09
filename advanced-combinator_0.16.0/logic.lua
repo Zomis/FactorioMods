@@ -123,7 +123,7 @@ local logic = {
     parameters = { "entity", "wire-color" },
     result = "array",
     parse = function(params, entity)
-      local resolved = resolve_entity(entity, target)
+      local resolved = resolve_entity(entity, params[1])
 
       local wire_color = params[2]
       local wire_type
@@ -175,7 +175,7 @@ local logic = {
     result = "number",
     parse = function(params)
       local index = tonumber(params[1])
-      return function(entity, current)
+      return function(_, current)
         if not current[index] then
           return 0
         end
@@ -189,7 +189,7 @@ local logic = {
     result = "number",
     parse = function(params)
       local index = tonumber(params[1])
-      return function(entity, current)
+      return function(entity)
         return entity.get_control_behavior().get_signal(index).count
       end
     end
@@ -200,7 +200,7 @@ local logic = {
     result = "number",
     parse = function(params)
       local param = params[1]
-      return function(entity, current)
+      return function()
         return game[param]
       end
     end
@@ -211,7 +211,7 @@ local logic = {
     result = "number",
     parse = function(params)
       local param = params[1]
-      return function(entity, current)
+      return function(entity)
         return entity.surface[param]
       end
     end
