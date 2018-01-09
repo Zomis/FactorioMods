@@ -1,6 +1,6 @@
 local logic = require "logic"
 local common = require "common"
-local current = {}
+local current = {} -- Key: player index, Value: { gui = frameRoot, combinator = advanced_combinator }
 
 local function click(player, element, update_callback)
   local player_current = current[player.index]
@@ -16,20 +16,6 @@ local function click(player, element, update_callback)
   if element == player_current.gui.header.close_button then
     player_current.gui.destroy()
     current[player.index] = nil
-  end
-end
-
-local function print_recursive_table(data, indentation)
-  if type(data) ~= "table" then
-    game.print(indentation .. tostring(data))
-    return
-  end
-  for k,v in pairs(data) do
-    if type(v) == "table" then
-      print_recursive_table(v, indentation .. "." .. k)
-    elseif type(v) ~= "function" then
-      game.print(indentation .. "[" .. k .. "]" .. " = " .. tostring(v))
-    end
   end
 end
 
@@ -56,8 +42,26 @@ local enum_types = {
   ["wire-color"] = { "green", "red" }
 }
 
+local function add_parameters_gui(parameters_gui, logic_data, model, add_calculation_gui)
+  common.print_recursive_table(logic_data, "logic for " .. model.name)
+  local params_count = #logic_data.parameters
+  for i=1,params_count do
+    local param_flow = parameters_gui.add({ type = "flow", name = "param" .. i, direction = "horizontal" })
+    local type = logic_data.parameters[i]
+    add_calculation_gui(param_flow, model.params[i], type)
+    if i < params_count then
+      parameters_gui.add({ type = "label", name = "comma" .. i, caption = ", " })
+    end
+  end
+end
+
 local function add_calculation_gui(gui, model, expected_result)
   if expected_result == "string" then
+    local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
+    textfield.style.width = 50
+    return
+  end
+  if expected_result == "signal-id" then
     local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
     textfield.style.width = 50
     return
@@ -69,7 +73,7 @@ local function add_calculation_gui(gui, model, expected_result)
     return
   end
   game.print("add_calculation_gui for " .. expected_result .. " model:")
-  print_recursive_table(model, "")
+  common.print_recursive_table(model, "")
 
   -- model.name, model.params[1], model.params[2]
   local data = logic.logic[model.name]
@@ -81,16 +85,9 @@ local function add_calculation_gui(gui, model, expected_result)
   function_name.tooltip = data.description
   flow.add({ type = "label", name = "start_parenthesis", caption = "(" })
 
-  print_recursive_table(data, "logic for " .. model.name)
-  local params_count = #data.parameters
-  for i=1,params_count do
-    local param_flow = flow.add({ type = "flow", name = "param" .. i, direction = "horizontal" })
-    local type = data.parameters[i]
-    add_calculation_gui(param_flow, model.params[i], type)
-    if i < params_count then
-      flow.add({ type = "label", name = "comma" .. i, caption = ", " })
-    end
-  end
+  local parameters_flow = flow.add({ type = "flow", name = "parameters", direction = "horizontal" })
+  add_parameters_gui(parameters_flow, data, model, add_calculation_gui)
+
   flow.add({ type = "label", name = "end_parenthesis", caption = ")" })
 end
 
@@ -120,16 +117,19 @@ local function openGUI(player, advanced_combinator, runtime)
   editor.style.width = 400
   editor.style.height = 400
 
-  print_recursive_table(runtime, "data")
+  common.print_recursive_table(runtime, "data")
 
   local list = frame
   for k, command in ipairs(runtime.commands) do
-    local flow = list.add({ type = "flow", name = "command" .. k, direction = "horizontal" })
+    -- Move Up, Move Down, Delete
+    local flow = list.add({ type = "flow", name = "index" .. k, direction = "horizontal" })
+    flow = flow.add({ type = "flow", name = "command", direction = "horizontal" })
     local index_box = flow.add({ type = "textfield", name = "index_box", text = command.index })
     index_box.tooltip = { "", "The index to use on the constant combinator" }
     index_box.style.width = 30
 
     local signal_result = flow.add({ type = "choose-elem-button", name = "signal_result", elem_type = "signal", signal = command.signal_result })
+    signal_result.tooltip = { "", "The signal to use as result for this calculation" }
 
     local calculation = flow.add({ type = "flow", name = "calculation", direction = "horizontal" })
     add_calculation_gui(calculation, command.calculation, "number")
@@ -164,4 +164,76 @@ local function openGUI(player, advanced_combinator, runtime)
 
 end
 
-return { openGUI = openGUI, click = click }
+local function get_default_model(function_name, advanced_combinator)
+  local data = logic.logic[function_name]
+  local params = {}
+
+  for _, param_type in ipairs(data.parameters) do
+    if param_type == "string" then
+      table.insert(params, "1")
+    elseif param_type == "string-signal" then
+      table.insert(params, "virtual/signal-0")
+    elseif enum_types[param_type] then
+      table.insert(params, enum_types[param_type][1])
+    elseif param_type == "number" then
+      table.insert(params, { name = "const", params = { "1" } })
+    elseif param_type == "signal-id" then
+      table.insert(params, "virtual/signal-0")
+--      table.insert(params, { name = "signal_type", params = { "virtual/signal-0" } })
+    end
+  end
+
+
+  local entity = advanced_combinator.entity
+  return { name = function_name, params = params, func = data.parse(params, entity) }
+end
+
+local function change_verified(player, player_current, element)
+  -- We have verified that the element clicked is in the heirarchy
+
+  -- DROPDOWN: Wipe children and rebuild
+  -- TEXT: Change parameter
+  -- ELEMENT: Change parameter
+
+  -- Parse GUI to create multi-line string
+  -- if DROPDOWN: Parse multi-line string to re-create GUI?
+  if element.type == "drop-down" and element.name == "function_name" then
+    local new_function_name = element.get_item(element.selected_index)
+    local logic_data = logic.logic[new_function_name]
+    local model = get_default_model(new_function_name, player_current.combinator)
+    local parameters_sibling = element.parent["parameters"]
+    -- Destroy children of the parameters element
+    local children = {}
+    for k, v in pairs(parameters_sibling.children) do
+      table.insert(children, v)
+    end
+    for _, v in ipairs(children) do
+      v.destroy()
+    end
+    -- Recreate new parameters GUI
+    add_parameters_gui(parameters_sibling, logic_data, model, add_calculation_gui)
+  elseif element.type == "choose-elem-button" then
+  elseif element.type == "textfield" then
+
+  end
+
+  -- Update multiline string
+
+end
+
+local function change(player, element)
+  local player_current = current[player.index]
+  if not player_current then
+    return
+  end
+  local expected_gui = player_current.gui
+  local el = element
+  while el.parent do
+    if el.parent == expected_gui then
+      change_verified(player, player_current, element)
+    end
+    el = el.parent
+  end
+end
+
+return { openGUI = openGUI, click = click, change = change }

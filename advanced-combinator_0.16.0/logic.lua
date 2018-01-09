@@ -133,6 +133,15 @@ local logic = {
     result = "number",
     parse = item_from_network(defines.wire_type.red)
   },
+  signal_type = {
+    description = "A constant signal type",
+    parameters = { "string-signal" },
+    result = "signal-id",
+    parse = function(params)
+      local value = resolve_signalID(params[1])
+      return function() return value end
+    end
+  },
   const = {
     description = "A constant value",
     parameters = { "string" },

@@ -31,7 +31,7 @@ signal_h = gameData(tick)
 
 -- Current game time in ticks, hours, minutes, seconds
 1:virtual/signal-c = add(previous(1),const(1))
-2:virtual/signal-D = gameData(daytime) -- also: darkness, wind_speed, wind_orientation, wind_orientation_change, peaceful_mode, freeze_daytime, ticks_per_day, dusk, dawn, evening, morning
+2:virtual/signal-D = surfaceData(daytime) -- also: darkness, wind_speed, wind_orientation, wind_orientation_change, peaceful_mode, freeze_daytime, ticks_per_day, dusk, dawn, evening, morning
 
 1:virtual/signal-t = gameData(tick) -- also: speed, players, active_mods?, connected_players, #item_prototypes?
 2:virtual/signal-s = div(current(1), 60)

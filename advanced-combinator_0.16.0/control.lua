@@ -83,6 +83,11 @@ local function onClick(event)
   gui.click(player, event.element, updateConfiguration)
 end
 
+local function onGuiChange(event)
+  local player = game.players[event.player_index]
+  gui.change(player, event.element)
+end
+
 script.on_init(onInit)
 script.on_load(onLoad)
 
@@ -96,7 +101,9 @@ script.on_event(defines.events.on_entity_died, onRemoveEntity)
 script.on_event(defines.events.on_tick, onTick)
 script.on_event(defines.events.on_gui_opened, onGuiOpened)
 script.on_event(defines.events.on_gui_click, onClick)
-
+script.on_event(defines.events.on_gui_elem_changed, onGuiChange)
+script.on_event(defines.events.on_gui_selection_state_changed, onGuiChange)
+script.on_event(defines.events.on_gui_text_changed, onGuiChange)
 
 --script.on_event(defines.events.on_gui_click, onClick)
 --script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
