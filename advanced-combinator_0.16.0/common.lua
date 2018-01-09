@@ -30,6 +30,12 @@ local function print_recursive_table(data, indentation)
   end
 end
 
+-- http://lua-users.org/wiki/CommonFunctions
+function trim(s)
+  -- from PiL2 20.4
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 local function table_indexof(table, value)
   for key, v in pairs(table) do
     if v == value then
@@ -39,11 +45,17 @@ local function table_indexof(table, value)
   return nil
 end
 
+local function signal_to_string(signal)
+  return signal.type .. "/" .. signal.name
+end
+
 return {
   txtpos = txtpos,
   print_recursive_table = print_recursive_table,
   worldAndPos = worldAndPos,
   table_indexof = table_indexof,
+  signal_to_string = signal_to_string,
+  trim = trim,
 
   out = out
 }

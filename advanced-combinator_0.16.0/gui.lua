@@ -110,7 +110,7 @@ local function openGUI(player, advanced_combinator, runtime)
   header.add({ type = "button", name = "apply_button", caption = "Apply" })
   header.add({ type = "button", name = "close_button", caption = "Close" })
 
-  local frame = frameRoot.add({type = "scroll-pane", name = "advancedCombinator_scroll", style = "advanced_combinator_list2"})
+  local frame = frameRoot.add({type = "scroll-pane", name = "command_list", style = "advanced_combinator_list2"})
 
   local editor = frameRoot.add({ type = "text-box", name = "commands", text = advanced_combinator.config })
   editor.word_wrap = false
@@ -188,6 +188,25 @@ local function get_default_model(function_name, advanced_combinator)
   return { name = function_name, params = params, func = data.parse(params, entity) }
 end
 
+local function gui_command_to_string(element)
+  if element.type == "flow" then
+    local result = ""
+    for _, child in ipairs(element.children) do
+      result = result .. gui_command_to_string(child)
+    end
+    return result
+  elseif element.type == "textfield" then
+    return element.text
+  elseif element.type == "choose-elem-button" then
+    return element.signal
+  elseif element.type == "drop-down" then
+    return element.get_item(element.selected_index)
+  elseif element.type == "label" then
+    return common.trim(element.caption)
+  end
+  game.print("Unknown element type: " .. element.type)
+end
+
 local function change_verified(player, player_current, element)
   -- We have verified that the element clicked is in the heirarchy
 
@@ -216,8 +235,23 @@ local function change_verified(player, player_current, element)
   elseif element.type == "textfield" then
 
   end
-
   -- Update multiline string
+  local multiline_string = ""
+  local gui_command_list = player_current.gui.command_list
+
+  for _, command_index_gui in ipairs(gui_command_list.children) do
+    local gui_command = command_index_gui.command
+    local command_string = ""
+    command_string = command_string .. gui_command.index_box.text .. ":"
+
+    local signal = gui_command.signal_result.elem_value
+    command_string = command_string .. common.signal_to_string(signal) .. " = "
+    command_string = command_string .. gui_command_to_string(gui_command.calculation)
+
+    multiline_string = multiline_string .. command_string .. "\n"
+  end
+
+  player_current.gui.commands.text = multiline_string
 
 end
 
