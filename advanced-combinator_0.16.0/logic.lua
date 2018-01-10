@@ -101,6 +101,85 @@ local enum_types = {
     "evolution_factor", "friendly_fire", "share_chart"
   },
   ["entity"] = { "this", "top", "left", "right", "bottom" },
+  ["entity-data"] = {
+    "active",
+    "destructible",
+    "minable",
+    "rotatable",
+    "operable",
+    "health",
+    "supports_direction",
+    "orientation",
+    "amount",
+    "initial_amount",
+    "effectivity_modifier",
+    "consumption_modifier",
+    "friction_modifier",
+    "speed",
+    "selected_gun_index",
+    "energy",
+    "temperature",
+    "time_to_live",
+    "chain_signal_state",
+    "crafting_progress",
+    "bonus_progress",
+    "rocket_parts",
+    "damage_dealt",
+    "kills",
+    "electric_buffer_size",
+    "electric_input_flow_limit",
+    "electric_output_flow_limit",
+    "electric_drain",
+    "electric_emissions",
+    "unit_number",
+    "mining_progress",
+    "bonus_mining_progress",
+    "power_production",
+    "power_usage",
+    "request_slot_count",
+    "filter_slot_count",
+    "graphics_variation",
+    "tree_color_index",
+    "inserter_stack_size_override",
+    "products_finished",
+    "power_switch_state",
+    "relative_turret_orientation",
+    "remove_unfiltered_items",
+    "character_corpse_player_index",
+    "character_corpse_tick_of_death",
+    "tick_of_last_attack",
+    "tick_of_last_damage",
+    "crafting_queue_size",
+    "walking_state",
+    "mining_state",
+    "shooting_state",
+    "picking_state",
+    "repair_state",
+    "driving",
+    "cheat_mode",
+    "character_crafting_speed_modifier",
+    "character_mining_speed_modifier",
+    "character_running_speed_modifier",
+    "character_build_distance_bonus",
+    "character_item_drop_distance_bonus",
+    "character_reach_distance_bonus",
+    "character_resource_reach_distance_bonus",
+    "character_item_pickup_distance_bonus",
+    "character_loot_pickup_distance_bonus",
+    "quickbar_count_bonus",
+    "character_inventory_slots_bonus",
+    "character_logistic_slot_count_bonus",
+    "character_trash_slot_count_bonus",
+    "character_maximum_following_robot_count_bonus",
+    "character_health_bonus",
+    "build_distance",
+    "drop_item_distance",
+    "reach_distance",
+    "item_pickup_distance",
+    "loot_pickup_distance",
+    "resource_reach_distance",
+    "in_combat"
+  },
   ["wire-color"] = { "green", "red" }
 }
 
@@ -316,6 +395,29 @@ local logic = {
       local param = params[1]
       return function(entity)
         return numeric(entity.force[param])
+      end
+    end
+  },
+  entityData = {
+    description = "Get data from an entity",
+    parameters = { "entity", "entity-data" },
+    result = "number",
+    parse = function(params)
+      local target = params[1]
+      local param = params[2]
+      return function(entity)
+        local resolved = resolve_entity(entity, target)
+        if not resolved or not resolved.valid then
+          return 0
+        end
+        local status, result = pcall(function()
+          return numeric(resolved[param])
+        end)
+        if not status then
+          entity.force.print("[Advanced Combinator] " .. common.worldAndPos(entity) .. ": " .. result)
+          return 0
+        end
+        return result
       end
     end
   },
