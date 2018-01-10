@@ -169,7 +169,14 @@ local function get_default_model(function_name, advanced_combinator)
       table.insert(params, { name = "const", params = { "1" } })
     elseif param_type == "signal-id" then
       table.insert(params, "virtual/signal-0")
---      table.insert(params, { name = "signal_type", params = { "virtual/signal-0" } })
+    elseif param_type == "signal-array" then
+      table.insert(params, { name = "network", params = { "top", "green" } })
+    elseif param_type == "signal-type" then
+      table.insert(params, { name = "signal_type", params = { "virtual/signal-0" } })
+    elseif param_type == "signal" then
+      table.insert(params, { name = "signal", params = get_default_model("signal", advanced_combinator).params })
+    else
+      error("No default model specified for type " .. param_type)
     end
   end
 

@@ -192,7 +192,7 @@ data:extend({
     icon_size = 32,
     flags = { "goes-to-quickbar" },
     subgroup = "circuit-network",
-    place_result="advanced-combinator",
+    place_result = "advanced-combinator",
     order = "b[combinators]-u[advanced-combinator]",
     stack_size= 50,
   }

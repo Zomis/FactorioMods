@@ -292,11 +292,61 @@ local logic = {
       end
     end
   },
+  set_signal = {
+    description = "At the index specified by the first parameter, set the signal and value of the second parameter",
+    parameters = { "number", "signal" },
+    result = "command",
+    parse = function(params)
+      local param_index = params[1]
+      local param_signal = params[2]
+      return function(entity, current)
+        local target_index = param_index.func(entity, current)
+        local signal = param_signal.func(entity, current)
+        if not signal or not signal.signal then
+          return
+        end
+        local max_range = constants[entity.name]
+        if target_index < 0 or target_index > max_range then
+          entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value outside range 1.." .. max_range .. ": " .. target_index)
+          return
+        end
+        signal.count = range_check(signal.count, entity)
+        current[target_index] = { signal = signal.signal, count = signal.count, index = target_index }
+      end
+    end
+  },
   sum = {
-    description = "",
-    parameters = { "array" },
+    description = "Return the sum of an array of numbers",
+    parameters = { "number-array" },
     result = "number",
-    parse = function()
+    parse = function(params)
+      local param_array = params[1]
+      return function(entity, current)
+        local sum = 0
+        local array = param_array.func(entity, current)
+        for _, v in ipairs(array) do
+          sum = sum + v
+        end
+        return sum
+      end
+    end
+  },
+  max_signal = {
+    description = "Return the maximum signal of an array of signals",
+    parameters = { "signal-array" },
+    result = "signal",
+    parse = function(params)
+      local param_array = params[1]
+      return function(entity, current)
+        local max = nil
+        local array = param_array.func(entity, current)
+        for _, v in ipairs(array) do
+          if not max or v.count > max.count then
+            max = v
+          end
+        end
+        return max
+      end
     end
   },
   network = {
@@ -338,6 +388,21 @@ local logic = {
     parameters = { "entity", "string-signal" },
     result = "number",
     parse = item_from_network(defines.wire_type.red)
+  },
+  signal = {
+    description = "Create a signal from a type and a value",
+    parameters = { "signal-type", "number" },
+    result = "signal",
+    parse = function(params)
+      local signal_type = params[1]
+      local signal_value = params[2]
+      return function(entity, current)
+        return {
+          signal = signal_type.func(entity, current),
+          count = signal_value.func(entity, current)
+        }
+      end
+    end
   },
   signal_type = {
     description = "A constant signal type",
@@ -483,6 +548,8 @@ local function parse(data, params, entity)
           error("No such signal type: " .. param_value)
         end
       end
+    elseif param_type == "signal" and param_value == nil then
+
     else
       if type(param_value) ~= "table" then
         error("Unable to validate parameter " .. tostring(param_value) .. " of expected type " .. param_type)
