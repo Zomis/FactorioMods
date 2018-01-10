@@ -1,3 +1,4 @@
+local constants = require "constants"
 local common = require "common"
 
 local function resolve_signalID(type_and_name)
@@ -167,6 +168,11 @@ local logic = {
         local signal_id = resolve_signalID(param_signal)
         -- local signal = param_signal.func(entity, current)
         local count = param_number.func(entity, current)
+        local max_range = constants[entity.name]
+        if target_index < 0 or target_index > max_range then
+          entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value outside range 1.." .. max_range .. ": " .. target_index)
+          return
+        end
         current[target_index] = { signal = signal_id, count = count, index = target_index }
       end
     end
