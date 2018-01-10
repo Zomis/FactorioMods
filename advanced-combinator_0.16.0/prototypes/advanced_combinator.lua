@@ -1,3 +1,5 @@
+local combinator_slot_counts = require "../constants"
+
 data:extend({
 {
     type = "constant-combinator",
@@ -12,7 +14,7 @@ data:extend({
     collision_box = {{-0.35, -0.35}, {0.35, 0.35}},
     selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
 
-    item_slot_count = 20,
+    item_slot_count = combinator_slot_counts["advanced-combinator"],
 
 
     energy_source =
