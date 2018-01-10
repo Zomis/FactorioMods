@@ -23,6 +23,12 @@ local function onLoad()
       v.entity.force.print("[Advanced Combinator] Unable to parse combinator at " ..
         common.worldAndPos(v.entity) .. ": " .. result)
     end
+
+    for _, player in pairs(v.entity.force.players) do
+      if player.gui.center["advancedCombinatorUI"] then
+        player.gui.center["advancedCombinatorUI"].destroy()
+      end
+    end
   end
 end
 
