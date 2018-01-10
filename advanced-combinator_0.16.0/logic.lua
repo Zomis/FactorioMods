@@ -146,6 +146,23 @@ local logic = {
       end
     end
   },
+  set = {
+    description = "At the index specified by the first parameter, set the signal of second parameter to the value returned by the third parameter",
+    parameters = { "number", "string-signal", "number" },
+    result = "command",
+    parse = function(params)
+      local param_index = params[1]
+      local param_signal = params[2]
+      local param_number = params[3]
+      return function(entity, current)
+        local target_index = param_index.func(entity, current)
+        local signal_id = resolve_signalID(param_signal)
+        -- local signal = param_signal.func(entity, current)
+        local count = param_number.func(entity, current)
+        current[target_index] = { signal = signal_id, count = count, index = target_index }
+      end
+    end
+  },
   sum = {
     description = "",
     parameters = { "array" },

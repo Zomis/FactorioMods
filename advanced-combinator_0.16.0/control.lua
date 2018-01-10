@@ -57,16 +57,16 @@ local function onPlaceEntity(event)
       entity = event.created_entity,
       updatePeriod = 1,
       config =
---        "1:virtual/signal-A = mod(add(previous(1),const(1)),const(60))\n" ..
---        "2:virtual/signal-B = current(1)\n" ..
---        "3:virtual/signal-C = add(green(this,item/iron-plate),red(this,item/copper-plate))\n" ..
-        "4:virtual/signal-T = gameData(tick)\n" ..
-        "5:virtual/signal-S = div(current(4),const(60))\n" ..
-        "6:virtual/signal-H = div(current(5),const(3600))\n" ..
-        "7:virtual/signal-M = mod(div(current(5),const(60)),const(60))\n" ..
-        "5:virtual/signal-S = mod(current(5),const(60))\n"
---        "8:virtual/signal-W = mult(surfaceData(daytime),const(1000))\n" ..
---        "20:virtual/signal-Z = add(previous(4),green(this,item/iron-plate))"
+--        "set(const(1),virtual/signal-A,mod(add(previous(1),const(1)),const(60))\n" ..
+--        "set(const(2),virtual/signal-B,current(1))\n" ..
+--        "set(const(3),virtual/signal-C,add(green(this,item/iron-plate),red(this,item/copper-plate)))\n" ..
+        "set(const(4),virtual/signal-T,gameData(tick))\n" ..
+        "set(const(5),virtual/signal-S,div(current(4),const(60)))\n" ..
+        "set(const(6),virtual/signal-H,div(current(5),const(3600)))\n" ..
+        "set(const(7),virtual/signal-M,mod(div(current(5),const(60)),const(60)))\n" ..
+        "set(const(5),virtual/signal-S,mod(current(5),const(60)))\n"
+--        "set(const(8),virtual/signal-W,mult(surfaceData(daytime),const(1000)))\n" ..
+--        "set(const(20),virtual/signal-Z,add(previous(4),green(this,item/iron-plate)))"
     }
     updateConfiguration(entity)
   end

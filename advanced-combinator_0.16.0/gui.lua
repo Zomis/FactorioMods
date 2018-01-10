@@ -122,16 +122,9 @@ local function openGUI(player, advanced_combinator, runtime)
     -- Move Up, Move Down, Delete
     local flow = list.add({ type = "flow", name = "index" .. k, direction = "horizontal" })
     flow = flow.add({ type = "flow", name = "command", direction = "horizontal" })
-    local index_box = flow.add({ type = "textfield", name = "index_box", text = command.index })
-    index_box.tooltip = { "", "The index to use on the constant combinator" }
-    index_box.style.width = 30
-
-    local signal_result = flow.add({ type = "choose-elem-button", name = "signal_result", elem_type = "signal", signal = command.signal_result })
-    signal_result.tooltip = { "", "The signal to use as result for this calculation" }
 
     local calculation = flow.add({ type = "flow", name = "calculation", direction = "horizontal" })
-    add_calculation_gui(calculation, command.calculation, "number")
-
+    add_calculation_gui(calculation, command, "command")
   end
 
   -- add(add(green(this,item/iron-plate),red(this,item/copper-plate)),current(1))
@@ -240,13 +233,7 @@ local function change_verified(player_current, element)
 
   for _, command_index_gui in ipairs(gui_command_list.children) do
     local gui_command = command_index_gui.command
-    local command_string = ""
-    command_string = command_string .. gui_command.index_box.text .. ":"
-
-    local signal = gui_command.signal_result.elem_value
-    command_string = command_string .. common.signal_to_string(signal) .. " = "
-    command_string = command_string .. gui_command_to_string(gui_command.calculation)
-
+    local command_string = gui_command_to_string(gui_command.calculation)
     multiline_string = multiline_string .. command_string .. "\n"
   end
 
