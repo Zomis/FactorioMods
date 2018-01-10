@@ -43,52 +43,10 @@ local function parseCalculation(text, advanced_combinator, entity)
   return error("No parenthesis found in " .. text)
 end
 
-local function parseCommand(advanced_combinator, entity, command)
-  -- table.insert(commands, command)
-  -- a = const(20)
-
-  local equalsIndex = string.find(command, " = ")
-  local colon = string.find(command, ":")
-  if not equalsIndex and not colon then
-    -- Parse as command
-    entity.force.print("new parsing")
-    return parseCalculation(command, advanced_combinator, entity)
-  end
-  if not equalsIndex then
-    error("Missing ' = ' in " .. command)
-  end
-  if not colon then
-    error("Missing ':' in " .. command)
-  end
-
-  local target_index = tonumber(string.sub(command, 1, colon - 1))
-  command = string.sub(command, colon + 1)
-  equalsIndex = string.find(command, " = ")
-
-  local result_signal = string.sub(command, 1, equalsIndex - 1)
-  local signal = logic.resolve_signalID(result_signal)
-
-  local result_value = string.sub(command, equalsIndex + 3)
-  local result_function = parseCalculation(result_value, advanced_combinator, entity)
-
-  local set_command = "set(const(" .. target_index .. ")," .. result_signal .. "," .. result_value .. ")"
-  entity.force.print("old parsing: " .. set_command)
-  if result_function.func then
-    local command_function = function(ent, result)
-      local count = result_function.func(ent, result)
-      result[target_index] = { signal = signal, count = count, index = target_index }
-    end
-    return parseCalculation(set_command)
---    table.insert(commands, { signal_result = signal, index = target_index, calculation = result_function, func = command_function })
-  else -- type should be table
-    error("Unexpected result when parsing command " .. command)
-  end
-end
-
 local function parse(advanced_combinator, entity)
   local commands = {}
   for command in string.gmatch(advanced_combinator.config, "[^\n]+") do
-    local parsed_command = parseCommand(advanced_combinator, entity, command)
+    local parsed_command = parseCalculation(command, advanced_combinator, entity)
     table.insert(commands, parsed_command)
   end
 
