@@ -37,6 +37,13 @@ local function item_from_network(wire_type)
  end
 end
 
+local function numeric(value)
+  if type(value) == "boolean" then
+    if value then return 1 else return 0 end
+  end
+  return value
+end
+
 local enum_types = {
   ["game-data"] = {
     "tick", "speed"
@@ -229,7 +236,7 @@ local logic = {
     parse = function(params)
       local param = params[1]
       return function()
-        return game[param]
+        return numeric(game[param])
       end
     end
   },
@@ -240,7 +247,7 @@ local logic = {
     parse = function(params)
       local param = params[1]
       return function(entity)
-        return entity.surface[param]
+        return numeric(entity.surface[param])
       end
     end
   },
@@ -251,7 +258,7 @@ local logic = {
     parse = function(params)
       local param = params[1]
       return function(entity)
-        return entity.force[param]
+        return numeric(entity.force[param])
       end
     end
   },
