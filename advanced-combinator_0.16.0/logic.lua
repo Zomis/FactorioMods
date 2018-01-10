@@ -46,6 +46,34 @@ local enum_types = {
     "daytime", "darkness", "wind_speed", "wind_orientation", "wind_orientation_change", "ticks_per_day", "dusk", "dawn", "evening", "morning"
     -- "peaceful_mode", "freeze_daytime",
   },
+  ["force-data"] = {
+    "manual_mining_speed_modifier", "manual_crafting_speed_modifier",
+    "laboratory_speed_modifier", "laboratory_productivity_bonus",
+    "worker_robots_speed_modifier", "worker_robots_battery_modifier",
+    "worker_robots_storage_bonus", "research_progress",
+    "inserter_stack_size_bonus", "stack_inserter_capacity_bonus",
+    "character_logistic_slot_count", "character_trash_slot_count",
+    "quickbar_count", "maximum_following_robot_count", "following_robots_lifetime_modifier",
+    "ghost_time_to_live",
+    -- players
+    "ai_controllable",
+    "item_production_statistics", "fluid_production_statistics",
+    "kill_count_statistics", "entity_build_count_statistics",
+    "character_running_speed_modifier", "artillery_range_modifier",
+    "character_build_distance_bonus", "character_item_drop_distance_bonus",
+    "character_reach_distance_bonus", "character_resource_reach_distance_bonus",
+    "character_item_pickup_distance_bonus", "character_loot_pickup_distance_bonus",
+    "character_inventory_slots_bonus", "deconstruction_time_to_live",
+    "character_health_bonus", "max_successful_attemps_per_tick_per_construction_queue",
+    "max_failed_attempts_per_tick_per_construction_queue", "auto_character_trash_slots",
+    "zoom_to_world_enabled", "zoom_to_world_ghost_building_enabled",
+    "zoom_to_world_blueprint_enabled", "zoom_to_world_deconstruction_planner_enabled",
+    "zoom_to_world_selection_tool_enabled", "rockets_launched",
+    -- items_launched
+    -- connected_players
+    "mining_drill_productivity_bonus", "train_braking_force_bonus",
+    "evolution_factor", "friendly_fire", "share_chart"
+  },
   ["entity"] = { "this", "top", "left", "right", "bottom" },
   ["wire-color"] = { "green", "red" }
 }
@@ -213,6 +241,17 @@ local logic = {
       local param = params[1]
       return function(entity)
         return entity.surface[param]
+      end
+    end
+  },
+  forceData = {
+    description = "Get data from the force owning this Advanced Combinator",
+    parameters = { "force-data" },
+    result = "number",
+    parse = function(params)
+      local param = params[1]
+      return function(entity)
+        return entity.force[param]
       end
     end
   },
