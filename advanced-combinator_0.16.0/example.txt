@@ -2,9 +2,10 @@
 -- TODO: min, max, typeof, valueof (returns signal)
 -- TODO: use typeof as signal type and set to = const(42)
 -- TODO: if, entityData
--- TODO: top/left/right/bottom (entity resolve)
 -- TODO: random(1,100)
 
+boolean data type?
+if-else(boolean,any,any)
 
 -- 1:result_value = func(func(a), func(20))
 

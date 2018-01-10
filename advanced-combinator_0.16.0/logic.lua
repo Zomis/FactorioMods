@@ -11,9 +11,28 @@ local function resolve_signalID(type_and_name)
   return { type = signal_type, name = signal_name }
 end
 
+local function find_entity(source, offset_x, offset_y)
+  local position = source.position
+  local surface = source.surface
+  local found = surface.find_entities_filtered({position = { source.position.x, source.position.y - 1 }})
+  return found and found[1] or nil
+end
+
 local function resolve_entity(entity, target)
   if target == "this" then
     return entity
+  end
+  if target == "top" then
+    return find_entity(entity, 0, -1)
+  end
+  if target == "left" then
+    return find_entity(entity, -1, 0)
+  end
+  if target == "right" then
+    return find_entity(entity, 1, 0)
+  end
+  if target == "bottom" then
+    return find_entity(entity, 0, 1)
   end
   error("Unable to resolve entity: " .. target)
 end
@@ -22,12 +41,11 @@ local function item_from_network(wire_type)
   return function(params, entity)
    local target = params[1]
    local signal_id = resolve_signalID(params[2])
-   local resolved = resolve_entity(entity, target)
 
-   return function()
-     if not resolved.valid then
-       -- invalidate this, it needs to be reparsed, or removed if there is no such entity at all
-       return { error = "Invalid target entity" }
+   return function(ent)
+     local resolved = resolve_entity(ent, target)
+     if not resolved or not resolved.valid then
+       return 0
      end
      local network = resolved.get_circuit_network(wire_type)
      if not network then
@@ -198,10 +216,18 @@ local logic = {
       elseif wire_color == "green" then
         wire_type = defines.wire_type.green
       else
-        return { error = "Unknown wire color: " .. wire_color }
+        error("Unknown wire type: " .. wire_color)
       end
-      return function()
-        -- to be implemented
+      return function(ent)
+        local resolved = resolve_entity(ent, target)
+        if not resolved or not resolved.valid then
+          return 0
+        end
+        local network = resolved.get_circuit_network(wire_type)
+        if not network then
+          return 0
+        end
+        return network.signals
       end
     end
   },
