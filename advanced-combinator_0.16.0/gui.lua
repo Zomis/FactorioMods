@@ -60,8 +60,7 @@ local function add_calculation_gui(gui, model, expected_result)
     return
   end
   if expected_result == "string-signal" then
-    local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
-    textfield.style.width = 50
+    gui.add({ type = "choose-elem-button", name = "signal_choice", elem_type = "signal", signal = logic.resolve_signalID(model) })
     return
   end
   if logic.enum_types[expected_result] then
@@ -189,7 +188,7 @@ local function gui_command_to_string(element)
   elseif element.type == "textfield" then
     return element.text
   elseif element.type == "choose-elem-button" then
-    return element.signal
+    return common.signal_to_string(element.elem_value)
   elseif element.type == "drop-down" then
     return element.get_item(element.selected_index)
   elseif element.type == "label" then
