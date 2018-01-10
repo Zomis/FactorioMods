@@ -277,6 +277,9 @@ local logic = {
       return function(entity, current)
         local target_index = param_index.func(entity, current)
         local signal_id = resolve_signalID(param_signal)
+        if not signal_id then
+          return
+        end
         -- local signal = param_signal.func(entity, current)
         local count = param_number.func(entity, current)
         local max_range = constants[entity.name]
