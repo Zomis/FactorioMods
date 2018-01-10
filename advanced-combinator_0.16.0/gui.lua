@@ -2,6 +2,17 @@ local logic = require "logic"
 local common = require "common"
 local current = {} -- Key: player index, Value: { gui = frameRoot, combinator = advanced_combinator }
 
+local function is_in_gui_heirarchy(element, expected)
+  local el = element
+  while el.parent do
+    if el.parent == expected then
+      return true
+    end
+    el = el.parent
+  end
+  return false
+end
+
 local function click(player, element, update_callback)
   local player_current = current[player.index]
   if not player_current then
@@ -248,12 +259,8 @@ local function change(player, element)
     return
   end
   local expected_gui = player_current.gui
-  local el = element
-  while el.parent do
-    if el.parent == expected_gui then
-      change_verified(player_current, element)
-    end
-    el = el.parent
+  if is_in_gui_heirarchy(element, expected_gui) then
+    change_verified(player_current, element)
   end
 end
 
