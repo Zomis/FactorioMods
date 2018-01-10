@@ -130,7 +130,11 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1.func(entity, current) / param2.func(entity, current)
+        local divby = param2.func(entity, current)
+        if divby == 0 then
+          return 0
+        end
+        return param1.func(entity, current) / divby
       end
     end
   },
@@ -142,7 +146,11 @@ local logic = {
       local param1 = params[1]
       local param2 = params[2]
       return function(entity, current)
-        return param1.func(entity, current) % param2.func(entity, current)
+        local divby = param2.func(entity, current)
+        if divby == 0 then
+          return 0
+        end
+        return param1.func(entity, current) % divby
       end
     end
   },
