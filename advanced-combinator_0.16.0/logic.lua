@@ -11,6 +11,15 @@ local function resolve_signalID(type_and_name)
   return { type = signal_type, name = signal_name }
 end
 
+local function range_check(value, entity)
+  if value < -2147483648 or value > 2147483647 then
+    entity.force.print("[Advanced Combinator] " .. common.worldAndPos(entity) ..
+      " Warning: Tried to set value outside valid range (-2147483648..2147483647). Using fallback of -1")
+    return -1
+  end
+  return value
+end
+
 local function find_entity(source, offset_x, offset_y)
   local position = source.position
   local surface = source.surface
@@ -275,6 +284,7 @@ local logic = {
           entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value outside range 1.." .. max_range .. ": " .. target_index)
           return
         end
+        count = range_check(count, entity)
         current[target_index] = { signal = signal_id, count = count, index = target_index }
       end
     end
@@ -289,7 +299,7 @@ local logic = {
   network = {
     description = "",
     parameters = { "entity", "wire-color" },
-    result = "array",
+    result = "signal-array",
     parse = function(params, entity)
       local entity_target = params[1]
       local wire_color = params[2]
