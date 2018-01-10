@@ -15,7 +15,7 @@ local function find_entity(source, offset_x, offset_y)
   local position = source.position
   local surface = source.surface
   local found = surface.find_entities_filtered({position = {
-    source.position.x + offset_x, source.position.y + offset_y
+    position.x + offset_x, position.y + offset_y
   }})
   return found and found[1] or nil
 end
@@ -40,7 +40,7 @@ local function resolve_entity(entity, target)
 end
 
 local function item_from_network(wire_type)
-  return function(params, entity)
+  return function(params)
    local target = params[1]
    local signal_id = resolve_signalID(params[2])
 
@@ -291,8 +291,7 @@ local logic = {
     parameters = { "entity", "wire-color" },
     result = "array",
     parse = function(params, entity)
-      local resolved = resolve_entity(entity, params[1])
-
+      local entity_target = params[1]
       local wire_color = params[2]
       local wire_type
       if wire_color == "red" then
@@ -303,7 +302,7 @@ local logic = {
         error("Unknown wire type: " .. wire_color)
       end
       return function(ent)
-        local resolved = resolve_entity(ent, target)
+        local resolved = resolve_entity(ent, entity_target)
         if not resolved or not resolved.valid then
           return 0
         end
