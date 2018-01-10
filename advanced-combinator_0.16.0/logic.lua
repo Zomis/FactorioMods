@@ -62,6 +62,9 @@ local function numeric(value)
   if type(value) == "boolean" then
     if value then return 1 else return 0 end
   end
+  if not value then
+    return 0
+  end
   return value
 end
 
