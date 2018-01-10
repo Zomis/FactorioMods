@@ -14,7 +14,9 @@ end
 local function find_entity(source, offset_x, offset_y)
   local position = source.position
   local surface = source.surface
-  local found = surface.find_entities_filtered({position = { source.position.x, source.position.y - 1 }})
+  local found = surface.find_entities_filtered({position = {
+    source.position.x + offset_x, source.position.y + offset_y
+  }})
   return found and found[1] or nil
 end
 
