@@ -18,14 +18,14 @@ local function print_recursive_table(data, indentation)
     indentation = ""
   end
   if type(data) ~= "table" then
-    game.print(indentation .. tostring(data))
+    out(indentation .. tostring(data))
     return
   end
   for k,v in pairs(data) do
     if type(v) == "table" then
       print_recursive_table(v, indentation .. "." .. k)
     elseif type(v) ~= "function" then
-      game.print(indentation .. "[" .. k .. "]" .. " = " .. tostring(v))
+      out(indentation .. "[" .. k .. "]" .. " = " .. tostring(v))
     end
   end
 end

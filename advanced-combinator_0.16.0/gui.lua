@@ -57,7 +57,7 @@ local function add_calculation_gui(gui, model, expected_result)
     gui.add({ type = "drop-down", name = "enum_value", items = items, selected_index = selected_index })
     return
   end
-  game.print("add_calculation_gui for " .. expected_result .. " model:")
+  common.out("add_calculation_gui for " .. expected_result .. " model:")
   common.print_recursive_table(model, "")
 
   -- model.name, model.params[1], model.params[2]
