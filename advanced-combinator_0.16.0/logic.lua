@@ -78,11 +78,11 @@ local function numeric(value)
 end
 
 local function sum(array_of_signals)
-  local sum = 0
+  local result = 0
   for _, v in ipairs(array_of_signals) do
-    sum = sum + v.count
+    result = result + v.count
   end
-  return sum
+  return result
 end
 
 local function compare(first_value, compare_method, second_value)
@@ -385,7 +385,6 @@ local logic = {
       local param_array = params[1]
       return function(entity, current)
         local array = param_array.func(entity, current)
-        local count = #array
         return sum(array)
       end
     end
@@ -399,8 +398,8 @@ local logic = {
       return function(entity, current)
         local array = param_array.func(entity, current)
         local count = #array
-        local sum = sum(array)
-        return sum / count
+        local array_sum = sum(array)
+        return array_sum / count
       end
     end
   },
@@ -444,7 +443,7 @@ local logic = {
     description = "",
     parameters = { "entity", "wire-color" },
     result = "signal-array",
-    parse = function(params, entity)
+    parse = function(params)
       local entity_target = params[1]
       local wire_color = params[2]
       local wire_type
@@ -703,11 +702,10 @@ local function parse(data, params, entity)
           error("No such signal type: " .. param_value)
         end
       end
-    elseif param_type == "signal?" and param_value == nil then
+    elseif param_type ~= "signal?" or param_value ~= nil then
       -- nil is an acceptable value for "signal?" (but should it be allowed when parsing??)
-    else
       if type(param_value) ~= "table" then
-        error("Unable to validate parameter " .. tostring(param_value) .. " of expected type " .. param_type)
+        error("Unable to validate parameter value " .. tostring(param_value) .. " of expected type " .. param_type)
       end
       if game then
         common.out("No validation for type " .. param_type)
