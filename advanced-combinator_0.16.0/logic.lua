@@ -279,6 +279,17 @@ local logic = {
       end
     end
   },
+  abs = {
+    description = "Absolute value of a number (change negative values to positive)",
+    parameters = { "number" },
+    result = "number",
+    parse = function(params)
+      local param = params[1]
+      return function(entity, current)
+        return math.abs(param.func(entity, current))
+      end
+    end
+  },
   set = {
     description = "At the index specified by the first parameter, set the signal of second parameter to the value returned by the third parameter",
     parameters = { "number", "string-signal", "number" },
