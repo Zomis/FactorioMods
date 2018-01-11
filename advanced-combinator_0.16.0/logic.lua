@@ -77,7 +77,25 @@ local function numeric(value)
   return value
 end
 
+local function compare(first_value, compare_method, second_value)
+  if compare_method == "=" then
+    return first_value == second_value
+  elseif compare_method == "<=" then
+    return first_value <= second_value
+  elseif compare_method == "<" then
+    return first_value < second_value
+  elseif compare_method == ">=" then
+    return first_value >= second_value
+  elseif compare_method == ">" then
+    return first_value > second_value
+  elseif compare_method == "≠" then
+    return first_value ~= second_value
+  end
+  error("Not a valid compare method: " .. compare_method)
+end
+
 local enum_types = {
+  ["compare-method"] = { "<", "<=", "=", ">=", ">", "≠" },
   ["game-data"] = {
     "tick", "speed"
     --, "players"--, active_mods?, connected_players, #item_prototypes?
@@ -473,6 +491,48 @@ local logic = {
     parse = function(params)
       local value = tonumber(params[1])
       return function() return value end
+    end
+  },
+  compare = {
+    description = "Compare two numbers",
+    parameters = { "number", "compare-method", "number" },
+    result = "boolean",
+    parse = function(params)
+      local first = params[1]
+      local compare_method = params[2]
+      local second = params[3]
+      return function(entity, current)
+        local first_value = first.func(entity, current)
+        local second_value = second.func(entity, current)
+        return compare(first_value, compare_method, second_value)
+      end
+    end
+  },
+  boolean_to_number = {
+    description = "Convert a boolean to a number. 1 == true and 0 == false",
+    parameters = { "boolean" },
+    result = "number",
+    parse = function(params)
+      local value = params[1]
+      return function(entity, current)
+        local bool = value.func(entity, current)
+        return bool and 1 or 0
+      end
+    end
+  },
+  ["if"] = {
+    description = "Perform a command if condition is true",
+    parameters = { "boolean", "command" },
+    result = "command",
+    parse = function(params)
+      local param_condition = params[1]
+      local param_command = params[2]
+      return function(entity, current)
+        local condition = param_condition.func(entity, current)
+        if condition then
+          return param_command.func(entity, current)
+        end
+      end
     end
   },
   current = {
