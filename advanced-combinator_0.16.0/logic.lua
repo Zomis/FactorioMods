@@ -425,6 +425,36 @@ local logic = {
       return function() return value end
     end
   },
+  value_of_signal = {
+    description = "Get the value of a signal",
+    parameters = { "signal?" },
+    result = "number",
+    parse = function(params)
+      local param_signal = params[1]
+      return function(entity, current)
+        local signal = param_signal.func(entity, current)
+        if not signal then
+          return 0
+        end
+        return signal.count
+      end
+    end
+  },
+  type_of_signal = {
+    description = "Get the type of a signal",
+    parameters = { "signal?" },
+    result = "signal-type",
+    parse = function(params)
+      local param_signal = params[1]
+      return function(entity, current)
+        local signal = param_signal.func(entity, current)
+        if not signal then
+          return nil
+        end
+        return signal.signal
+      end
+    end
+  },
   const = {
     description = "A constant number",
     parameters = { "string-number" },
