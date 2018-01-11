@@ -312,7 +312,7 @@ local logic = {
   },
   set_signal = {
     description = "At the index specified by the first parameter, set the signal and value of the second parameter",
-    parameters = { "number", "signal" },
+    parameters = { "number", "signal?" },
     result = "command",
     parse = function(params)
       local param_index = params[1]
@@ -346,7 +346,7 @@ local logic = {
   max_signal = {
     description = "Return the maximum signal of an array of signals",
     parameters = { "signal-array" },
-    result = "signal",
+    result = "signal?",
     parse = function(params)
       local param_array = params[1]
       return function(entity, current)
@@ -404,7 +404,7 @@ local logic = {
   signal = {
     description = "Create a signal from a type and a value",
     parameters = { "signal-type", "number" },
-    result = "signal",
+    result = "signal?",
     parse = function(params)
       local signal_type = params[1]
       local signal_value = params[2]
@@ -560,8 +560,8 @@ local function parse(data, params, entity)
           error("No such signal type: " .. param_value)
         end
       end
-    elseif param_type == "signal" and param_value == nil then
-
+    elseif param_type == "signal?" and param_value == nil then
+      -- nil is an acceptable value for "signal?" (but should it be allowed when parsing??)
     else
       if type(param_value) ~= "table" then
         error("Unable to validate parameter " .. tostring(param_value) .. " of expected type " .. param_type)
