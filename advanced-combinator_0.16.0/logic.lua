@@ -692,7 +692,7 @@ local function parse(data, params, entity)
       if game then
         local signal = resolve_signalID(param_value)
         if not signal then
-          error("No such signal: " .. param_value)
+          error("No such signal: " .. tostring(param_value))
         end
         if signal.type == "fluid" then
           if not game.fluid_prototypes[signal.name] then

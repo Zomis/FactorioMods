@@ -1,3 +1,4 @@
+local common = require "common"
 local logic = require "logic"
 
 local function perform(advanced_combinator, runtime_combinator)
@@ -45,8 +46,9 @@ end
 
 local function parse(advanced_combinator, entity)
   local commands = {}
-  for command in string.gmatch(advanced_combinator.config, "[^\n]+") do
-    local parsed_command = parseCalculation(command, advanced_combinator, entity)
+  for command in string.gmatch(advanced_combinator.config, "[^\n;]+") do
+    local trimmed = common.trim(command)
+    local parsed_command = parseCalculation(trimmed, advanced_combinator, entity)
     table.insert(commands, parsed_command)
   end
 

@@ -216,7 +216,7 @@ local function gui_command_to_string(element)
   elseif element.type == "label" then
     return common.trim(element.caption)
   end
-  common.out("[Advanced Combinator] Warning: Unknown element type " .. element.type)
+  error("[Advanced Combinator] Warning: Unknown element type " .. element.type)
 end
 
 local function change_verified(player_current, element)
@@ -256,7 +256,7 @@ local function change_verified(player_current, element)
   for key, command_index_gui in ipairs(gui_command_list.children) do
     local gui_command = command_index_gui.command
     if gui_command then
-      local command_string = gui_command_to_string(gui_command.calculation)
+      local command_string = gui_command_to_string(gui_command.calculation) .. ";"
       if key > 1 then
         multiline_string = multiline_string .. "\n"
       end
