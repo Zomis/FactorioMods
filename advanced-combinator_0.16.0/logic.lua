@@ -77,6 +77,14 @@ local function numeric(value)
   return value
 end
 
+local function sum(array_of_signals)
+  local sum = 0
+  for _, v in ipairs(array_of_signals) do
+    sum = sum + v.count
+  end
+  return sum
+end
+
 local function compare(first_value, compare_method, second_value)
   if compare_method == "=" then
     return first_value == second_value
@@ -356,19 +364,61 @@ local logic = {
       end
     end
   },
-  sum = {
-    description = "Return the sum of an array of numbers",
-    parameters = { "number-array" },
+  count = {
+    description = "Return the number of values in an array of signals",
+    parameters = { "signal-array" },
     result = "number",
     parse = function(params)
       local param_array = params[1]
       return function(entity, current)
-        local sum = 0
+        local array = param_array.func(entity, current)
+        local count = #array
+        return count
+      end
+    end
+  },
+  sum = {
+    description = "Return the sum of the signal values in an array of signals",
+    parameters = { "signal-array" },
+    result = "number",
+    parse = function(params)
+      local param_array = params[1]
+      return function(entity, current)
+        local array = param_array.func(entity, current)
+        local count = #array
+        return sum(array)
+      end
+    end
+  },
+  avg = {
+    description = "Return the average value of an array of signals",
+    parameters = { "signal-array" },
+    result = "number",
+    parse = function(params)
+      local param_array = params[1]
+      return function(entity, current)
+        local array = param_array.func(entity, current)
+        local count = #array
+        local sum = sum(array)
+        return sum / count
+      end
+    end
+  },
+  min_signal = {
+    description = "Return the maximum signal of an array of signals",
+    parameters = { "signal-array" },
+    result = "signal?",
+    parse = function(params)
+      local param_array = params[1]
+      return function(entity, current)
+        local min = nil
         local array = param_array.func(entity, current)
         for _, v in ipairs(array) do
-          sum = sum + v
+          if not min or v.count < min.count then
+            min = v
+          end
         end
-        return sum
+        return min
       end
     end
   },
@@ -614,14 +664,6 @@ local logic = {
         end
         return result
       end
-    end
-  },
-  array = {
-    description = "",
-    parameters = { "number" },
-    varargs = true,
-    result = "array",
-    parse = function()
     end
   }
 }
