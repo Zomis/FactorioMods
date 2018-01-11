@@ -13,23 +13,6 @@ local function is_in_gui_heirarchy(element, expected)
   return false
 end
 
-local function click(player, element, update_callback)
-  local player_current = current[player.index]
-  if not player_current then
-    return
-  end
-  if element == player_current.gui.header.apply_button then
-    player_current.combinator.updatePeriod = tonumber(player_current.gui.header.update_frequency.text)
-    player_current.combinator.config = player_current.gui.commands.text
-    update_callback(player_current.combinator.entity)
-    return
-  end
-  if element == player_current.gui.header.close_button then
-    player_current.gui.destroy()
-    current[player.index] = nil
-  end
-end
-
 local function find_functions_for_type(type)
   local result = {}
   for name, data in pairs(logic.logic) do
@@ -112,12 +95,19 @@ local function openGUI(player, advanced_combinator, runtime)
   header.add({ type = "button", name = "apply_button", caption = "Apply" })
   header.add({ type = "button", name = "close_button", caption = "Close" })
 
-  local frame = frameRoot.add({type = "scroll-pane", name = "command_list", style = "advanced_combinator_list2"})
+  local frame = frameRoot.add({type = "scroll-pane", name = "command_list" })
+  frame.style.minimal_width = 400
+  frame.style.minimal_height = 100
+  frame.style.maximal_width = 800
+  frame.style.maximal_height = 400
+
+  frameRoot.add({ type = "label", name = "editor_label_1", caption = "Commands. Only edit this manually is you know what you are doing." })
+  frameRoot.add({ type = "label", name = "editor_label_2", caption = "Can be used for copy-pasting and sharing your creation." })
 
   local editor = frameRoot.add({ type = "text-box", name = "commands", text = advanced_combinator.config })
   editor.word_wrap = false
   editor.style.width = 400
-  editor.style.height = 400
+  editor.style.height = 300
 
   common.print_recursive_table(runtime, "data")
 
@@ -125,11 +115,21 @@ local function openGUI(player, advanced_combinator, runtime)
   for k, command in ipairs(runtime.commands) do
     -- Move Up, Move Down, Delete
     local flow = list.add({ type = "flow", name = "index" .. k, direction = "horizontal" })
+    local button
+    button = flow.add({ type = "button", name = "delete_button", caption = "X" })
+    button.tooltip = "Delete this command"
+    button = flow.add({ type = "button", name = "move_up", caption = "U" })
+    button.tooltip = "Move this command up"
+    button = flow.add({ type = "button", name = "move_down", caption = "D" })
+    button.tooltip = "Move this command down"
+
     flow = flow.add({ type = "flow", name = "command", direction = "horizontal" })
 
     local calculation = flow.add({ type = "flow", name = "calculation", direction = "horizontal" })
     add_calculation_gui(calculation, command, "command")
   end
+  local button = list.add({ type = "button", name = "add_button", caption = "Add" })
+  button.tooltip = "Add a new command"
 
   -- add(add(green(this,item/iron-plate),red(this,item/copper-plate)),current(1))
 -- COMBO_BOX '(' COMBO_BOX '(' COMBO_BOX '(' ENUM_DROP_DOWN ', ' SIGNAL_SELECT ')' ')'  ')'
@@ -252,10 +252,15 @@ local function change_verified(player_current, element)
   local multiline_string = ""
   local gui_command_list = player_current.gui.command_list
 
-  for _, command_index_gui in ipairs(gui_command_list.children) do
+  for key, command_index_gui in ipairs(gui_command_list.children) do
     local gui_command = command_index_gui.command
-    local command_string = gui_command_to_string(gui_command.calculation)
-    multiline_string = multiline_string .. command_string .. "\n"
+    if gui_command then
+      local command_string = gui_command_to_string(gui_command.calculation)
+      if key > 1 then
+        multiline_string = multiline_string .. "\n"
+      end
+      multiline_string = multiline_string .. command_string
+    end
   end
 
   player_current.gui.commands.text = multiline_string
@@ -269,6 +274,41 @@ local function change(player, element)
   local expected_gui = player_current.gui
   if is_in_gui_heirarchy(element, expected_gui) then
     change_verified(player_current, element)
+  end
+end
+
+local function click(player, element, update_callback)
+  local player_current = current[player.index]
+  if not player_current then
+    return
+  end
+  if element == player_current.gui.header.apply_button then
+    player_current.combinator.updatePeriod = tonumber(player_current.gui.header.update_frequency.text)
+    player_current.combinator.config = player_current.gui.commands.text
+    update_callback(player_current.combinator.entity)
+    return
+  end
+  if element == player_current.gui.header.close_button then
+    player_current.gui.destroy()
+    current[player.index] = nil
+    return
+  end
+  if element == player_current.gui.command_list.add_button then
+    player_current.combinator.config = player_current.gui.commands.text .. "\ncomment(Empty command)"
+    local runtime = update_callback(player_current.combinator.entity)
+    openGUI(player, player_current.combinator, runtime)
+    return
+  end
+  if element.name == "delete_button" then
+    return
+  end
+  if element.name == "move_up" or element.name == "move_down" then
+    return
+  end
+
+  if element.name == "function_name" and is_in_gui_heirarchy(element, player_current.gui) then
+    -- TODO Check if Alt is pressed or something and then perform this command and print all results to console
+    return
   end
 end
 

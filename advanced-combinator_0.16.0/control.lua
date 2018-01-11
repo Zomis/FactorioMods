@@ -44,6 +44,7 @@ local function updateConfiguration(entity)
     runtime_combinators[common.worldAndPos(entity)] = result
     entity.force.print("[Advanced Combinator] Updated Advanced Combinator at " ..
       common.worldAndPos(entity))
+    return result
   else
     entity.force.print("[Advanced Combinator] Error parsing combinator at " ..
       common.worldAndPos(entity) .. result)
