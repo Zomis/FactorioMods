@@ -247,6 +247,7 @@ local function change_verified(player_current, element)
     end
     -- Recreate new parameters GUI
     add_parameters_gui(parameters_sibling, logic_data, model, add_calculation_gui)
+    element.tooltip = logic_data.description
   end
   -- Update multiline string
   local multiline_string = ""
