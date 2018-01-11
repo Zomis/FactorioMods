@@ -278,6 +278,12 @@ local function change(player, element)
   end
 end
 
+local function saveAndRebuildGUI(player, player_current, runtime, update_callback)
+  player_current.combinator.config = player_current.gui.commands.text
+  local runtime = update_callback(player_current.combinator.entity)
+  openGUI(player, player_current.combinator, runtime)
+end
+
 local function click(player, element, update_callback)
   local player_current = current[player.index]
   if not player_current then
@@ -295,15 +301,46 @@ local function click(player, element, update_callback)
     return
   end
   if element == player_current.gui.command_list.add_button then
-    player_current.combinator.config = player_current.gui.commands.text .. "\ncomment(Empty command)"
-    local runtime = update_callback(player_current.combinator.entity)
-    openGUI(player, player_current.combinator, runtime)
+    player_current.gui.commands.text = player_current.gui.commands.text .. "\ncomment(Empty command)"
+    saveAndRebuildGUI(player, player_current, runtime, update_callback)
     return
   end
+  local index = nil
+  local el = element
+  while el.parent ~= nil do
+    if string.find(el.name, "index%d+") then
+      index = string.sub(el.name, 6)
+      break
+    end
+    el = el.parent
+  end
   if element.name == "delete_button" then
+    -- save GUI to config, then split string, then remove line, then join string (and save?) and re-build GUI
+    change_verified(player_current, element)
+    local split = common.split(player_current.gui.commands.text, "\n")
+    split[tonumber(index)] = nil
+    local joined = common.join(split, "\n")
+    player_current.gui.commands.text = joined
+    saveAndRebuildGUI(player, player_current, runtime, update_callback)
     return
   end
   if element.name == "move_up" or element.name == "move_down" then
+    -- save GUI to config, then split string, then reorder lines, then join string (and save?) and re-build GUI
+    change_verified(player_current, element)
+    local split = common.split(player_current.gui.commands.text, "\n")
+    local current = tonumber(index)
+    if current == 1 and element.name == "move_up" then
+      return
+    end
+    local next = element.name == "move_up" and current - 1 or current + 1
+
+    local temp = split[current]
+    split[current] = split[next]
+    split[next] = temp
+
+    local joined = common.join(split, "\n")
+    player_current.gui.commands.text = joined
+    saveAndRebuildGUI(player, player_current, runtime, update_callback)
     return
   end
 

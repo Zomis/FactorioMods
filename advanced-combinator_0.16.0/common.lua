@@ -13,6 +13,30 @@ local function worldAndPos(entity)
   return entity.surface.name .. txtpos(entity.position)
 end
 
+local function split(text, delimiter)
+  if string.len(delimiter) > 1 then
+    error("split only supports a single character as delimiter, not a string")
+  end
+  local result = {}
+  for line in string.gmatch(text, "[^" .. delimiter .. "]+") do
+    table.insert(result, line)
+  end
+  return result
+end
+
+local function join(dict, joiner)
+  local joined = ""
+  local first = true
+  for _, v in pairs(dict) do
+    if not first then
+      joined = joined .. joiner
+    end
+    joined = joined .. v
+    first = false
+  end
+  return joined
+end
+
 local function print_recursive_table(data, indentation)
   if not indentation then
     indentation = ""
@@ -56,6 +80,8 @@ return {
   table_indexof = table_indexof,
   signal_to_string = signal_to_string,
   trim = trim,
+  split = split,
+  join = join,
 
   out = out
 }
