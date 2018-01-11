@@ -569,6 +569,14 @@ local logic = {
       end
     end
   },
+  comment = {
+    description = "Does nothing. Just allows you to add a comment",
+    parameters = { "string" },
+    result = "command",
+    parse = function()
+      return function() end
+    end
+  },
   ["if"] = {
     description = "Perform a command if condition is true",
     parameters = { "boolean", "command" },
@@ -702,7 +710,7 @@ local function parse(data, params, entity)
           error("No such signal type: " .. param_value)
         end
       end
-    elseif param_type ~= "signal?" or param_value ~= nil then
+    elseif param_type ~= "string" and (param_type ~= "signal?" or param_value ~= nil) then
       -- nil is an acceptable value for "signal?" (but should it be allowed when parsing??)
       if type(param_value) ~= "table" then
         error("Unable to validate parameter value " .. tostring(param_value) .. " of expected type " .. param_type)

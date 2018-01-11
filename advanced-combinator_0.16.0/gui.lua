@@ -59,6 +59,11 @@ local function add_calculation_gui(gui, model, expected_result)
     textfield.style.width = 50
     return
   end
+  if expected_result == "string" then
+    local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
+    textfield.style.width = 100
+    return
+  end
   if expected_result == "string-signal" then
     gui.add({ type = "choose-elem-button", name = "signal_choice", elem_type = "signal", signal = logic.resolve_signalID(model) })
     return
@@ -167,6 +172,8 @@ local function get_default_model(function_name, advanced_combinator)
       table.insert(params, logic.enum_types[param_type][1])
     elseif param_type == "number" then
       table.insert(params, { name = "const", params = { "1" } })
+    elseif param_type == "string" then
+      table.insert(params, "")
     elseif param_type == "signal-id" then
       table.insert(params, "virtual/signal-0")
     elseif param_type == "signal-array" then
@@ -197,7 +204,11 @@ local function gui_command_to_string(element)
     end
     return result
   elseif element.type == "textfield" then
-    return element.text
+    local text = element.text
+    text = string.gsub(text, "%(", "")
+    text = string.gsub(text, "%)", "")
+    text = string.gsub(text, "%;", "")
+    return text
   elseif element.type == "choose-elem-button" then
     return common.signal_to_string(element.elem_value)
   elseif element.type == "drop-down" then
