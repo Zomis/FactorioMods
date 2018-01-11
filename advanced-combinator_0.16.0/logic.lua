@@ -197,6 +197,19 @@ local enum_types = {
   ["wire-color"] = { "green", "red" }
 }
 
+local function set_signal(entity, current, index, signal_type, signal_value)
+  if not signal_type then
+    return
+  end
+  local max_range = constants[entity.name]
+  if index < 0 or index > max_range then
+    entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value at index outside range 1.." .. max_range .. ": " .. index)
+    return
+  end
+  signal_value = range_check(signal_value, entity)
+  current[index] = { signal = signal_type, count = signal_value, index = index }
+end
+
 local logic = {
   add = {
     description = "Add two values together",
@@ -275,20 +288,25 @@ local logic = {
       local param_signal = params[2]
       local param_number = params[3]
       return function(entity, current)
-        local target_index = param_index.func(entity, current)
         local signal_id = resolve_signalID(param_signal)
-        if not signal_id then
-          return
-        end
-        -- local signal = param_signal.func(entity, current)
-        local count = param_number.func(entity, current)
-        local max_range = constants[entity.name]
-        if target_index < 0 or target_index > max_range then
-          entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value outside range 1.." .. max_range .. ": " .. target_index)
-          return
-        end
-        count = range_check(count, entity)
-        current[target_index] = { signal = signal_id, count = count, index = target_index }
+        local index = param_index.func(entity, current)
+        local value = param_number.func(entity, current)
+        set_signal(entity, current, index, signal_id, value)
+      end
+    end
+  },
+  set_simple = {
+    description = "At the index specified by the first parameter, set the signal of second parameter to the value returned by the third parameter",
+    parameters = { "string-number", "string-signal", "number" },
+    result = "command",
+    parse = function(params)
+      local param_index = tonumber(params[1])
+      local param_signal = params[2]
+      local param_number = params[3]
+      return function(entity, current)
+        local signal_id = resolve_signalID(param_signal)
+        local value = param_number.func(entity, current)
+        set_signal(entity, current, param_index, signal_id, value)
       end
     end
   },
@@ -302,16 +320,10 @@ local logic = {
       return function(entity, current)
         local target_index = param_index.func(entity, current)
         local signal = param_signal.func(entity, current)
-        if not signal or not signal.signal then
+        if not signal then
           return
         end
-        local max_range = constants[entity.name]
-        if target_index < 0 or target_index > max_range then
-          entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value outside range 1.." .. max_range .. ": " .. target_index)
-          return
-        end
-        signal.count = range_check(signal.count, entity)
-        current[target_index] = { signal = signal.signal, count = signal.count, index = target_index }
+        set_signal(entity, current, target_index, signal.signal, signal.count)
       end
     end
   },
