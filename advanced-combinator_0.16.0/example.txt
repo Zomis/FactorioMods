@@ -1,7 +1,14 @@
+-- This file contains some random plans and thoughts for commands
+-- This is not considered documentation in any way.
+-- The below commands will likely NOT work
+
 -- TODO: random(1,100)
 
-boolean data type
 if-else(boolean,any,any)
+filter(network(this,green),not_in(network(top,green)))
+
+circuit network to check if prio_1 items is ok, then prio_2 items... (line production)
+
 set_simple(1,virtual/signal-V,avg(map(network(top,green),sig->sig_value(sig))))
 map(network(top,green),sig->abs(sub(sig_value(sig),current(const(1)))))
 set_all(filter(network(top,green),sig->compare(sig_value(sig),<=,current(1))))
@@ -18,9 +25,6 @@ set_all(filter(network(top,green),sig->compare(sig_value(sig),<=,current(1))))
 coal = if-else(boolean,const(4),const(2))
 -- if (stone == 0) then coal = 1 else coal = 0
 
--- Random
-1:virtual/signal-R = if(current(2),==,const(1),random(1,100))
-
 -- Filtering
 signal_b = filter(red, array(iron_plate, copper_plate, signal_a))
 signal_c = filter(red, predicate("==", 20)) -- filter all values that fulfill a criteria
@@ -34,13 +38,7 @@ signal_c = filter(red, predicate("==", 20)) -- filter all values that fulfill a 
 6:virtual/signal-C = #surface.get_chunks()
 surface.get_resource_counts() ?
 
--- Minesweeper ?
-
--- http://lua-api.factorio.com/latest/Concepts.html#ConstantCombinatorParameters
-
-1:copper_plate = previous(1)
-if(red.coal > 100) copper_plate = 1
-if(red.coal < 20) copper_plate = 0
+-- Can this be done to create Minesweeper ?
 
 transform(array(iron_plate, copper_plate, signal_a, signal_b, signal_c), array(signal_f, signal_g, signal_h, signal_i, signal_j))
 transform(top.red, bottom.green) -- take the signals that exist on top.red and map them to signals on bottom.green (?)
