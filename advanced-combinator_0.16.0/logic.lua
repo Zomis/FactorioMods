@@ -457,13 +457,13 @@ local logic = {
       return function(ent)
         local resolved = resolve_entity(ent, entity_target)
         if not resolved or not resolved.valid then
-          return 0
+          return {}
         end
         local network = resolved.get_circuit_network(wire_type)
         if not network then
-          return 0
+          return {}
         end
-        return network.signals
+        return network.signals or {}
       end
     end
   },
