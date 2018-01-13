@@ -1,1 +1,3 @@
-return { ["advanced-combinator"] = 20 }
+return {
+  ["advanced-combinator"] = 24
+}
