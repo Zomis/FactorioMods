@@ -44,7 +44,8 @@ local function add_calculation_gui(gui, model, expected_result)
   end
   if expected_result == "string" then
     local textfield = gui.add({ type = "textfield", name = "textfield", text = model })
-    textfield.style.width = 100
+    textfield.style.minimal_width = 100
+    textfield.style.maximal_width = 600
     return
   end
   if expected_result == "string-signal" then
