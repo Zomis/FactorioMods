@@ -1,3 +1,4 @@
+local htmlString = require "htmlsave"
 local player_guis = {}
 
 local function create_menu_gui_for(player)
@@ -31,7 +32,10 @@ function hide_timeline(player)
 end
 
 function saveTimeline(player, filename)
-	game.write_file(filename, htmlString(player))
+  local force = player.force
+  local forceData = global.forces[force.name]
+  local marks = forceData.allMarks
+	game.write_file(filename, htmlString(marks))
 end
 
 function showTimeline(player)

@@ -1,15 +1,15 @@
-function row(mark)
+local function row(mark)
 	local TICKS_PER_SECOND = 60
 	local tick = mark.tick
-    local seconds = tick / TICKS_PER_SECOND
-	local minutes = seconds / 60
-	local hours = minutes / 60
+  local seconds = math.floor(tick / TICKS_PER_SECOND)
+	local minutes = math.floor(seconds / 60)
+	local hours = math.floor(minutes / 60)
 	local timestamp = string.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
-	
+
 	local name = mark.name
 	local param = mark.param
 	local value = mark.value
-	
+
 	local tickStr = "<td>" .. tostring(tick) .. "</td>\n"
 	local timestampStr = "<td>" .. timestamp .. "</td>\n"
 	local nameStr = "<td>" .. tostring(name) .. "</td>\n"
@@ -18,10 +18,7 @@ function row(mark)
 	return "<tr>\n" .. tickStr .. timestampStr .. nameStr .. paramStr .. valueStr .. "</tr>\n"
 end
 
-function timelineRows(player)
-	local force = player.force
-	local forceData = global.forces[force.name]
-	local marks = forceData.allMarks
+local function timelineRows(marks)
 	html = ""
 	for i, mark in ipairs(marks) do
 		html = html .. row(mark) .. "\n"
@@ -29,8 +26,9 @@ function timelineRows(player)
 	return html
 end
 
-function htmlString(player)
-	local html = [[<!DOCTYPE html><html>
+local function htmlString(marks)
+	local html = [[<!DOCTYPE html>
+<html>
 	<head>
 	</head>
 	<body>
@@ -46,7 +44,7 @@ function htmlString(player)
 			</thead>
 			<tbody>
 ]]
-	html = html .. timelineRows(player)
+	html = html .. timelineRows(marks)
 	html = html .. [[
 		</tbody>
 	</table>
@@ -55,3 +53,5 @@ function htmlString(player)
 	]]
 	return html
 end
+
+return htmlString
