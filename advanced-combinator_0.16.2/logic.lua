@@ -228,7 +228,7 @@ local function set_signal(entity, current, index, signal_type, signal_value)
     return
   end
   local max_range = constants[entity.name]
-  if index < 0 or index > max_range then
+  if index <= 0 or index > max_range then
     entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value at index outside range 1.." .. max_range .. ": " .. index)
     return
   end
