@@ -743,9 +743,19 @@ local function parse(data, params, entity)
   return data.parse(params, entity)
 end
 
+local function extend(logic_data)
+  for name, data in pairs(logic_data) do
+    if logic[name] then
+      error("Logic already contains function " .. name)
+    end
+    logic[name] = data
+  end
+end
+
 return {
   logic = logic,
   resolve_signalID = resolve_signalID,
   enum_types = enum_types,
+  extend = extend,
   parse = parse
 }

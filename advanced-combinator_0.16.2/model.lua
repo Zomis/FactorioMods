@@ -1,5 +1,6 @@
 local common = require "common"
 local logic = require "logic"
+logic.extend(require "logic/bitwise")
 
 local function perform(advanced_combinator, runtime_combinator)
   if not runtime_combinator or not runtime_combinator.func then
