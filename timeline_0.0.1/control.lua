@@ -1,14 +1,19 @@
 require "interface"
 require "htmlsave"
 
+local force_data
+local player_data
+
 script.on_init(function()
 	global.forces = global.forces or {}
 	global.players = global.players or {}
-    initPlayers()
+	force_data = global.forces
+	player_data = global.players
 end)
 
-script.on_event(defines.events.on_player_created, function(event)
-    playerCreated(event)
+script.on_load(function()
+	force_data = global.forces
+	player_data = global.players
 end)
 
 script.on_event(defines.events.on_rocket_launched, function(event)
@@ -18,54 +23,30 @@ script.on_event(defines.events.on_rocket_launched, function(event)
 	markTimeline(event.rocket.force, "rocket-launched", forceData.rockets_launched, forceData.rockets_launched)
 end)
 
-script.on_event(defines.events.on_built_entity, function(event)
-	local player = game.players[event.player_index]
-	local force = player.force
-    markTimeline(force, "built-entity", event.created_entity.name, nil)
-end)
-
 function markTimeline(force, name, params, value)
+	for _, player in ipairs(force.players) do
+		initPlayer(player)
+	end
 	local mark = { name = name, param = params, tick = game.tick }
+	if value then
+		mark.value = value
+	end
 	local forceData = global.forces[force.name]
 	if not forceData then
 		forceData = {}
 		global.forces[force.name] = forceData
 	end
-	if not forceData.marks then
-		forceData.marks = {}
-	end
-	if not forceData.marks[name] then
-		forceData.marks[name] = {}
-	end
 	forceData.allMarks = forceData.allMarks or {}
-	local marks = forceData.marks[name]
-	if marks[params] then
-		-- timeline was already marked
-		return marks[params]
-	end
-	
+
 	-- mark timeline
-	marks[params] = mark
 	table.insert(forceData.allMarks, mark)
-	
-	for i, player in pairs(force.players) do
-		player.print("Timeline: " .. mark.name .. " - " .. mark.param .. " at " .. mark.tick)
-	end
-end
-
-function initPlayers()
-    for _, player in ipairs(game.players) do
-        initPlayer(player)
-    end
-end
-
-function playerCreated(event)
-    local player = game.players[event.player_index]
-    initPlayer(player)
+	force.print("Timeline: " .. mark.name .. " - " .. mark.param .. " with value " .. tostring(value) .. " at " .. mark.tick)
 end
 
 function initPlayer(player)
-    player.gui.top.add { type = "button", name = "timeline", caption = "Timeline" }
+	if not player.gui.top.timeline then
+  	player.gui.top.add { type = "button", name = "timeline", caption = "Timeline" }
+	end
 end
 
 script.on_event(defines.events.on_research_finished, function(event)
@@ -146,3 +127,29 @@ function showTimeline(player)
 	frame.add { type = "button", name = "saveTimeline", caption = "Save" }
 	nextMark(player)
 end
+
+function on_tick()
+	-- /c for k, v in pairs(game.player.force.item_production_statistics.input_counts) do game.print(k .. " = " .. v) end
+	for _, force in pairs(game.forces) do
+		if not force_data[force.name] then
+			force_data[force.name] = {}
+		end
+		if not force_data[force.name].next_stats then
+			force_data[force.name].next_stats = {}
+		end
+
+		local next_stats = force_data[force.name].next_stats
+		-- force.item_production_statistics.get_input_count("stone-brick")
+		for key, count in pairs(force.item_production_statistics.input_counts) do
+			if not next_stats[key] then
+				markTimeline(force, "produced", key, 1)
+				next_stats[key] = 10
+			elseif count >= next_stats[key] then
+				markTimeline(force, "produced", key, next_stats[key])
+				next_stats[key] = next_stats[key] * 10
+			end
+		end
+	end
+end
+
+script.on_event(defines.events.on_tick, on_tick)
