@@ -1,6 +1,3 @@
-local LAMP_DISTANCE = 8
-local EXTRA = 10
-
 local function droppedItem(event)
     if not event.entity or not event.entity.stack then
         return
@@ -26,9 +23,9 @@ local function findElectricity(poles, x, y)
     return false
 end
 
-local function findLamp(lamps, x, y)
+local function findLamp(lamps, x, y, lamp_distance)
     for _, entity in ipairs(lamps) do
-        if isInRange(entity.position, x, y, LAMP_DISTANCE) then
+        if isInRange(entity.position, x, y, lamp_distance) then
             return true
         end
     end
@@ -44,10 +41,13 @@ local function on_player_selected_area(event)
     end
     local player = game.players[event.player_index]
     local surface = player.surface
+    local player_settings = settings.get_player_settings(player)
+    local lamp_distance = player_settings["lamp-placer-lamp-distance"].value
 
     -- local searchEntities = event.entities
-    local searchEntities = surface.find_entities({ { event.area.left_top.x - EXTRA, event.area.left_top.y - EXTRA },
-      { event.area.right_bottom.x + EXTRA, event.area.right_bottom.y + EXTRA } })
+    local extra = lamp_distance + 10
+    local searchEntities = surface.find_entities({ { event.area.left_top.x - extra, event.area.left_top.y - extra },
+      { event.area.right_bottom.x + extra, event.area.right_bottom.y + extra } })
 
     local lamps = {}
 
@@ -76,7 +76,7 @@ local function on_player_selected_area(event)
                 if electricityFound then
                     electricities = electricities + 1
                     -- Check if there is an existing lamp in area
-                    local lampFound = findLamp(lamps, x, y)
+                    local lampFound = findLamp(lamps, x, y, lamp_distance)
                     if not lampFound then
                         noLamps = noLamps + 1
                         local newLamp = surface.create_entity({ name = "entity-ghost",
