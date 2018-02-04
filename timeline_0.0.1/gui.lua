@@ -1,3 +1,4 @@
+local tick_to_timestring = require "tick_to_timestring"
 local htmlString = require "htmlsave"
 local player_guis = {}
 
@@ -7,21 +8,58 @@ local function create_menu_gui_for(player)
 	end
 end
 
-local function next_mark(player)
+local function show_marks(player)
 	if not player_guis[player.index] then
 		player_guis[player.index] = { mark_index = 0 }
 	end
-
 	local marks = global.forces[player.force.name].allMarks
-	local player_data = player_guis[player.index]
-	if player_data.mark_index <= 1 then
-		player_data.mark_index = #marks
-	else
-		player_data.mark_index = player_data.mark_index - 1
-	end
+	local mark_count = #marks
 
-	local showMark = marks[player_data.mark_index]
-	player.gui.center.timelineFrame.currentMark.caption = showMark.name .. " - " .. showMark.param .. " - " .. showMark.tick
+	local player_data = player_guis[player.index]
+	local frame = player.gui.center.timelineFrame
+	frame.table_container.table.destroy()
+	local table = frame.table_container.add({type = "table", name = "table", column_count = 5})
+
+	local delta = -1
+	local start_mark = mark_count - player_data.mark_index
+	player.print("start_mark is " .. start_mark .. " mark_count: " .. mark_count .. " mark_index: " .. player_data.mark_index)
+
+	table.add({ type = "label", name = "header_tick", caption = "Tick" })
+	table.add({ type = "label", name = "header_time", caption = "Time" })
+	table.add({ type = "label", name = "header_name", caption = "Type" })
+	table.add({ type = "label", name = "header_param", caption = "Name" })
+	table.add({ type = "label", name = "header_value", caption = "Value" })
+	for i = 0,9 do
+		local index = start_mark + delta * i
+		local mark = marks[index]
+		player.print("mark at " .. index .. " = " .. tostring(mark))
+		if mark then
+			local append = "row" .. i .. "_"
+			local timestring = tick_to_timestring(mark.tick)
+			table.add({ type = "label", name = append .. "tick", caption = mark.tick })
+			table.add({ type = "label", name = append .. "time", caption = timestring })
+			table.add({ type = "label", name = append .. "name", caption = mark.name })
+			table.add({ type = "label", name = append .. "param", caption = mark.param })
+			table.add({ type = "label", name = append .. "value", caption = mark.value })
+		end
+	end
+end
+
+
+local function next_mark(player)
+	local marks = global.forces[player.force.name].allMarks
+	local mark_count = #marks
+
+	if not player_guis[player.index] then
+		player_guis[player.index] = { mark_index = 0 }
+	else
+		local player_data = player_guis[player.index]
+		player_data.mark_index = player_data.mark_index - 1
+		if player_data.mark_index < 0 then
+			player_data.mark_index = mark_count
+		end
+	end
+	show_marks(player)
 end
 
 function hide_timeline(player)
@@ -45,11 +83,14 @@ function showTimeline(player)
 		return
 	end
 	local frame = player.gui.center.add { type = "frame", name = "timelineFrame", direction = "vertical" }
-	frame.add { type = "label", name = "currentMark", caption = "current" }
-	frame.add { type = "button", name = "nextMark", caption = "Next" }
-	frame.add { type = "button", name = "hideTimeline", caption = "Hide" }
-	frame.add { type = "button", name = "saveTimeline", caption = "Save" }
-	next_mark(player)
+	local header = frame.add({ type = "flow", name = "header", direction = "horizontal" })
+	header.add { type = "button", name = "nextMark", caption = "Next" }
+	header.add { type = "button", name = "hideTimeline", caption = "Hide" }
+	header.add { type = "button", name = "saveTimeline", caption = "Save" }
+
+	local table_container = frame.add({ type = "flow", name = "table_container", direction = "horizontal" })
+	local tableui = table_container.add({type = "table", name = "table", column_count = 3})
+	show_marks(player)
 end
 
 script.on_event(defines.events.on_gui_click, function(event)
@@ -60,15 +101,19 @@ script.on_event(defines.events.on_gui_click, function(event)
 	if element == player.gui.top.timeline then
 		-- player_guis[player.index].mark_index = 0
 		showTimeline(player)
-    end
-	if element.name == "hideTimeline" then
+  end
+	if not player.gui.center.timelineFrame then
+		return
+	end
+	local frame = player.gui.center.timelineFrame
+	if element == frame.header.hideTimeline then
 		hide_timeline(player)
 		return
 	end
-	if element.name == "nextMark" then
+	if element == frame.header.nextMark then
 		next_mark(player)
 	end
-	if element.name == "saveTimeline" then
+	if element == frame.header.saveTimeline then
 		saveTimeline(player, "timeline-" .. event.tick .. ".html")
 	end
 end)
