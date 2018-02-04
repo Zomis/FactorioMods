@@ -45,11 +45,8 @@ end
 script.on_event(defines.events.on_research_finished, function(event)
 	local name = event.research.name
 	local force = event.research.force
-	local forceData = global.forces[force.name]
-	forceData.research = forceData.research or {}
-	local level = forceData.research[name] or 0
-	forceData.research[name] = level + 1
-	markTimeline(force, "research-finished", name, level + 1)
+	local level = event.research.level
+	markTimeline(force, "research-finished", name, level)
 end)
 
 function on_tick()
