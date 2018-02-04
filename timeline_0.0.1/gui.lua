@@ -136,7 +136,9 @@ script.on_event(defines.events.on_gui_click, function(event)
 		next_mark(player, -10)
 	end
 	if element == frame.header.saveTimeline then
-		saveTimeline(player, "timeline-" .. event.tick .. ".html")
+		local filename = "timeline-" .. event.tick .. ".html"
+		saveTimeline(player, filename)
+		player.print("Timeline saved to file: " .. filename)
 	end
 end)
 
