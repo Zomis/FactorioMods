@@ -14,10 +14,12 @@ script.on_load(function()
 end)
 
 script.on_event(defines.events.on_rocket_launched, function(event)
-  local forceData = global.forces[event.rocket.force.name]
-	forceData.rockets_launched = forceData.rockets_launched or 0
-	forceData.rockets_launched = forceData.rockets_launched + 1
-	markTimeline(event.rocket.force, "rocket-launched", forceData.rockets_launched, forceData.rockets_launched)
+	local force = event.rocket.force
+	local inventory = event.rocket.get_inventory(defines.inventory.item_main)
+	for k, v in pairs(inventory.get_contents()) do
+		local total = force.get_item_launched(k)
+		markTimeline(event.rocket.force, "rocket-launched", k, total)
+	end
 end)
 
 function markTimeline(force, name, params, value)
