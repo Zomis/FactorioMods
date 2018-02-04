@@ -1,9 +1,11 @@
 {
-    "name": "timeline",
-    "version": "0.0.1",
-    "title": "Timeline",
-    "author": "Zomis",
-    "description": "Save information about important key events in your game, to help you get better next time",
-    "homepage": "https://github.com/Zomis/FactorioMods",
-    "dependencies": ["base >= 0.12.12"]
+  "name": "timeline",
+  "version": "0.0.1",
+  "title": "Timeline",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.16",
+  "dependencies": ["base >= 0.16"],
+  "description": "Save information about important key events in your game, to help you get better next time"
 }
