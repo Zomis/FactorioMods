@@ -1,3 +1,5 @@
+local tick_to_timestring = require "tick_to_timestring"
+
 local function row(mark)
 	local TICKS_PER_SECOND = 60
 	local tick = mark.tick
