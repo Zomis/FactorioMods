@@ -1,23 +1,20 @@
+local gui = require "gui"
 require "interface"
 require "htmlsave"
 
 local force_data
-local player_data
 
 script.on_init(function()
 	global.forces = global.forces or {}
-	global.players = global.players or {}
 	force_data = global.forces
-	player_data = global.players
 end)
 
 script.on_load(function()
 	force_data = global.forces
-	player_data = global.players
 end)
 
 script.on_event(defines.events.on_rocket_launched, function(event)
-    local forceData = global.forces[event.rocket.force.name]
+  local forceData = global.forces[event.rocket.force.name]
 	forceData.rockets_launched = forceData.rockets_launched or 0
 	forceData.rockets_launched = forceData.rockets_launched + 1
 	markTimeline(event.rocket.force, "rocket-launched", forceData.rockets_launched, forceData.rockets_launched)
@@ -25,7 +22,7 @@ end)
 
 function markTimeline(force, name, params, value)
 	for _, player in ipairs(force.players) do
-		initPlayer(player)
+		gui.create_menu_gui_for(player)
 	end
 	local mark = { name = name, param = params, tick = game.tick }
 	if value then
@@ -43,12 +40,6 @@ function markTimeline(force, name, params, value)
 	force.print("Timeline: " .. mark.name .. " - " .. mark.param .. " with value " .. tostring(value) .. " at " .. mark.tick)
 end
 
-function initPlayer(player)
-	if not player.gui.top.timeline then
-  	player.gui.top.add { type = "button", name = "timeline", caption = "Timeline" }
-	end
-end
-
 script.on_event(defines.events.on_research_finished, function(event)
 	local name = event.research.name
 	local force = event.research.force
@@ -58,75 +49,6 @@ script.on_event(defines.events.on_research_finished, function(event)
 	forceData.research[name] = level + 1
 	markTimeline(force, "research-finished", name, level + 1)
 end)
-
-script.on_event(defines.events.on_gui_click, function(event)
-	local element = event.element
-	local playerIndex = event.player_index
-	local player = game.players[playerIndex]
-	local force = player.force
-	if element.name == "timeline" then
-		setTimelineMark(player, 0)
-		showTimeline(player)
-    end
-	if element.name == "hideTimeline" then
-		hideTimeline(player)
-		return
-	end
-	if element.name == "nextMark" then
-		nextMark(player)
-	end
-	if element.name == "saveTimeline" then
-		saveTimeline(player, "timeline-" .. event.tick .. ".html")
-	end
-end)
-
-function setTimelineMark(player, index)
-	
-end
-
-function getTimelineMark(player)
-	
-end
-
-function nextMark(player)
-	if not global.players[player.index] then
-		global.players[player.index] = { markIndex = 0 }
-	end
-	local marks = global.forces[player.force.name].allMarks
-	local playerData = global.players[player.index]
-	if playerData.markIndex <= 1 then
-		playerData.markIndex = #marks
-	else
-		playerData.markIndex = playerData.markIndex - 1
-	end
-
-	local showMark = marks[playerData.markIndex]
-	player.gui.center.timelineFrame.currentMark.caption = showMark.name .. " - " .. showMark.param .. " - " .. showMark.tick
-end
-
-function hideTimeline(player)
-	local frame = player.gui.center.timelineFrame
-	if frame then
-		frame.destroy()
-	end
-end
-
-function saveTimeline(player, filename)
-	game.write_file(filename, htmlString(player))
-end
-
-function showTimeline(player)
-	if player.gui.center.timelineFrame then
-		hideTimeline(player)
-		return
-	end
-	local frame = player.gui.center.add { type = "frame", name = "timelineFrame", direction = "vertical" }
-	frame.add { type = "label", name = "currentMark", caption = "current" }
-	frame.add { type = "button", name = "nextMark", caption = "Next" }
-	frame.add { type = "button", name = "hideTimeline", caption = "Hide" }
-	frame.add { type = "button", name = "saveTimeline", caption = "Save" }
-	nextMark(player)
-end
 
 function on_tick()
 	-- /c for k, v in pairs(game.player.force.item_production_statistics.input_counts) do game.print(k .. " = " .. v) end
