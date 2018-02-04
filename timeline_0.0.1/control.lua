@@ -49,6 +49,11 @@ script.on_event(defines.events.on_research_finished, function(event)
 	markTimeline(force, "research-finished", name, level)
 end)
 
+script.on_event(defines.events.on_player_died, function(event)
+	local player = game.players[event.player_index]
+	markTimeline(player.force, "player-died", player.name, nil)
+end)
+
 function on_tick()
 	-- /c for k, v in pairs(game.player.force.item_production_statistics.input_counts) do game.print(k .. " = " .. v) end
 	for _, force in pairs(game.forces) do
