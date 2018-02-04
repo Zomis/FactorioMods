@@ -78,6 +78,10 @@ local function add_calculation_gui(gui, model, expected_result)
 end
 
 local function openGUI(player, advanced_combinator, runtime)
+  if not runtime then
+    player.print("This Advanced Combinator was not parsed correctly.")
+    return
+  end
   if player.gui.center["advancedCombinatorUI"] then
     player.gui.center["advancedCombinatorUI"].destroy()
   end

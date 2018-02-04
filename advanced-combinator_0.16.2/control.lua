@@ -6,6 +6,7 @@ local model = require "model"
 local common = require "common"
 local advanced_combinators = {}
 local runtime_combinators = {}
+require "interface"
 
 local function onInit()
   global.advanced_combinators = {}
@@ -13,22 +14,26 @@ end
 
 local function onLoad()
   advanced_combinators = global.advanced_combinators
-  for k, v in pairs(advanced_combinators) do
-    local status, result = pcall(function()
-      return model.parse(v, v.entity)
-    end)
-    if status then
-      runtime_combinators[k] = result
-    else
-      v.entity.force.print("[Advanced Combinator] Unable to parse combinator at " ..
-        common.worldAndPos(v.entity) .. ": " .. result)
-    end
+end
 
-    for _, player in pairs(v.entity.force.players) do
-      if player.gui.center["advancedCombinatorUI"] then
-        player.gui.center["advancedCombinatorUI"].destroy()
-      end
+local function parse_combinator(advanced_combinator)
+  local v = advanced_combinator
+  local status, result = pcall(function()
+    return model.parse(v, v.entity)
+  end)
+  if not status then
+--    runtime_combinators[k] = result
+--  else
+    v.entity.force.print("[Advanced Combinator] Unable to parse combinator at " ..
+      common.worldAndPos(v.entity) .. ": " .. result)
+  end
+  for _, player in pairs(v.entity.force.players) do
+    if player.gui.center["advancedCombinatorUI"] then
+      player.gui.center["advancedCombinatorUI"].destroy()
     end
+  end
+  if status then
+    return result
   end
 end
 
@@ -71,6 +76,9 @@ end
 
 local function onTick()
   for k, v in pairs(advanced_combinators) do
+    if not runtime_combinators[k] then
+      runtime_combinators[k] = parse_combinator(v)
+    end
     if game.tick % v.updatePeriod == 0 then
       model.perform(v, runtime_combinators[k])
     end

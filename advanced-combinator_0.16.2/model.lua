@@ -2,6 +2,9 @@ local common = require "common"
 local logic = require "logic"
 
 local function perform(advanced_combinator, runtime_combinator)
+  if not runtime_combinator or not runtime_combinator.func then
+    return
+  end
   runtime_combinator.func(advanced_combinator.entity)
 end
 
