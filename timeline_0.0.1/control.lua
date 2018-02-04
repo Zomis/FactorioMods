@@ -1,5 +1,5 @@
 local markTimeline = require "timeline"
-require "interface"
+local interface = require "interface"
 require "htmlsave"
 
 local force_data
@@ -11,6 +11,7 @@ end)
 
 script.on_load(function()
 	force_data = global.forces
+	interface.setup_integrations()
 end)
 
 script.on_event(defines.events.on_rocket_launched, function(event)

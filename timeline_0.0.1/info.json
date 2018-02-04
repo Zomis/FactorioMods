@@ -6,6 +6,6 @@
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://github.com/Zomis/FactorioMods",
   "factorio_version": "0.16",
-  "dependencies": ["base >= 0.16"],
-  "description": "Save information about important key events in your game, to help you get better next time"
+  "dependencies": ["base >= 0.16", "? advanced-combinator"],
+  "description": "Save information about important key events in your game, to help you get more efficient next time"
 }
