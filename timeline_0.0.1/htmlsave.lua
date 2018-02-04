@@ -1,13 +1,8 @@
 local tick_to_timestring = require "tick_to_timestring"
 
 local function row(mark)
-	local TICKS_PER_SECOND = 60
 	local tick = mark.tick
-  local seconds = math.floor(tick / TICKS_PER_SECOND)
-	local minutes = math.floor(seconds / 60)
-	local hours = math.floor(minutes / 60)
-	local timestamp = string.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
-
+	local timestamp = tick_to_timestring(mark.tick)
 	local name = mark.name
 	local param = mark.param
 	local value = mark.value
@@ -21,8 +16,8 @@ local function row(mark)
 end
 
 local function timelineRows(marks)
-	html = ""
-	for i, mark in ipairs(marks) do
+	local html = ""
+	for _, mark in ipairs(marks) do
 		html = html .. row(mark) .. "\n"
 	end
 	return html

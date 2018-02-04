@@ -5,7 +5,7 @@ local player_guis = {}
 
 local function create_menu_gui_for(player)
 	if not player.gui.top.timeline then
-  	player.gui.top.add { type = "button", name = "timeline", caption = "Timeline" }
+    player.gui.top.add { type = "button", name = "timeline", caption = "Timeline" }
 	end
 end
 
@@ -77,21 +77,21 @@ local function next_mark(player, change)
 	show_marks(player)
 end
 
-function hide_timeline(player)
+local function hide_timeline(player)
 	local frame = player.gui.center.timelineFrame
 	if frame then
 		frame.destroy()
 	end
 end
 
-function saveTimeline(player, filename)
+local function saveTimeline(player, filename)
   local force = player.force
   local forceData = global.forces[force.name]
   local marks = forceData.allMarks
 	game.write_file(filename, htmlString(marks))
 end
 
-function showTimeline(player)
+local function showTimeline(player)
 	-- custom marks
 	if player.gui.center.timelineFrame then
 		hide_timeline(player)
@@ -108,8 +108,8 @@ function showTimeline(player)
 	local table_container = frame.add({ type = "flow", name = "table_container", direction = "horizontal" })
 	table_container.style.minimal_width = 500
 	table_container.style.minimal_height = 500
+	table_container.add({type = "table", name = "table", column_count = 5})
 
-	local tableui = table_container.add({type = "table", name = "table", column_count = 3})
 	show_marks(player)
 end
 
@@ -117,7 +117,6 @@ script.on_event(defines.events.on_gui_click, function(event)
 	local element = event.element
 	local playerIndex = event.player_index
 	local player = game.players[playerIndex]
-	local force = player.force
 	if element == player.gui.top.timeline then
 		-- player_guis[player.index].mark_index = 0
 		showTimeline(player)
