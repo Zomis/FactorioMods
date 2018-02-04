@@ -1,3 +1,4 @@
+local PER_PAGE = 10
 local tick_to_timestring = require "tick_to_timestring"
 local htmlString = require "htmlsave"
 local player_guis = {}
@@ -22,17 +23,29 @@ local function show_marks(player)
 
 	local delta = -1
 	local start_mark = mark_count - player_data.mark_index
-	player.print("start_mark is " .. start_mark .. " mark_count: " .. mark_count .. " mark_index: " .. player_data.mark_index)
 
 	table.add({ type = "label", name = "header_tick", caption = "Tick" })
 	table.add({ type = "label", name = "header_time", caption = "Time" })
 	table.add({ type = "label", name = "header_name", caption = "Type" })
 	table.add({ type = "label", name = "header_param", caption = "Name" })
 	table.add({ type = "label", name = "header_value", caption = "Value" })
-	for i = 0,9 do
+	table.header_tick.style.minimal_width = 70
+	table.header_time.style.minimal_width = 100
+	table.header_name.style.minimal_width = 130
+	table.header_param.style.minimal_width = 230
+	table.header_value.style.minimal_width = 70
+
+
+	local showing_start = player_data.mark_index + 1
+	local showing_end = showing_start + PER_PAGE - 1
+	if showing_end > mark_count then
+		showing_end = mark_count
+	end
+	frame.currently_showing.caption = "Showing " .. showing_start .. "-" .. showing_end .. " / " .. mark_count
+	local loop_end = PER_PAGE - 1
+	for i = 0,loop_end do
 		local index = start_mark + delta * i
 		local mark = marks[index]
-		player.print("mark at " .. index .. " = " .. tostring(mark))
 		if mark then
 			local append = "row" .. i .. "_"
 			local timestring = tick_to_timestring(mark.tick)
@@ -45,8 +58,7 @@ local function show_marks(player)
 	end
 end
 
-
-local function next_mark(player)
+local function next_mark(player, change)
 	local marks = global.forces[player.force.name].allMarks
 	local mark_count = #marks
 
@@ -54,9 +66,12 @@ local function next_mark(player)
 		player_guis[player.index] = { mark_index = 0 }
 	else
 		local player_data = player_guis[player.index]
-		player_data.mark_index = player_data.mark_index - 1
+		player_data.mark_index = player_data.mark_index + change
 		if player_data.mark_index < 0 then
 			player_data.mark_index = mark_count
+		end
+		if player_data.mark_index > mark_count then
+			player_data.mark_index = 0
 		end
 	end
 	show_marks(player)
@@ -84,11 +99,16 @@ function showTimeline(player)
 	end
 	local frame = player.gui.center.add { type = "frame", name = "timelineFrame", direction = "vertical" }
 	local header = frame.add({ type = "flow", name = "header", direction = "horizontal" })
-	header.add { type = "button", name = "nextMark", caption = "Next" }
 	header.add { type = "button", name = "hideTimeline", caption = "Hide" }
+	header.add { type = "button", name = "previousMark", caption = "Previous" }
+	header.add { type = "button", name = "nextMark", caption = "Next" }
 	header.add { type = "button", name = "saveTimeline", caption = "Save" }
+	frame.add { type = "label", name = "currently_showing", caption = "" }
 
 	local table_container = frame.add({ type = "flow", name = "table_container", direction = "horizontal" })
+	table_container.style.minimal_width = 500
+	table_container.style.minimal_height = 500
+
 	local tableui = table_container.add({type = "table", name = "table", column_count = 3})
 	show_marks(player)
 end
@@ -111,7 +131,10 @@ script.on_event(defines.events.on_gui_click, function(event)
 		return
 	end
 	if element == frame.header.nextMark then
-		next_mark(player)
+		next_mark(player, 10)
+	end
+	if element == frame.header.previousMark then
+		next_mark(player, -10)
 	end
 	if element == frame.header.saveTimeline then
 		saveTimeline(player, "timeline-" .. event.tick .. ".html")
