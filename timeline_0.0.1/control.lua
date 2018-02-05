@@ -17,7 +17,7 @@ end)
 script.on_event(defines.events.on_rocket_launched, function(event)
 	local force = event.rocket.force
 	local inventory = event.rocket.get_inventory(defines.inventory.item_main)
-	for k, v in pairs(inventory.get_contents()) do
+	for k, _ in pairs(inventory.get_contents()) do
 		local total = force.get_item_launched(k)
 		markTimeline(event.rocket.force, "rocket-launched", k, total)
 	end
@@ -35,7 +35,7 @@ script.on_event(defines.events.on_player_died, function(event)
 	markTimeline(player.force, "player-died", player.name, nil)
 end)
 
-function on_tick()
+local function on_tick()
 	-- /c for k, v in pairs(game.player.force.item_production_statistics.input_counts) do game.print(k .. " = " .. v) end
 	for _, force in pairs(game.forces) do
 		if not force_data[force.name] then
