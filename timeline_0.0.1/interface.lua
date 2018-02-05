@@ -15,7 +15,6 @@ remote.add_interface("timeline", {
 
 local function setup_integrations()
   if remote.interfaces["advanced-combinator"] then
-    local advanced_combinator = remote.interfaces["advanced-combinator"]
     remote.call("advanced-combinator", "add_function", "add_timeline_mark", {
       description = "Add a mark to the timeline, with the specified name, params and value.",
       parameters = { "string", "string", "number" },
