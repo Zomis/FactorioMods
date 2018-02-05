@@ -1,4 +1,5 @@
 local gui = require "gui"
+local tick_to_timestring = require "tick_to_timestring"
 
 local function markTimeline(force, name, params, value)
 	for _, player in ipairs(force.players) do
@@ -17,7 +18,8 @@ local function markTimeline(force, name, params, value)
 
 	-- mark timeline
 	table.insert(forceData.allMarks, mark)
-	force.print("Timeline: " .. mark.name .. " - " .. mark.param .. " with value " .. tostring(value) .. " at " .. mark.tick)
+	local timestring = tick_to_timestring(mark.tick)
+	force.print("[Timeline] " .. timestring .. " " .. mark.name .. " - " .. mark.param .. " with value " .. tostring(value))
 end
 
 return markTimeline
