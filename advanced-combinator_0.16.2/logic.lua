@@ -1,7 +1,9 @@
 local constants = require "constants"
 local common = require "common"
+local logic = {}
+logic.logic = {}
 
-local function resolve_signalID(type_and_name)
+function logic.resolve_signalID(type_and_name)
   local split = string.find(type_and_name, "/")
   if not split then
     return nil
@@ -11,7 +13,7 @@ local function resolve_signalID(type_and_name)
   return { type = signal_type, name = signal_name }
 end
 
-local function range_check(value, entity)
+function logic.range_check(value, entity)
   if value < -2147483648 or value > 2147483647 then
     entity.force.print("[Advanced Combinator] " .. common.worldAndPos(entity) ..
       " Warning: Tried to set value outside valid range (-2147483648..2147483647). Using fallback of -1")
@@ -20,7 +22,7 @@ local function range_check(value, entity)
   return value
 end
 
-local function find_entity(source, offset_x, offset_y)
+function logic.find_entity(source, offset_x, offset_y)
   local position = source.position
   local surface = source.surface
   local found = surface.find_entities_filtered({position = {
@@ -29,45 +31,26 @@ local function find_entity(source, offset_x, offset_y)
   return found and found[1] or nil
 end
 
-local function resolve_entity(entity, target)
+function logic.resolve_entity(entity, target)
   if target == "this" then
     return entity
   end
   if target == "top" then
-    return find_entity(entity, 0, -1)
+    return logic.find_entity(entity, 0, -1)
   end
   if target == "left" then
-    return find_entity(entity, -1, 0)
+    return logic.find_entity(entity, -1, 0)
   end
   if target == "right" then
-    return find_entity(entity, 1, 0)
+    return logic.find_entity(entity, 1, 0)
   end
   if target == "bottom" then
-    return find_entity(entity, 0, 1)
+    return logic.find_entity(entity, 0, 1)
   end
   error("Unable to resolve entity: " .. target)
 end
 
-local function item_from_network(wire_type)
-  return function(params)
-   local target = params[1]
-   local signal_id = resolve_signalID(params[2])
-
-   return function(ent)
-     local resolved = resolve_entity(ent, target)
-     if not resolved or not resolved.valid then
-       return 0
-     end
-     local network = resolved.get_circuit_network(wire_type)
-     if not network then
-       return 0
-     end
-     return network.get_signal(signal_id)
-   end
- end
-end
-
-local function numeric(value)
+function logic.numeric(value)
   if type(value) == "boolean" then
     if value then return 1 else return 0 end
   end
@@ -77,32 +60,7 @@ local function numeric(value)
   return value
 end
 
-local function sum(array_of_signals)
-  local result = 0
-  for _, v in ipairs(array_of_signals) do
-    result = result + v.count
-  end
-  return result
-end
-
-local function compare(first_value, compare_method, second_value)
-  if compare_method == "=" then
-    return first_value == second_value
-  elseif compare_method == "<=" then
-    return first_value <= second_value
-  elseif compare_method == "<" then
-    return first_value < second_value
-  elseif compare_method == ">=" then
-    return first_value >= second_value
-  elseif compare_method == ">" then
-    return first_value > second_value
-  elseif compare_method == "≠" then
-    return first_value ~= second_value
-  end
-  error("Not a valid compare method: " .. compare_method)
-end
-
-local enum_types = {
+logic.enum_types = {
   ["compare-method"] = { "<", "<=", "=", ">=", ">", "≠" },
   ["game-data"] = {
     "tick", "speed"
@@ -223,484 +181,12 @@ local enum_types = {
   ["wire-color"] = { "green", "red" }
 }
 
-local function set_signal(entity, current, index, signal_type, signal_value)
-  if not signal_type then
-    return
-  end
-  local max_range = constants[entity.name]
-  if index <= 0 or index > max_range then
-    entity.force.print("[Advanced Combinator] Warning: " .. common.worldAndPos(entity) .. " tried to set value at index outside range 1.." .. max_range .. ": " .. index)
-    return
-  end
-  signal_value = range_check(signal_value, entity)
-  current[index] = { signal = signal_type, count = signal_value, index = index }
-end
-
-local logic = {
-  add = {
-    description = "Add two values together",
-    parameters = { "number", "number" },
-    result = "number",
-    parse = function(params)
-      local param1 = params[1]
-      local param2 = params[2]
-      return function(entity, current)
-        return param1.func(entity, current) + param2.func(entity, current)
-      end
-    end
-  },
-  sub = {
-    description = "Subtract second value from first value",
-    parameters = { "number", "number" },
-    result = "number",
-    parse = function(params)
-      local param1 = params[1]
-      local param2 = params[2]
-      return function(entity, current)
-        return param1.func(entity, current) - param2.func(entity, current)
-      end
-    end
-  },
-  mult = {
-    description = "Multiply two numbers",
-    parameters = { "number", "number" },
-    result = "number",
-    parse = function(params)
-      local param1 = params[1]
-      local param2 = params[2]
-      return function(entity, current)
-        return param1.func(entity, current) * param2.func(entity, current)
-      end
-    end
-  },
-  div = {
-    description = "Divide first number by second number",
-    parameters = { "number", "number" },
-    result = "number",
-    parse = function(params)
-      local param1 = params[1]
-      local param2 = params[2]
-      return function(entity, current)
-        local divby = param2.func(entity, current)
-        if divby == 0 then
-          return 0
-        end
-        return param1.func(entity, current) / divby
-      end
-    end
-  },
-  mod = {
-    description = "Return the remainder of a division between two numbers",
-    parameters = { "number", "number" },
-    result = "number",
-    parse = function(params)
-      local param1 = params[1]
-      local param2 = params[2]
-      return function(entity, current)
-        local divby = param2.func(entity, current)
-        if divby == 0 then
-          return 0
-        end
-        return param1.func(entity, current) % divby
-      end
-    end
-  },
-  abs = {
-    description = "Absolute value of a number (change negative values to positive)",
-    parameters = { "number" },
-    result = "number",
-    parse = function(params)
-      local param = params[1]
-      return function(entity, current)
-        return math.abs(param.func(entity, current))
-      end
-    end
-  },
-  set = {
-    description = "At the index specified by the first parameter, set the signal of second parameter to the value returned by the third parameter",
-    parameters = { "number", "string-signal", "number" },
-    result = "command",
-    parse = function(params)
-      local param_index = params[1]
-      local param_signal = params[2]
-      local param_number = params[3]
-      return function(entity, current)
-        local signal_id = resolve_signalID(param_signal)
-        local index = param_index.func(entity, current)
-        local value = param_number.func(entity, current)
-        set_signal(entity, current, index, signal_id, value)
-      end
-    end
-  },
-  print = {
-    description = "Print a message to all players in the force. Allows substitution of current signal values using $1, $2, etc.",
-    parameters = { "string" },
-    result = "command",
-    parse = function(params)
-      local param_message = params[1]
-      return function(entity, current)
-        local message = param_message
-        for search_result in string.gmatch(message, "$%d+") do
-          local search_index = tonumber(string.sub(search_result, 2))
-          local replace = "0"
-          if current[search_index] then
-            replace = current[search_index].count
-          end
-          message = string.gsub(message, search_result, replace)
-        end
-        entity.force.print(message)
-      end
-    end
-  },
-  set_simple = {
-    description = "At the index specified by the first parameter, set the signal of second parameter to the value returned by the third parameter",
-    parameters = { "string-number", "string-signal", "number" },
-    result = "command",
-    parse = function(params)
-      local param_index = tonumber(params[1])
-      local param_signal = params[2]
-      local param_number = params[3]
-      return function(entity, current)
-        local signal_id = resolve_signalID(param_signal)
-        local value = param_number.func(entity, current)
-        set_signal(entity, current, param_index, signal_id, value)
-      end
-    end
-  },
-  set_signal = {
-    description = "At the index specified by the first parameter, set the signal and value of the second parameter",
-    parameters = { "number", "signal?" },
-    result = "command",
-    parse = function(params)
-      local param_index = params[1]
-      local param_signal = params[2]
-      return function(entity, current)
-        local target_index = param_index.func(entity, current)
-        local signal = param_signal.func(entity, current)
-        if not signal then
-          return
-        end
-        set_signal(entity, current, target_index, signal.signal, signal.count)
-      end
-    end
-  },
-  count = {
-    description = "Return the number of values in an array of signals",
-    parameters = { "signal-array" },
-    result = "number",
-    parse = function(params)
-      local param_array = params[1]
-      return function(entity, current)
-        local array = param_array.func(entity, current)
-        local count = #array
-        return count
-      end
-    end
-  },
-  sum = {
-    description = "Return the sum of the signal values in an array of signals",
-    parameters = { "signal-array" },
-    result = "number",
-    parse = function(params)
-      local param_array = params[1]
-      return function(entity, current)
-        local array = param_array.func(entity, current)
-        return sum(array)
-      end
-    end
-  },
-  avg = {
-    description = "Return the average value of an array of signals",
-    parameters = { "signal-array" },
-    result = "number",
-    parse = function(params)
-      local param_array = params[1]
-      return function(entity, current)
-        local array = param_array.func(entity, current)
-        local count = #array
-        local array_sum = sum(array)
-        return array_sum / count
-      end
-    end
-  },
-  min_signal = {
-    description = "Return the maximum signal of an array of signals",
-    parameters = { "signal-array" },
-    result = "signal?",
-    parse = function(params)
-      local param_array = params[1]
-      return function(entity, current)
-        local min = nil
-        local array = param_array.func(entity, current)
-        for _, v in ipairs(array) do
-          if not min or v.count < min.count then
-            min = v
-          end
-        end
-        return min
-      end
-    end
-  },
-  max_signal = {
-    description = "Return the maximum signal of an array of signals",
-    parameters = { "signal-array" },
-    result = "signal?",
-    parse = function(params)
-      local param_array = params[1]
-      return function(entity, current)
-        local max = nil
-        local array = param_array.func(entity, current)
-        for _, v in ipairs(array) do
-          if not max or v.count > max.count then
-            max = v
-          end
-        end
-        return max
-      end
-    end
-  },
-  network = {
-    description = "",
-    parameters = { "entity", "wire-color" },
-    result = "signal-array",
-    parse = function(params)
-      local entity_target = params[1]
-      local wire_color = params[2]
-      local wire_type
-      if wire_color == "red" then
-        wire_type = defines.wire_type.red
-      elseif wire_color == "green" then
-        wire_type = defines.wire_type.green
-      else
-        error("Unknown wire type: " .. wire_color)
-      end
-      return function(ent)
-        local resolved = resolve_entity(ent, entity_target)
-        if not resolved or not resolved.valid then
-          return {}
-        end
-        local network = resolved.get_circuit_network(wire_type)
-        if not network then
-          return {}
-        end
-        return network.signals or {}
-      end
-    end
-  },
-  green = {
-    description = "Return the value of a signal in the green circuit network of an entity",
-    parameters = { "entity", "string-signal" },
-    result = "number",
-    parse = item_from_network(defines.wire_type.green)
-  },
-  red = {
-    description = "Return the value of a signal in the red circuit network of an entity",
-    parameters = { "entity", "string-signal" },
-    result = "number",
-    parse = item_from_network(defines.wire_type.red)
-  },
-  signal = {
-    description = "Create a signal from a type and a value",
-    parameters = { "signal-type", "number" },
-    result = "signal?",
-    parse = function(params)
-      local signal_type = params[1]
-      local signal_value = params[2]
-      return function(entity, current)
-        return {
-          signal = signal_type.func(entity, current),
-          count = signal_value.func(entity, current)
-        }
-      end
-    end
-  },
-  signal_type = {
-    description = "A constant signal type",
-    parameters = { "string-signal" },
-    result = "signal-type",
-    parse = function(params)
-      local value = resolve_signalID(params[1])
-      return function() return value end
-    end
-  },
-  value_of_signal = {
-    description = "Get the value of a signal",
-    parameters = { "signal?" },
-    result = "number",
-    parse = function(params)
-      local param_signal = params[1]
-      return function(entity, current)
-        local signal = param_signal.func(entity, current)
-        if not signal then
-          return 0
-        end
-        return signal.count
-      end
-    end
-  },
-  type_of_signal = {
-    description = "Get the type of a signal",
-    parameters = { "signal?" },
-    result = "signal-type",
-    parse = function(params)
-      local param_signal = params[1]
-      return function(entity, current)
-        local signal = param_signal.func(entity, current)
-        if not signal then
-          return nil
-        end
-        return signal.signal
-      end
-    end
-  },
-  const = {
-    description = "A constant number",
-    parameters = { "string-number" },
-    result = "number",
-    parse = function(params)
-      local value = tonumber(params[1])
-      return function() return value end
-    end
-  },
-  compare = {
-    description = "Compare two numbers",
-    parameters = { "number", "compare-method", "number" },
-    result = "boolean",
-    parse = function(params)
-      local first = params[1]
-      local compare_method = params[2]
-      local second = params[3]
-      return function(entity, current)
-        local first_value = first.func(entity, current)
-        local second_value = second.func(entity, current)
-        return compare(first_value, compare_method, second_value)
-      end
-    end
-  },
-  boolean_to_number = {
-    description = "Convert a boolean to a number. 1 == true and 0 == false",
-    parameters = { "boolean" },
-    result = "number",
-    parse = function(params)
-      local value = params[1]
-      return function(entity, current)
-        local bool = value.func(entity, current)
-        return bool and 1 or 0
-      end
-    end
-  },
-  comment = {
-    description = "Does nothing. Just allows you to add a comment",
-    parameters = { "string" },
-    result = "command",
-    parse = function()
-      return function() end
-    end
-  },
-  ["if"] = {
-    description = "Perform a command if condition is true",
-    parameters = { "boolean", "command" },
-    result = "command",
-    parse = function(params)
-      local param_condition = params[1]
-      local param_command = params[2]
-      return function(entity, current)
-        local condition = param_condition.func(entity, current)
-        if condition then
-          return param_command.func(entity, current)
-        end
-      end
-    end
-  },
-  current = {
-    description = "A previously calculated value in the current iteration",
-    parameters = { "string-number" },
-    result = "number",
-    parse = function(params)
-      local index = tonumber(params[1])
-      return function(_, current)
-        if not current[index] then
-          return 0
-        end
-        return current[index].count
-      end
-    end
-  },
-  previous = {
-    description = "The calculated value of the last iteration",
-    parameters = { "string-number" },
-    result = "number",
-    parse = function(params)
-      local index = tonumber(params[1])
-      return function(entity)
-        return entity.get_control_behavior().get_signal(index).count
-      end
-    end
-  },
-  gameData = {
-    description = "Get data from current game",
-    parameters = { "game-data" },
-    result = "number",
-    parse = function(params)
-      local param = params[1]
-      return function()
-        return numeric(game[param])
-      end
-    end
-  },
-  surfaceData = {
-    description = "Get data from current surface",
-    parameters = { "surface-data" },
-    result = "number",
-    parse = function(params)
-      local param = params[1]
-      return function(entity)
-        return numeric(entity.surface[param])
-      end
-    end
-  },
-  forceData = {
-    description = "Get data from the force owning this Advanced Combinator",
-    parameters = { "force-data" },
-    result = "number",
-    parse = function(params)
-      local param = params[1]
-      return function(entity)
-        return numeric(entity.force[param])
-      end
-    end
-  },
-  entityData = {
-    description = "Get data from an entity",
-    parameters = { "entity", "entity-data" },
-    result = "number",
-    parse = function(params)
-      local target = params[1]
-      local param = params[2]
-      return function(entity)
-        local resolved = resolve_entity(entity, target)
-        if not resolved or not resolved.valid then
-          return 0
-        end
-        local status, result = pcall(function()
-          return numeric(resolved[param])
-        end)
-        if not status then
-          entity.force.print("[Advanced Combinator] " .. common.worldAndPos(entity) .. ": " .. result)
-          return 0
-        end
-        return result
-      end
-    end
-  }
-}
-
-local function parse(data, params, entity)
+function logic.parse(data, params, entity)
   -- type check parameters
   for i, param_type in ipairs(data.parameters) do
     local param_value = params[i]
-    if enum_types[param_type] then
-      local index_of = common.table_indexof(enum_types[param_type], param_value)
+    if logic.enum_types[param_type] then
+      local index_of = common.table_indexof(logic.enum_types[param_type], param_value)
       if not index_of then
         error("No such enum value '" .. param_value .. "' in type " .. param_type)
       end
@@ -710,7 +196,7 @@ local function parse(data, params, entity)
       end
     elseif param_type == "string-signal" then
       if game then
-        local signal = resolve_signalID(param_value)
+        local signal = logic.resolve_signalID(param_value)
         if not signal then
           error("No such signal: " .. tostring(param_value))
         end
@@ -740,22 +226,24 @@ local function parse(data, params, entity)
       end
     end
   end
-  return data.parse(params, entity)
+  return data.parse(params, logic)
 end
 
-local function extend(logic_data)
+function logic.extend(logic_data)
   for name, data in pairs(logic_data) do
-    if logic[name] then
+    if logic.logic[name] then
       error("Logic already contains function " .. name)
     end
-    logic[name] = data
+    logic.logic[name] = data
   end
 end
 
-return {
-  logic = logic,
-  resolve_signalID = resolve_signalID,
-  enum_types = enum_types,
-  extend = extend,
-  parse = parse
-}
+function logic.resolve(param, entity, current)
+  local function_name = param.name
+  local params = param.params
+  local data = logic.logic[function_name]
+  local func = data.parse(params, logic)
+  return func(entity, current)
+end
+
+return logic

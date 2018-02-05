@@ -1,6 +1,14 @@
 local common = require "common"
 local logic = require "logic"
 logic.extend(require "logic/bitwise")
+logic.extend(require "logic/boolean")
+logic.extend(require "logic/commands")
+logic.extend(require "logic/environment_data")
+logic.extend(require "logic/numeric")
+logic.extend(require "logic/processing")
+logic.extend(require "logic/signal_set")
+logic.extend(require "logic/signals")
+
 
 local function perform(advanced_combinator, runtime_combinator)
   if not runtime_combinator or not runtime_combinator.func then
@@ -42,8 +50,7 @@ local function parseCalculation(text, advanced_combinator, entity)
         unfinished_params = unfinished_params .. param .. ","
       end
     end
-    local func = logic.parse(logic_data, params, entity)
-    return { name = function_name, params = params, func = func }
+    return { name = function_name, params = params }
   end
   return error("No parenthesis found in " .. text)
 end
@@ -59,11 +66,8 @@ local function parse(advanced_combinator, entity)
   local perform_function = function(ent)
     local control = entity.get_control_behavior()
     local result = {}
---    table.insert(result, {signal = { type = "virtual", name = "signal-A" }, count = 42, index = 1 })
---    table.insert(result, {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 1 })
---    result[4] = {signal = { type = "virtual", name = "signal-B" }, count = 21, index = 4 }
     for _, command in ipairs(commands) do
-      command.func(ent, result)
+      logic.resolve(command, ent, result)
     end
     control.parameters = { parameters = result }
   end
