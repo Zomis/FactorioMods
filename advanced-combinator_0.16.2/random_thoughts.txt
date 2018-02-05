@@ -2,8 +2,6 @@
 -- This is not considered documentation in any way.
 -- The below commands will likely NOT work
 
--- TODO: random(1,100)
-
 if-else(boolean,any,any)
 filter(network(this,green),not_in(network(top,green)))
 

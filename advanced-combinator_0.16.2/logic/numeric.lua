@@ -78,6 +78,17 @@ return {
       end
     end
   },
+  random = {
+    description = "Get a random value from 1 to the upper value specified by the parameter (inclusive)",
+    parameters = { "number" },
+    result = "number",
+    parse = function(params, logic)
+      local param_upper = params[1]
+      return function(entity, current)
+        return math.random(logic.resolve(param_upper, entity, current))
+      end
+    end
+  },
   const = {
     description = "A constant number",
     parameters = { "string-number" },
