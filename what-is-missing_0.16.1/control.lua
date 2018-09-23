@@ -64,21 +64,24 @@ local function createMissingFlow(parent, id)
     return flow[name]
 end
 
+local function createSmallTopButton(player)
+  local top = player.gui.top
+  if top["missing_perform"] ~= nil then
+    top["missing_perform"].destroy()
+  end
+
+  if top["what_is_missing"] == nil then
+    top.add({
+      type = "button",
+      name = "what_is_missing",
+      caption = "WiM",
+      style = "what_is_missing_small_button"
+    })
+  end
+end
+
 local function createGUI(player, fromConfig)
-    local top = player.gui.top
-    if top["missing_perform"] ~= nil then
-      top["missing_perform"].destroy()
-    end
-
-    if top["what_is_missing"] == nil then
-      top.add({
-        type = "button",
-        name = "what_is_missing",
-        caption = "WiM",
-        style = "what_is_missing_small_button"
-      })
-    end
-
+    createSmallTopButton(player)
     local left = player.gui.left
     if left["what_is_missing"] == nil then
         left.add({type = "frame", name = "what_is_missing"})
@@ -324,10 +327,6 @@ end
 -- When we place a new entity, we need to add it to our list of machines
 local function onPlaceEntity(event)
     addMachine(event.created_entity)
-    if event.player_index ~= nil then
-        local player = game.players[event.player_index]
-        createGUI(player)
-    end
 end
 
 -- When we remove an entity, we need to remove it from our list of machines
@@ -672,6 +671,11 @@ local function onCheckboxClick(event)
   end
 end
 
+local function onPlayerJoined(event)
+  local player = game.players[event.player_index]
+  createSmallTopButton(player)
+end
+
 script.on_init(onInit)
 script.on_load(onLoad)
 
@@ -687,6 +691,7 @@ script.on_event(defines.events.on_gui_click, onClick)
 
 script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
 script.on_event(defines.events.on_gui_checked_state_changed, onCheckboxClick)
+script.on_event(defines.events.on_player_joined_game, onPlayerJoined)
 
 local function onSelectedEntityChanged(event)
   -- event.last_entity, event.player_index
@@ -710,6 +715,9 @@ end
 local function onConfigurationChanged(data)
   if not global.playerDatas then
     savePlayerSettingsFromGUI()
+  end
+  for _, player in pairs(game.players) do
+    createSmallTopButton(player)
   end
 
   -- Migration code to also save world name for saved machines (fix #30) in 0.16
