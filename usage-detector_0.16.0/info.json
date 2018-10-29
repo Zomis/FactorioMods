@@ -1,0 +1,12 @@
+{
+  "name": "usage-detector",
+  "version": "0.16.0",
+  "title": "Usage Detector",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.16",
+  "dependencies": ["base >= 0.16"],
+  "description":
+    "Find out how your resources are distributed. What is it that is consuming all those resources? Use this to find out."
+}
