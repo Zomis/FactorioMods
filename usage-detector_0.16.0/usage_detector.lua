@@ -49,7 +49,7 @@ end
 local function start(player, item_or_fluid, section_name)
   local player_data = global.player_data[player.index] or { jobs = {} }
   global.player_data[player.index] = player_data
-  player_data.jobs[section_name] = player_data.jobs[section_name] or {
+  player_data.jobs[section_name] = {
     current_thing = item_or_fluid,
     current_furnaces = {},
     current_machines = {},
