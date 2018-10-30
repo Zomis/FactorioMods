@@ -19,7 +19,7 @@ local function gui_header_create(parent, job_data)
   end
 end
 
-local function create_job_gui(player, frame, job_name, job_data)
+local function create_job_gui(frame, job_name, job_data)
   local section = frame.add { type = "flow", name = job_name, direction = "vertical" }
   gui_header_create(section, job_data)
   section.add { type = "label", name = "job_status", caption = "Not started." }
@@ -32,11 +32,11 @@ end
 local function create(player, player_data)
   local frame = player.gui.center.add({ type = "frame", name = "usage_detector_center", direction = "vertical" })
   for job_name, job_data in pairs(player_data.jobs) do
-    create_job_gui(player, frame, job_name, job_data)
+    create_job_gui(frame, job_name, job_data)
   end
 end
 
-function round_to_closest(number, precision)
+local function round_to_closest(number, precision)
   return math.floor(number / precision + 0.5) * precision
 end
 
@@ -102,8 +102,6 @@ local function click(player, event, usage_detector)
       player.print("[Usage Detector] No item or fluid selected")
       return
     end
-    local job_gui = player.gui.center.usage_detector_center[section_name]
-
     usage_detector.start(player, current_thing, section_name)
   end
   if event.element.name == "usage_detector_stop" then

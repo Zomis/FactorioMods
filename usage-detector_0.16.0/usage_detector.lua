@@ -26,9 +26,9 @@ local function is_using_product(entity, product)
   return nil
 end
 
-local function add_to_if_using(job, entities, target_list, ingredient)
+local function add_to_if_using(job, entities, target_list, ingredient_product)
   for _, entity in ipairs(entities) do
-    local ingredient = is_using_product(entity, ingredient)
+    local ingredient = is_using_product(entity, ingredient_product)
     if ingredient then
       table.insert(target_list, { entity = entity, recipe = ingredient.recipe,
           amount = ingredient.amount,

@@ -61,11 +61,11 @@ local function onClick(event)
 end
 
 local function on_game_tick()
-  local player_data = global.player_data
-  if not player_data then player_data = {} end -- TODO: temporary code for me while debugging
-  for player_index, player_data in pairs(player_data) do
+  local player_datas = global.player_data
+  if not player_datas then player_datas = {} end -- TODO: temporary code for me while debugging
+  for player_index, player_data in pairs(player_datas) do
     local player = game.players[player_index]
-    for section_name, job in pairs(player_data.jobs) do
+    for _, job in pairs(player_data.jobs) do
       usage_detector.onTick(job)
     end
     gui_center.update_gui(player, player_data)
