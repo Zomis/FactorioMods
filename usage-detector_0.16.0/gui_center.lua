@@ -56,9 +56,10 @@ local function update_job(player, section_name, job_data)
   if job_gui.table_container["table"] then
     job_gui.table_container.table.destroy()
   end
-  local stopped_at = job_data.stopped_at > job_data.started_at and job_data.stopped_at or game.tick
+  local stopped = job_data.stopped_at > job_data.started_at
+  local stopped_at = stopped and job_data.stopped_at or game.tick
   local running_label = string.format("Running for %d ticks.", stopped_at - job_data.started_at)
-  job_gui.job_status.caption = job_data.running and running_label or "Not started."
+  job_gui.job_status.caption = game.tick > job_data.started_at and running_label or "Not started."
 
   recreate_table_with_results(job_gui, job_data.results)
 end
