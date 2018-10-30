@@ -1,6 +1,4 @@
-local current_thing = nil
-local current_furnaces = {}
-local current_machines = {} -- table of: furnace/machine + recipe + count
+--current_machines = {} -- table of: entity + recipe + count
 
 -- TODO: Player-specific. Multiplayer support.
 
@@ -28,50 +26,69 @@ local function is_using_product(entity, product)
   return nil
 end
 
-local function add_to_if_using(entities, target_list, ingredient)
+local function add_to_if_using(job, entities, target_list, ingredient)
   for _, entity in ipairs(entities) do
     local ingredient = is_using_product(entity, ingredient)
     if ingredient then
       table.insert(target_list, { entity = entity, recipe = ingredient.recipe,
           amount = ingredient.amount,
           count = 0, last_progress = entity.crafting_progress })
+      if not job.results[ingredient.recipe.name] then
+        job.results[ingredient.recipe.name] = {
+          recipe = ingredient.recipe,
+          amount = ingredient.amount,
+          count = 0,
+          machine_count = 0
+        }
+      end
+      job.results[ingredient.recipe.name].machine_count = job.results[ingredient.recipe.name].machine_count + 1
     end
   end
 end
 
-local function start(item_or_fluid)
-  current_furnaces = {}
-  current_machines = {}
-  current_thing = item_or_fluid
+local function start(player, item_or_fluid, section_name)
+  local player_data = global.player_data[player.index] or { jobs = {} }
+  global.player_data[player.index] = player_data
+  player_data.jobs[section_name] = player_data.jobs[section_name] or {
+    current_thing = item_or_fluid,
+    current_furnaces = {},
+    current_machines = {},
+    results = {},
+    running = true,
+    started_at = game.tick,
+    stopped_at = game.tick
+  }
+  local job = player_data.jobs[section_name]
 
   for _, surface in pairs(game.surfaces) do
     local furnaces = surface.find_entities_filtered({type = "furnace"})
-    add_to_if_using(furnaces, current_furnaces, current_thing)
+    add_to_if_using(job, furnaces, job.current_furnaces, item_or_fluid)
 
     local assembling_machines = surface.find_entities_filtered({type = "assembling-machine"})
-    add_to_if_using(assembling_machines, current_machines, current_thing)
+    add_to_if_using(job, assembling_machines, job.current_machines, item_or_fluid)
   end
-  game.print("Started checking usage for " .. item_or_fluid.type .. " " .. item_or_fluid.name)
+  player.print("Started checking usage for " .. item_or_fluid.type .. " " .. item_or_fluid.name)
 end
 
-local function check_progress(entity_data)
+local function check_progress(job, entity_data)
   local progress = entity_data.entity.crafting_progress
   local last_progress = entity_data.last_progress
   if progress < last_progress and progress > 0 then
     entity_data.count = entity_data.count + 1
+    job.results[entity_data.recipe.name].count = job.results[entity_data.recipe.name].count + 1
   end
   entity_data.last_progress = progress
 end
 
-local function tick()
-  if not current_thing then
+local function tick(job)
+  if not job.running then
     return
   end
-  for _, furnace in ipairs(current_furnaces) do
-    check_progress(furnace)
+  for _, furnace in ipairs(job.current_furnaces) do
+    check_progress(job, furnace)
   end
-  for _, machine in ipairs(current_machines) do
-    check_progress(machine)
+  for _, machine in ipairs(job.current_machines) do
+    check_progress(job, machine)
   end
 end
 
@@ -94,12 +111,15 @@ local function print_result(result)
   game.print("Recipe " .. name .. " used " .. amount .. " * " .. count .. " times using a total of " .. sum .. " in " .. machine_count .. " machines.")
 end
 
-local function stop()
+local function stop(player, section_name)
   local results = {}
-  for _, furnace in ipairs(current_furnaces) do
+  local job = global.player_data[player.index].jobs[section_name]
+  job.running = false
+  job.stopped_at = game.tick
+  for _, furnace in ipairs(job.current_furnaces) do
     summarize_results(results, furnace)
   end
-  for _, machine in ipairs(current_machines) do
+  for _, machine in ipairs(job.current_machines) do
     summarize_results(results, machine)
   end
 
