@@ -67,7 +67,6 @@ local function start(player, item_or_fluid, section_name)
     local assembling_machines = surface.find_entities_filtered({type = "assembling-machine"})
     add_to_if_using(job, assembling_machines, job.current_machines, item_or_fluid)
   end
-  player.print("Started checking usage for " .. item_or_fluid.type .. " " .. item_or_fluid.name)
 end
 
 local function check_progress(job, entity_data)
@@ -92,41 +91,10 @@ local function tick(job)
   end
 end
 
-local function summarize_results(target_list, entity_data)
-  local key = entity_data.recipe.name
-  local used = entity_data.amount * entity_data.count
-  if not target_list[key] then
-    target_list[key] = { recipe = entity_data.recipe, amount = entity_data.amount, count = 0, machine_count = 0 }
-  end
-  target_list[key].count = target_list[key].count + entity_data.count
-  target_list[key].machine_count = target_list[key].machine_count + 1
-end
-
-local function print_result(result)
-  local name = result.recipe.name
-  local amount = result.amount
-  local count = result.count
-  local sum = amount * count
-  local machine_count = result.machine_count
-  game.print("Recipe " .. name .. " used " .. amount .. " * " .. count .. " times using a total of " .. sum .. " in " .. machine_count .. " machines.")
-end
-
 local function stop(player, section_name)
-  local results = {}
   local job = global.player_data[player.index].jobs[section_name]
   job.running = false
   job.stopped_at = game.tick
-  for _, furnace in ipairs(job.current_furnaces) do
-    summarize_results(results, furnace)
-  end
-  for _, machine in ipairs(job.current_machines) do
-    summarize_results(results, machine)
-  end
-
-  for recipe_name, result in pairs(results) do
-    print_result(result)
-  end
-  current_thing = nil
 end
 
 return {
