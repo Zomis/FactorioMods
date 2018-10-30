@@ -27,7 +27,10 @@ local function on_chosen_element_changed(event)
   if not player.gui.center["usage_detector_center"] then
     return
   end
-  local player_data = global.player_data[event.player_index] or {}
+  local player_data = global.player_data[event.player_index]
+  if not player_data then
+    return
+  end
   for job_name in pairs(player_data.jobs) do
     local job_gui = player.gui.center.usage_detector_center[job_name]
     if event.element == job_gui.header.item then
@@ -43,10 +46,14 @@ local function onClick(event)
   local player = game.players[event.player_index]
   if event.element.name == "usage_detector" then
     global.player_data = global.player_data or {} -- TODO: temporary code for me while debugging
+    local player_data = global.player_data[player.index] or { jobs = {} }
+    if not player_data.jobs["section0"] then
+      usage_detector.create_empty_job(player, "section0")
+    end
     if player.gui.center["usage_detector_center"] then
       player.gui.center["usage_detector_center"].destroy()
     else
-      gui_center.create(player)
+      gui_center.create(player, global.player_data[player.index])
     end
     return
   end

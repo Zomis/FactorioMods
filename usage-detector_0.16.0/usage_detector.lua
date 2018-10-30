@@ -46,19 +46,27 @@ local function add_to_if_using(job, entities, target_list, ingredient)
   end
 end
 
-local function start(player, item_or_fluid, section_name)
+local function create_empty_job(player, job_name)
   local player_data = global.player_data[player.index] or { jobs = {} }
   global.player_data[player.index] = player_data
-  player_data.jobs[section_name] = {
-    current_thing = item_or_fluid,
+  player_data.jobs[job_name] = {
+    current_thing = nil,
     current_furnaces = {},
     current_machines = {},
     results = {},
-    running = true,
-    started_at = game.tick,
-    stopped_at = game.tick
+    running = false,
+    started_at = 0,
+    stopped_at = 0
   }
+end
+
+local function start(player, item_or_fluid, section_name)
+  local player_data = global.player_data[player.index]
+  create_empty_job(player, section_name)
   local job = player_data.jobs[section_name]
+  job.current_thing = item_or_fluid
+  job.running = true
+  job.started_at = game.tick
 
   for _, surface in pairs(game.surfaces) do
     local furnaces = surface.find_entities_filtered({type = "furnace"})
@@ -99,6 +107,7 @@ end
 
 return {
   start = start,
+  create_empty_job = create_empty_job,
   onTick = tick,
   stop = stop
 }

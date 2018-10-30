@@ -1,4 +1,4 @@
-local function gui_header_create(parent)
+local function gui_header_create(parent, job_data)
   local header = parent.add({ type = "flow", name = "header", direction = "horizontal" })
   header.add { type = "button", name = "usage_detector_start", caption = "Start" }
   header.add { type = "button", name = "usage_detector_stop", caption = "Stop" }
@@ -8,19 +8,32 @@ local function gui_header_create(parent)
 
   header.add { type = "label", name = "fluid_label", caption = "or Fluid" }
   local fluid = header.add { type = "choose-elem-button", name = "fluid", elem_type = "fluid" }
-  -- TODO: If a job exists, load it
+
+  if job_data.current_thing then
+    if job_data.current_thing.type == "item" then
+      item.elem_value = job_data.current_thing.name
+    end
+    if job_data.current_thing.type == "fluid" then
+      fluid.elem_value = job_data.current_thing.name
+    end
+  end
 end
 
-local function create(player)
-  local frame = player.gui.center.add({ type = "frame", name = "usage_detector_center", direction = "vertical" })
-
-  local section = frame.add { type = "flow", name = "section0", direction = "vertical" }
-  gui_header_create(section)
+local function create_job_gui(player, frame, job_name, job_data)
+  local section = frame.add { type = "flow", name = job_name, direction = "vertical" }
+  gui_header_create(section, job_data)
   section.add { type = "label", name = "job_status", caption = "Not started." }
 
   local table_container = section.add { type = "flow", name = "table_container", direction = "horizontal" }
-	table_container.style.minimal_width = 700
-	table_container.style.minimal_height = 600
+  table_container.style.minimal_width = 700
+  table_container.style.minimal_height = 600
+end
+
+local function create(player, player_data)
+  local frame = player.gui.center.add({ type = "frame", name = "usage_detector_center", direction = "vertical" })
+  for job_name, job_data in pairs(player_data.jobs) do
+    create_job_gui(player, frame, job_name, job_data)
+  end
 end
 
 function round_to_closest(number, precision)
@@ -68,7 +81,8 @@ local function update_job(player, section_name, job_data)
   local stopped_at = stopped and job_data.stopped_at or game.tick
   local running_time = stopped_at - job_data.started_at
   local running_label = string.format("Running for %d seconds (%d ticks).", math.floor(running_time / 60), running_time)
-  job_gui.job_status.caption = game.tick > job_data.started_at and running_label or "Not started."
+  local started = game.tick > job_data.started_at and job_data.started_at > 0
+  job_gui.job_status.caption = started and running_label or "Not started."
 
   recreate_table_with_results(job_gui, job_data.results, running_time)
 end
@@ -76,7 +90,21 @@ end
 local function click(player, event, usage_detector)
   if event.element.name == "usage_detector_start" then
     local section_name = event.element.parent.parent.name
-    usage_detector.start(player, { type = "item", name = "iron-plate" }, section_name)
+    local job_gui = player.gui.center.usage_detector_center[section_name]
+    local current_thing = nil
+    if job_gui.header.item.elem_value then
+      current_thing = { type = "item", name = job_gui.header.item.elem_value }
+    end
+    if job_gui.header.fluid.elem_value then
+      current_thing = { type = "fluid", name = job_gui.header.fluid.elem_value }
+    end
+    if not current_thing then
+      player.print("[Usage Detector] No item or fluid selected")
+      return
+    end
+    local job_gui = player.gui.center.usage_detector_center[section_name]
+
+    usage_detector.start(player, current_thing, section_name)
   end
   if event.element.name == "usage_detector_stop" then
     local section_name = event.element.parent.parent.name
