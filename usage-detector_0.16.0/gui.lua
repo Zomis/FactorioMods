@@ -22,6 +22,23 @@ local function setupGui(player)
   end
 end
 
+local function on_chosen_element_changed(event)
+  local player = game.players[event.player_index]
+  if not player.gui.center["usage_detector_center"] then
+    return
+  end
+  local player_data = global.player_data[event.player_index] or {}
+  for job_name in pairs(player_data.jobs) do
+    local job_gui = player.gui.center.usage_detector_center[job_name]
+    if event.element == job_gui.header.item then
+      job_gui.header.fluid.elem_value = nil
+    end
+    if event.element == job_gui.header.fluid then
+      job_gui.header.item.elem_value = nil
+    end
+  end
+end
+
 local function onClick(event)
   local player = game.players[event.player_index]
   if event.element.name == "usage_detector" then
@@ -49,6 +66,7 @@ local function on_game_tick()
 end
 
 script.on_event(defines.events.on_gui_click, onClick)
+script.on_event(defines.events.on_gui_elem_changed, on_chosen_element_changed)
 
 return {
   setupGui = setupGui,

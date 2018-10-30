@@ -84,8 +84,6 @@ local function click(player, event, usage_detector)
   end
 end
 
--- TODO: When changing item, erase fluid, and vice-versa.
-
 local function update_gui(player, player_data)
   if not player.gui.center["usage_detector_center"] then
     return
