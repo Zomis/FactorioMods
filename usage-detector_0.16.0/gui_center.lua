@@ -67,7 +67,7 @@ local function update_job(player, section_name, job_data)
   local stopped = job_data.stopped_at > job_data.started_at
   local stopped_at = stopped and job_data.stopped_at or game.tick
   local running_time = stopped_at - job_data.started_at
-  local running_label = string.format("Running for %d ticks.", running_time)
+  local running_label = string.format("Running for %d seconds (%d ticks).", math.floor(running_time / 60), running_time)
   job_gui.job_status.caption = game.tick > job_data.started_at and running_label or "Not started."
 
   recreate_table_with_results(job_gui, job_data.results, running_time)
