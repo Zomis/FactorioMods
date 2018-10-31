@@ -16,5 +16,5 @@ data.raw["gui-style"].default["usage_detector_small_button"] = {
     type = "button_style",
     width = 30,
     height = 30,
-    font = "what_is_missing_font"
+    font = "usage_detector_font"
 }
