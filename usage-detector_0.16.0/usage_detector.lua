@@ -78,6 +78,12 @@ local function start(player, item_or_fluid, section_name)
 end
 
 local function check_progress(job, entity_data)
+  if not entity_data.entity.valid then
+    return
+  end
+  if not entity_data.recipe.valid then
+    return
+  end
   local progress = entity_data.entity.crafting_progress
   local last_progress = entity_data.last_progress
   if progress < last_progress and progress > 0 then
