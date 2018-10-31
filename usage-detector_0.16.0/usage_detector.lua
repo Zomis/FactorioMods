@@ -86,7 +86,7 @@ local function check_progress(job, entity_data)
   end
   local progress = entity_data.entity.crafting_progress
   local last_progress = entity_data.last_progress
-  if progress < last_progress and progress > 0 then
+  if progress < last_progress then
     entity_data.count = entity_data.count + 1
     job.results[entity_data.recipe.name].count = job.results[entity_data.recipe.name].count + 1
   end
