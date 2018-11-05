@@ -24,9 +24,8 @@ local function create_job_gui(frame, job_name, job_data)
   gui_header_create(section, job_data)
   section.add { type = "label", name = "job_status", caption = "Not started." }
 
-  local table_container = section.add { type = "flow", name = "table_container", direction = "horizontal" }
-  table_container.style.minimal_width = 700
-  table_container.style.minimal_height = 600
+  section.add({type = "scroll-pane", name = "table_container",
+     vertical_scroll_policy = "auto", horizontal_scroll_policy = "never", style = "usage_detector_scroll"})
 end
 
 local function create(player, player_data)

@@ -1,6 +1,8 @@
 data.raw["gui-style"].default["usage_detector_scroll"] = {
     type = "scroll_pane_style",
-    maximal_width = 400
+    minimal_width = 700,
+    minimal_height = 400,
+    maximal_height = 800
 }
 
 data:extend({
