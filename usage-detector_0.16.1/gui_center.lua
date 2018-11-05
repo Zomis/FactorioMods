@@ -12,7 +12,8 @@ local function gui_header_create(parent, job_data)
   if job_data.show_empty == nil then
     job_data.show_empty = true
   end
-  header.add({type = "checkbox", name = "show_unused", caption = "Show currently inactive recipes", state = job_data.show_empty})
+  header.add({type = "checkbox", name = "show_unused",
+    caption = "Show currently inactive recipes", state = job_data.show_empty})
 
   if job_data.current_thing then
     if job_data.current_thing.type == "item" then
@@ -71,9 +72,11 @@ local function recreate_table_with_results(section, results, running_time)
       table.add { type = "label", name = name_prefix .. "sum", caption = recipe_sum }
       table.add { type = "label", name = name_prefix .. "machine_count", caption = result.machine_count }
       local used_per_second = recipe_sum / running_seconds
-      table.add { type = "label", name = name_prefix .. "per_second", caption = round_to_closest(used_per_second, 0.01) }
+      table.add { type = "label", name = name_prefix .. "per_second",
+         caption = round_to_closest(used_per_second, 0.01) }
       local used_percent = recipe_sum / all_sum * 100
-      table.add { type = "label", name = name_prefix .. "percent", caption = round_to_closest(used_percent, 0.01) }
+      table.add { type = "label", name = name_prefix .. "percent",
+         caption = round_to_closest(used_percent, 0.01) }
     end
   end
 end
