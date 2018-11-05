@@ -51,7 +51,7 @@ local function onClick(event)
       usage_detector.create_empty_job(player, "section0")
     end
     if player.gui.center["usage_detector_center"] then
-      player.gui.center["usage_detector_center"].destroy()
+      gui_center.save_and_destroy(player, global.player_data[player.index])
     else
       gui_center.create(player, global.player_data[player.index])
     end

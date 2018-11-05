@@ -131,8 +131,19 @@ local function update_gui(player, player_data)
   end
 end
 
+local function save_and_destroy(player, player_data)
+  local center = player.gui.center["usage_detector_center"]
+  for job_name, job_data in pairs(player_data.jobs) do
+    if center[job_name] and center[job_name].header.show_unused then
+      job_data.show_empty = center[job_name].header.show_unused.state
+    end
+  end
+  center.destroy()
+end
+
 return {
   create = create,
   click = click,
+  save_and_destroy = save_and_destroy,
   update_gui = update_gui
 }
