@@ -5,8 +5,8 @@
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://github.com/Zomis/FactorioMods",
-  "factorio_version": "0.16",
-  "dependencies": ["base >= 0.16"],
+  "factorio_version": "0.17",
+  "dependencies": ["base >= 0.17"],
   "description":
     "Find out how your resources are distributed. What is it that is consuming all those resources? Use this to find out."
 }
