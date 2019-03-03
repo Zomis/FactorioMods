@@ -14,7 +14,13 @@ data:extend({
 
 data.raw["gui-style"].default["what_is_missing_small_button"] = {
     type = "button_style",
-    width = 30,
-    height = 30,
+    width = 50,
+    height = 35,
+    font = "what_is_missing_font"
+}
+
+data.raw["gui-style"].default["what_is_missing_delete_button"] = {
+    type = "button_style",
+    width = 35,
     font = "what_is_missing_font"
 }

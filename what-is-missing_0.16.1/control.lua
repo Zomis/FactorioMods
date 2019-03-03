@@ -56,7 +56,8 @@ local function createMissingFlow(parent, id)
     local name = "missing" .. id
     local flow = parent
     flow.add({type = "flow", name = name, direction = "horizontal"})
-    flow[name].add({type = "button", name = "what_is_missing_delete", caption = "X"})
+    flow[name].add({type = "button", name = "what_is_missing_delete", caption = "X",
+      style = "what_is_missing_delete_button"})
     flow[name].add({type = "choose-elem-button", name = "wanted", elem_type = "item"})
     local scroll = flow[name].add({type = "scroll-pane", name = "result",
        vertical_scroll_policy = "never", horizontal_scroll_policy = "auto", style = "what_is_missing_scroll"})
