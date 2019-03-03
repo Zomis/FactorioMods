@@ -1,4 +1,8 @@
 tools/factorioPosts/duga.groovy
+/angelsaddons-*/
+TinyStart_*/
+mod-settings.dat
+
 
 mod-list.json
 working/
@@ -47,3 +51,5 @@ luac.out
 
 
 mod-settings\.json
+
+*.höllenmodpack
