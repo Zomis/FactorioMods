@@ -93,6 +93,10 @@ local function onGuiOpened(event)
   local entity = event.entity
   if entity.name == "advanced-combinator" then
     local advanced_combinator = advanced_combinators[common.worldAndPos(entity)]
+    if not advanced_combinator then
+      player.print("Advanced Combinator does not seem to exist.")
+      return
+    end
     if advanced_combinator.entity and advanced_combinator.entity.valid and advanced_combinator.entity == entity then
       local runtime = runtime_combinators[common.worldAndPos(entity)]
       gui.openGUI(player, advanced_combinator, runtime)

@@ -64,6 +64,10 @@ local function parse(advanced_combinator, entity)
   end
 
   local perform_function = function(ent)
+    if not entity.valid then
+      -- If entity is invalid then there's not much to do
+      return
+    end
     local control = entity.get_control_behavior()
     local result = {}
     for _, command in ipairs(commands) do
