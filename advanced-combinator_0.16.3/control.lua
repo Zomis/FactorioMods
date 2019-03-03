@@ -71,7 +71,9 @@ end
 
 local function onRemoveEntity(event)
   local entity = event.entity
-  advanced_combinators[common.worldAndPos(entity)] = nil
+  if entity.name == "advanced-combinator" then
+    advanced_combinators[common.worldAndPos(entity)] = nil
+  end
 end
 
 local function onTick()
