@@ -115,14 +115,8 @@ node {
       def mod = params.releaseMod.substring(0, params.releaseMod.indexOf(' ('))
       def oldVersion = mods[mod]
       def releaseString = "$mod to version $params.releaseVersion (previous: $oldVersion)"
-      stage('Release?') {
-        duga.dugaResult("Ready to release $mod version $params.releaseVersion (previous version was $oldVersion). Awaiting confirmation")
-        timeout(time: 5, unit: 'MINUTES') {
-            input message: "Release $releaseString ? (tag, build artifact and publish in Jenkins, prepare with new version)"
-        }
-      }
       stage('Release') {
-        duga.dugaResult("Starting release of $mod version $params.releaseVersion")
+        echo("Starting release of $mod version $params.releaseVersion")
         def oldDir = mod + '_' + oldVersion
         def newDir = mod + '_' + params.releaseVersion
 
