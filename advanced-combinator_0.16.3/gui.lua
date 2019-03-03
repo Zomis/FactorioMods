@@ -121,11 +121,11 @@ local function openGUI(player, advanced_combinator, runtime)
     -- Move Up, Move Down, Delete
     local flow = list.add({ type = "flow", name = "index" .. k, direction = "horizontal" })
     local button
-    button = flow.add({ type = "button", name = "delete_button", caption = "X" })
+    button = flow.add({ type = "button", name = "delete_button", caption = "X", style = "advanced_combinator_small_button" })
     button.tooltip = "Delete this command"
-    button = flow.add({ type = "button", name = "move_up", caption = "U" })
+    button = flow.add({ type = "button", name = "move_up", caption = "U", style = "advanced_combinator_small_button" })
     button.tooltip = "Move this command up"
-    button = flow.add({ type = "button", name = "move_down", caption = "D" })
+    button = flow.add({ type = "button", name = "move_down", caption = "D", style = "advanced_combinator_small_button" })
     button.tooltip = "Move this command down"
 
     flow = flow.add({ type = "flow", name = "command", direction = "horizontal" })
