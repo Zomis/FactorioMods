@@ -1,4 +1,4 @@
-local constants = require "constants"
+local constants = require "prototypes/constants"
 local common = require "common"
 local logic = {}
 logic.logic = {}

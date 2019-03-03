@@ -1,4 +1,4 @@
-local combinator_slot_counts = require "../constants"
+local combinator_slot_counts = require "constants"
 
 data:extend({
 {
@@ -190,7 +190,7 @@ data:extend({
     name = "advanced-combinator",
     icon = "__advanced-combinator__/graphics/icons/constant-combinator.png",
     icon_size = 32,
-    flags = { "goes-to-quickbar" },
+    flags = { },
     subgroup = "circuit-network",
     place_result = "advanced-combinator",
     order = "b[combinators]-u[advanced-combinator]",

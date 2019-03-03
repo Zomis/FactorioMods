@@ -1,5 +1,5 @@
-local constants = require "../constants"
-local common = require "../common"
+local constants = require "prototypes/constants"
+local common = require "common"
 
 local function set_signal(logic, entity, current, index, signal_type, signal_value)
   if not signal_type then

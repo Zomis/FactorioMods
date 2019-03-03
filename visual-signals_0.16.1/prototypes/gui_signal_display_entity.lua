@@ -188,7 +188,7 @@ data:extend({
     name = "gui-signal-display",
     icon = "__visual-signals__/graphics/icons/constant-combinator.png",
     icon_size = 32,
-    flags = { "goes-to-quickbar" },
+    flags = { },
     subgroup = "circuit-network",
     place_result="gui-signal-display",
     order = "b[combinators]-u[gui-signal-display]",
