@@ -17,8 +17,15 @@ local function check_for_loot(unit_type)
     end
 end
 
+local ignored_types = {}
+ignored_types["resource"] = true
+ignored_types["tree"] = true
+ignored_types["simple-entity"] = true
+ignored_types["simple-entity-with-owner"] = true
+ignored_types["simple-entity-with-force"] = true
+
 for type_name, raw_table in pairs(data.raw) do
-    if type_name ~= "resource" then
+    if not ignored_types[type_name] then
         check_for_loot(raw_table)
     end
 end
