@@ -86,6 +86,10 @@ local function check_progress(job, entity_data)
   end
   local progress = entity_data.entity.crafting_progress
   local last_progress = entity_data.last_progress
+  if not job.results[entity_data.recipe.name] then
+    -- Bugfix for https://mods.factorio.com/mod/usage-detector/discussion/5c925495cc0838000dcd2e05
+    return
+  end
   if progress < last_progress then
     entity_data.count = entity_data.count + 1
     job.results[entity_data.recipe.name].count = job.results[entity_data.recipe.name].count + 1
