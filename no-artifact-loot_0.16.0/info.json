@@ -1,11 +1,12 @@
 {
   "name": "no-artifact-loot",
   "version": "0.16.0",
-  "factorio_version": "0.16",
+  "factorio_version": "0.17",
   "title": "No Artifact Loot",
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://www.github.com/Zomis/FactorioMods",
-  "description": "Removes all alien-artifact loot from enemies. For use in combination with Bob's Enemies + Angel's Bio Processing when there are other ways to get artifacts.",
-  "dependencies": ["base >= 0.16.0"]
+  "description":
+    "Removes all alien-artifact loot from enemies. For use in combination with Bob's Enemies + Angel's Bio Processing when there are other ways to get artifacts.",
+  "dependencies": []
 }
