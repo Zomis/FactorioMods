@@ -8,7 +8,7 @@ local function productAmount(product)
     return product.probability * (product.amount_max + product.amount_min) / 2
 end
 
-local function applyRecipe(force, recipe, inventory, want)
+function Inventory:applyRecipe(recipe, want)
     local times = 1
     if recipe.type ~= "technology" then
         local product = nil
@@ -22,7 +22,7 @@ local function applyRecipe(force, recipe, inventory, want)
         end
         times = math.ceil(math.abs(want.count) / productAmount(product))
     end
-    local results = inventory:copy()
+    local results = self:copy()
     for _, i in pairs(recipe.ingredients) do
         results:modify(i.type, i.name, -i.amount * times)
     end
@@ -68,18 +68,18 @@ function Inventory:hasMissingItems()
     return false
 end
 
-function Inventory:findRecipeFor(force, product)
+function Inventory:findRecipeFor(product)
     if product.type == "recipe" then
-        for _, tech in pairs(force.technologies) do
+        for _, tech in pairs(self.force.technologies) do
             for _, modifier in pairs(tech.effects) do
                 if modifier.type == "unlock-recipe" and modifier.recipe == product.name then
-                    return self:findRecipeFor(force, {type = "technology", name = tech.name})
+                    return self:findRecipeFor({type = "technology", name = tech.name})
                 end
             end
         end
     end
     if product.type == "technology" then
-        local recipe = force.technologies[product.name]
+        local recipe = self.force.technologies[product.name]
         local count = recipe.research_unit_count
         local research_ingredients = recipe.research_unit_ingredients
         local time = count * recipe.research_unit_energy
@@ -109,12 +109,12 @@ function Inventory:findRecipeFor(force, product)
         }
     end
     if product.type == "item" or product.type == "fluid" then
-        for k, recipe in pairs(force.recipes) do
+        for k, recipe in pairs(self.force.recipes) do
             for _, recipe_product in pairs(recipe.products) do
                 if recipe_product.type == product.type and recipe_product.name == product.name then
                     if not recipe.enabled and not self.data["recipe/" .. recipe.name] then
---                        force.print("Recipe " .. recipe.name .. " is not available yet" .. ". " .. math.random(1, 10))
-                        return self:findRecipeFor(force, {type = "recipe", name = recipe.name})
+--                        self.force.print("Recipe " .. recipe.name .. " is not available yet" .. ". " .. math.random(1, 10))
+                        return self:findRecipeFor({type = "recipe", name = recipe.name})
                     end
                     return {
                         type = "recipe",
@@ -130,9 +130,9 @@ function Inventory:findRecipeFor(force, product)
     -- error({ message = "Unknown product: " .. product.type .. "/" .. product.name })
 end
 
-function Inventory:findMissingItem(force)
+function Inventory:findMissingItem()
     for _, v in pairs(self.data) do
-        if v.count < 0 and self:findRecipeFor(force, v) then
+        if v.count < 0 and self:findRecipeFor(v) then
             return v
         end
     end
@@ -147,17 +147,17 @@ function Inventory:copy()
     return newInventory
 end
 
-function Inventory:resolveRequirements(force)
+function Inventory:resolveRequirements()
   local have = self:copy()
   local tries = 0
   while tries < 100000 do
     tries = tries + 1
-    local product = have:findMissingItem(force)
+    local product = have:findMissingItem()
     if product == nil then
         return have
     end
-    local recipe = have:findRecipeFor(force, product)
-    have = applyRecipe(force, recipe, have, product)
+    local recipe = have:findRecipeFor(product)
+    have = have:applyRecipe(recipe, product)
   end
   return have
 end
@@ -176,7 +176,7 @@ local function MissingGoal(player)
   have:modify("item", "assembling-machine-1", -1)
 --  have:modify("item", "rocket-part", -100)
 --  have:modify("item", "satellite", -1)
-  have = have:resolveRequirements(player.force)
+  have = have:resolveRequirements()
   for k, v in pairs(have.data) do
     if v.count ~= 0 and v.type ~= "technology" then
         player.print(v.name .. ": " .. v.count)
