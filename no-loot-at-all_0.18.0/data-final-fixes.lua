@@ -1,3 +1,5 @@
+local probability = settings.startup["no-loot-probability-of-loot"].value
+
 local function check_for_loot(unit_type)
     for _, unit in pairs(unit_type) do
         if unit.minable then
@@ -9,7 +11,7 @@ local function check_for_loot(unit_type)
                 name = unit.minable.result,
                 amount_min = 1,
                 amount_max = 1,
-                probability = 0.5
+                probability = probability / 100.0
               })
             end
             unit.minable.result = nil
