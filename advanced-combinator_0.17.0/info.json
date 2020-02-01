@@ -5,8 +5,8 @@
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://github.com/Zomis/FactorioMods",
-  "factorio_version": "0.17",
-  "dependencies": ["base >= 0.17"],
+  "factorio_version": "0.18",
+  "dependencies": ["base >= 0.18"],
   "description":
     "Make combinators great again! One combinator to rule them all."
 }
