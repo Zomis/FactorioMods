@@ -279,6 +279,9 @@ local function onPlayerChangedForce(event)
     if guiRoot["panel" .. k] then
       guiRoot["panel" .. k].destroy()
     end
+    if guiRoot["label" .. k] then
+      guiRoot["label" .. k].destroy()
+    end
   end
 end
 
