@@ -20,6 +20,7 @@
 
 -- x Table with product as key and a list of machines that is producing that as value
 require "entity_tick_iterate"
+local Async = require "async"
 
 local STEP_BY_STEP = false
 local ROCKET_PART = "rocket-part"
@@ -287,6 +288,7 @@ end
 
 -- Add all assembling machines and furnaces in the game to our machines table
 local function onInit()
+    Async:on_init()
     for _, f in pairs(game.forces) do
         for _, surface in pairs(game.surfaces) do
             for _, ent in pairs(surface.find_entities_filtered({ force = f, type = "assembling-machine"})) do
@@ -318,6 +320,7 @@ local function onInit()
 end
 
 local function onLoad()
+    Async:on_load()
     machines = global.machines
     machineRecipes = global.machineRecipes
     if global.playerDatas then
@@ -557,6 +560,7 @@ local function perform(player)
 end
 
 local function onTick()
+    Async:on_tick()
     if not STEP_BY_STEP then -- and (0 == game.tick % update_interval) then
         local entity = entityTickIterateNext()
         if entity then
