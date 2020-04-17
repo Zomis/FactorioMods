@@ -8,6 +8,10 @@ Async.__index = Async
 local async_tasks = {}
 
 local function add_async_task(task)
+    if not async_tasks then
+        async_tasks = {}
+        global.async_tasks = async_tasks
+    end
     for k, existing_task in pairs(async_tasks) do
         if existing_task:is_completed() then
             async_tasks[k] = task
@@ -117,6 +121,9 @@ function Async:is_completed()
 end
 
 function Async:on_tick()
+    if async_tasks == nil then
+        return
+    end
     local tick = game.tick
     for k, task in pairs(async_tasks) do
         task:tick(tick)
