@@ -31,16 +31,28 @@ function Async:perform_once(loops, perform_function)
     return obj
 end
 
-function Async:loop(name, start, stop)
-    local values = {}
-    for i = start, stop do
-        table.insert(values, i)
+local function loop_next(loop, current)
+    if loop.type == "loop" then
+        if current == nil then
+            return loop.start, loop.start
+        elseif current == loop.stop then
+            return nil, nil
+        else
+            return current + 1, current + 1
+        end
+    elseif loop.type == "loop_values" then
+        return next(loop.values, current)
+    else
+        error("Unknown loop type: " .. loop.type)
     end
-    return { type = "loop", identifier = name, values = values }
+end
+
+function Async:loop(name, start, stop)
+    return { type = "loop", identifier = name, start = start, stop = stop }
 end
 
 function Async:loop_values(name, values)
-    return { type = "loop", identifier = name, values = values }
+    return { type = "loop_values", identifier = name, values = values }
 end
 
 function Async:restart_loops()
@@ -50,7 +62,7 @@ function Async:restart_loops()
 
     for loop_index, loop in pairs(self.loops) do
         local loop = self.loops[loop_index]
-        local it, value = next(loop.values, nil)
+        local it, value = loop_next(loop, nil)
         self.iterators[loop_index] = it
         self.state[loop.identifier] = value
     end
@@ -61,7 +73,7 @@ function Async:next_iteration()
 
     while true do
         local loop = self.loops[loop_index]
-        local it, value = next(loop.values, self.iterators[loop_index])
+        local it, value = loop_next(loop, self.iterators[loop_index])
         self.iterators[loop_index] = it
         self.state[loop.identifier] = value
         if it == nil then
@@ -134,7 +146,7 @@ end
 local function async_command_step(event)
     local player = game.players[event.player_index]
     if event.command == "async_create" then
-        local loop1 = Async:loop("a", 1, 3)
+        local loop1 = Async:loop_values("a", {"ONE", "TWO", "THREE"})
         local loop2 = Async:loop("b", 1, 2)
         local loop3 = Async:loop("c", 1, 3)
         local perform = function(state)
