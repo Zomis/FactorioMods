@@ -562,10 +562,7 @@ end
 local function onTick()
     Async:on_tick()
     if not STEP_BY_STEP then -- and (0 == game.tick % update_interval) then
-        local entity = entityTickIterateNext()
-        if entity then
-            checkMachine(entity)
-        end
+        check_iterate_tasks(checkMachine)
     end
     if 0 == game.tick % update_interval then
         for _, player in pairs(game.players) do

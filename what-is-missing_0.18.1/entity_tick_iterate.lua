@@ -1,8 +1,5 @@
-local entitiesToScan = {}
-local entitiesToScanIndex = nil
-local surfacesToScan = {}
-local surfacesToScanIndex = nil
-local typeToScan = "assembling-machine"
+local Async = require "async"
+local scan_delay = 3600
 
 local function out(txt)
   local debug = true
@@ -11,82 +8,57 @@ local function out(txt)
   end
 end
 
-local function scan()
-    local useNext = false
-    for surfaceIndex, surface in pairs(game.surfaces) do
---      out(surfaceIndex .. " name " .. surface.name .. " useNext? " .. tostring(useNext))
-        if surfacesToScanIndex == nil then
-            return surfaceIndex
-        end
-        if useNext then
-            return surfaceIndex
-        end
-        if surfaceIndex == surfacesToScanIndex then
-            useNext = true
-        end
-    end
-    return nil
+-- local function checkMachine ?
+-- local function onFinished ?
+-- for proper loading/saving of tasks
 
---    out("Scan surface current index is " .. tostring(surfacesToScanIndex))
---   local index, surface = next(surfacesToScan, surfacesToScanIndex)
---    if not index then
---        surfacesToScan = game.surfaces
---        out("Resetting surfaces to scan2")
---        index, surface = next(surfacesToScan, nil)
---    end
---    if surface then
---        surfacesToScanIndex = index
---        out("Scanning surface " .. index .. tostring(surface))
-----        return surface.find_entities_filtered({type = "assembling-machine"})
---    else
---        out("Surface is nil. Not scanning")
---    end
---    return {}
+function start_scanning(force, perform)
+--  if true then return end
+  if not force.valid then
+    return
+  end
+  -- loop surfaces, entity_types, entities
+  local surfaces = Async:loop_func("surface", function()
+    local surface_list = {}
+    for _, surface in pairs(game.surfaces) do table.insert(surface_list, surface) end
+    return surface_list
+  end)
+  local entity_types = Async:loop_values("entity_type", { "assembling-machine", "furnace" })
+  local entities = Async:loop_func("entity", function(loop_values)
+    return loop_values.surface.find_entities_filtered({type = loop_values.entity_type, force = force})
+  end)
+
+  local i = 0
+  local iterate_perform = function(values)
+    perform(values.entity)
+  end
+
+  -- Start task and automatically renew it after it expires
+  local on_finished = function(task)
+    game.print("ON FINISHED " .. game.tick)
+    game.print("Sleeping " .. force.name .. game.tick)
+    global.force_tasks[task.force.name] = Async:delayed(scan_delay, function() start_scanning(task.force, perform) end)
+  end
+  game.print("Starting " .. force.name .. game.tick)
+  local async_task = Async:perform_once({ surfaces, entity_types, entities }, iterate_perform, on_finished)
+  async_task.force = force
+  global.force_tasks[force.name] = async_task
 end
 
-local scan_delay = 3600
-local last_scan = 0
-local wait = false
+function check_iterate_tasks(perform)
+  if not global.force_tasks then
+    global.force_tasks = {}
+  end
 
-function entityTickIterateNext()
-  -- Use time constraint to not scan too often (to avoid lag)
-  -- If next is not nil, then scan it
-  local index, entity
-  if not wait then
-    index, entity = next(entitiesToScan, entitiesToScanIndex)
-  end
-  if index then
-    entitiesToScanIndex = index
-    return entity
-  end
-  wait = true
-  if last_scan + scan_delay > game.tick then
-    -- Skip checking to avoid lag.
-    return nil
-  end
-  wait = false
-  last_scan = game.tick
---  out("TIME " .. last_scan)
-    if not index then
---      out("No index at tick " .. game.tick)
-        local surfaceIndex = scan()
-        surfacesToScanIndex = surfaceIndex
-        if surfaceIndex then
---          out("Scan " .. typeToScan .. " on " .. surfaceIndex .. " at tick " .. game.tick)
-            entitiesToScan = game.surfaces[surfaceIndex].find_entities_filtered({type = typeToScan})
-            -- out("Using surfaceIndex " .. tostring(surfaceIndex) .. " contains " .. #entitiesToScan)
-            index, entity = next(entitiesToScan, index)
-        else
-            entitiesToScanIndex = nil
-            if typeToScan == "assembling-machine" then
-                typeToScan = "furnace"
-            else
-                typeToScan = "assembling-machine"
-            end
-            -- out("Switching type to " .. typeToScan)
-            return nil
-        end
+  for _, force in pairs(game.forces) do
+    if not global.force_tasks[force.name] then
+      game.print("No task for force " .. force.name)
+      start_scanning(force, perform)
     end
-    entitiesToScanIndex = index
-    return entity
+  end
 end
+
+--function on_force_created(event)
+--  start_scanning()
+--end
+--script.on_event(defines.events.on_force_created, on_force_created)
