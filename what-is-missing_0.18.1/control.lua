@@ -236,7 +236,7 @@ local function removeMachine(entity, outputs)
     end
 end
 
-local function checkMachine(entity, debug)
+local function checkMachine(entity, debug, print_message)
     if not entity.valid then
         return
     end
@@ -279,7 +279,7 @@ local function checkMachine(entity, debug)
                 addMachine(entity)
                 current = current.name
             end
-            if entity.type == "assembling-machine" then
+            if print_message and entity.type == "assembling-machine" then
               entity.force.print("[What is missing] Detected recipe change at " .. pos ..
                 " from " .. tostring(previous) .. " to " .. tostring(current))
             end
@@ -714,12 +714,25 @@ local function onGuiClosed(event)
   -- player_index, gui_type, entity, item, equipment, other_player, element
 end
 
+local function iterate_perform(values)
+  checkMachine(values.entity, false, true)
+end
+
+local function on_research_finished(event)
+  -- Scan all machines once to detect recipe changes due to old recipes being obsolete
+  entity_tick_iterate.scan_once(event.force, iterate_perform)
+end
+
 local function onConfigurationChanged(data)
   if not global.playerDatas then
     savePlayerSettingsFromGUI()
   end
   for _, player in pairs(game.players) do
     createSmallTopButton(player)
+  end
+  -- Scan all machines once to detect recipe changes due to old recipes being obsolete
+  for _, force in pairs(game.forces) do
+    entity_tick_iterate.scan_once(force, iterate_perform)
   end
 
   -- Migration code to also save world name for saved machines (fix #30) in 0.16
@@ -735,7 +748,7 @@ local function onConfigurationChanged(data)
         -- game.print("migrate " .. key .. " to " .. worldAndPos(entity, key))
         newMachineRecipes[worldAndPos(entity, key)] = savedMachine
       else
-        game.print("[What is missing] Removing invalid entity in table " .. key)
+        game.print("[What is Missing] Removing invalid entity in table " .. key)
       end
     end
     machineRecipes = newMachineRecipes
@@ -744,9 +757,10 @@ local function onConfigurationChanged(data)
 end
 
 Async:configure(function(task)
-  local iterate_perform = function(values)
-    checkMachine(values.entity)
+  if task.once then
+    return { perform_function = iterate_perform }
   end
+
   local sleeping_finished = function()
     entity_tick_iterate.start_scanning(task.force, iterate_perform)
   end
@@ -756,7 +770,7 @@ Async:configure(function(task)
 
   local force_task_finished = function(task)
     -- automatically task after it expires, after a delay
-    game.print("Sleeping " .. task.force.name .. game.tick)
+    -- game.print("Sleeping " .. task.force.name .. game.tick)
     global.force_tasks[task.force.name] = Async:delayed({ force = task.force, sleeping = true }, scan_delay)
   end
 
@@ -766,8 +780,8 @@ Async:configure(function(task)
   }
 end)
 
---script.on_event(defines.events.on_research_finished, on_research_finished) -- TODO: Scan everything here
---script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
---script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
---script.on_event(defines.events.on_gui_closed, onGuiClosed)
+script.on_event(defines.events.on_research_finished, on_research_finished)
+script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
+script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
+script.on_event(defines.events.on_gui_closed, onGuiClosed)
 script.on_configuration_changed(onConfigurationChanged)

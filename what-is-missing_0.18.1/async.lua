@@ -56,12 +56,13 @@ function Async:perform_once(task_data, loops)
     save_state.task_data = task_data
     save_state.completions = 0
     save_state.interval = 1
+    save_state.steps_per_interval = 1
     save_state.remaining = 1
     save_state.loops = loops
     save_state.loop_counts = table_size(loops)
     local task = Async:load_task(save_state)
     task:restart_loops()
-    return task
+    return task.save_state
 end
 
 function Async:delayed(task_data, delay_ticks)
@@ -179,15 +180,14 @@ function AsyncTask:finished()
     self.save_state.completions = self.save_state.completions + 1
     self.save_state.remaining = self.save_state.remaining - 1
     if self.on_finished then
-        game.print("Finished")
-        game.print(serpent.line(self.on_finished))
+        -- game.print("Finished")
         self.on_finished(self.save_state.task_data)
     end
 end
 
 function AsyncTask:call_perform_function()
 --    log("Call perform with " .. serpent.line(self.state))
-    self.perform_function(self.save_state.state)
+    self.perform_function(self.save_state.state, self.save_state.task_data)
 end
 
 function AsyncTask:tick(tick)
@@ -195,8 +195,12 @@ function AsyncTask:tick(tick)
         return
     end
     if tick % self.save_state.interval == 0 then
-        self:call_perform_function()
-        self:next_iteration()
+        for i = 1, self.save_state.steps_per_interval do
+            if self.save_state.remaining ~= 0 then
+                self:call_perform_function()
+                self:next_iteration()
+            end
+        end
     end
 end
 
@@ -205,7 +209,7 @@ function AsyncTask:is_completed()
 end
 
 function Async:initialize()
-    game.print("Async:initialize")
+    -- game.print("Async:initialize")
     -- perform configuration step
     if not global.async_tasks then
         global.async_tasks = {}
