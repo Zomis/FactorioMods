@@ -28,6 +28,14 @@ node {
       println dirs
     }
 
+    stage('Check Async util') {
+      def asyncFiles = findFiles(glob: '*/async.lua')
+      println asyncFiles
+      for (def file : asyncFiles) {
+        sh(script: "diff async.lua " + file.path)
+      }
+    }
+
     stage('Scan info.json') {
       for (def json : infoJsonFiles) {
           println "Found info.json: " + json.path
