@@ -74,6 +74,7 @@ local function on_player_selected_area(event)
         player = player, force = player.force, surface = player.surface
     }
     local place = Async:perform_once(task_data, { xloop, yloop })
+    place.steps_per_interval = 20
     player.print("[Lamp Placer] Starting placing lamps in an area of " .. width .. " x " .. height .. " using distance of " .. lamp_distance)
 end
 
