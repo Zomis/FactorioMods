@@ -19,13 +19,14 @@
 
 
 -- x Table with product as key and a list of machines that is producing that as value
-require "entity_tick_iterate"
+local entity_tick_iterate = require "entity_tick_iterate"
 local Async = require "async"
 
 local STEP_BY_STEP = false
 local ROCKET_PART = "rocket-part"
 local RESEARCH = "RESEARCH"
 
+local scan_delay = 3600
 local machines = {}
 local machineRecipes = {} -- KEY: position, VALUE: entity + recipe. Check one machine per tick
 local playerDatas = {} -- KEY: Player index, VALUE: research (bool), rocket (bool), wanted (array of string)
@@ -320,7 +321,6 @@ local function onInit()
 end
 
 local function onLoad()
-    Async:on_load()
     machines = global.machines
     machineRecipes = global.machineRecipes
     if global.playerDatas then
@@ -562,7 +562,7 @@ end
 local function onTick()
     Async:on_tick()
     if not STEP_BY_STEP then -- and (0 == game.tick % update_interval) then
-        check_iterate_tasks(checkMachine)
+        entity_tick_iterate.check_iterate_tasks(checkMachine)
     end
     if 0 == game.tick % update_interval then
         for _, player in pairs(game.players) do
@@ -743,7 +743,31 @@ local function onConfigurationChanged(data)
   end
 end
 
-script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
-script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
-script.on_event(defines.events.on_gui_closed, onGuiClosed)
+Async:configure(function(task)
+  local iterate_perform = function(values)
+    checkMachine(values.entity)
+  end
+  local sleeping_finished = function()
+    entity_tick_iterate.start_scanning(task.force, iterate_perform)
+  end
+  if task.sleeping then
+    return { perform_function = function() end, on_finished = sleeping_finished }
+  end
+
+  local force_task_finished = function(task)
+    -- automatically task after it expires, after a delay
+    game.print("Sleeping " .. task.force.name .. game.tick)
+    global.force_tasks[task.force.name] = Async:delayed({ force = task.force, sleeping = true }, scan_delay)
+  end
+
+  return {
+    perform_function = iterate_perform,
+    on_finished = force_task_finished
+  }
+end)
+
+--script.on_event(defines.events.on_research_finished, on_research_finished) -- TODO: Scan everything here
+--script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
+--script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings)
+--script.on_event(defines.events.on_gui_closed, onGuiClosed)
 script.on_configuration_changed(onConfigurationChanged)

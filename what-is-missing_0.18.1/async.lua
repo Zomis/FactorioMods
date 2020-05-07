@@ -7,7 +7,10 @@ Async.__index = Async
 AsyncTask = {}
 AsyncTask.__index = AsyncTask
 
-local async_tasks = {}
+local async_tasks = nil
+local async_runtimes = {}
+local async_initialized = false -- can't use configuration_function because that's set before LuaGameScript is available
+local async_configuration_function = nil
 
 local function add_async_task(task)
     if not async_tasks then
@@ -15,35 +18,67 @@ local function add_async_task(task)
         global.async_tasks = async_tasks
     end
     for k, existing_task in pairs(async_tasks) do
-        if existing_task:is_completed() then
-            async_tasks[k] = task
+        if async_tasks[k] == task.save_state then
+            -- Just load task, no need for inserting anything
+            async_runtimes[k] = task
             return
         end
     end
-    table.insert(async_tasks, task)
-end
-
-function Async:perform_once(loops, perform_function, on_finished)
-    if not perform_function then
-        error("No perform function specified")
+    for k, existing_task in pairs(async_runtimes) do
+        if existing_task:is_completed() then
+            async_tasks[k] = task.save_state
+            async_runtimes[k] = task
+            return
+        end
     end
-    local obj = {}
-    setmetatable(obj, AsyncTask)
-    obj.completions = 0
-    obj.interval = 1
-    obj.remaining = 1
-    obj.loops = loops
-    obj.loop_counts = table_size(loops)
-    obj.perform_function = perform_function
-    obj.on_finished = on_finished
-    obj:restart_loops()
-    add_async_task(obj)
-    return obj
+    table.insert(async_tasks, task.save_state)
+    table.insert(async_runtimes, task)
 end
 
-function Async:delayed(delay_ticks, perform_function)
+function Async:configure(configuration_function)
+    async_configuration_function = configuration_function
+end
+
+function Async:load_task(task_state)
+    local task = {}
+    setmetatable(task, AsyncTask)
+    task.save_state = task_state
+
+    local task_config = Async:config_lookup(task_state.task_data)
+    task.perform_function = task_config.perform_function
+    task.on_finished = task_config.on_finished
+    add_async_task(task)
+    return task
+end
+
+function Async:perform_once(task_data, loops)
+    local save_state = {}
+    save_state.task_data = task_data
+    save_state.completions = 0
+    save_state.interval = 1
+    save_state.remaining = 1
+    save_state.loops = loops
+    save_state.loop_counts = table_size(loops)
+    local task = Async:load_task(save_state)
+    task:restart_loops()
+    return task
+end
+
+function Async:delayed(task_data, delay_ticks)
     local sleep_loop = Async:loop("sleep", 1, delay_ticks)
-    return Async:perform_once({ sleep_loop }, function() end, perform_function)
+    local task = Async:perform_once(task_data, { sleep_loop })
+    return task
+end
+
+function Async:config_lookup(task_data)
+    if not async_configuration_function then
+        error("Async has not been configured correctly. Call Async:configure(...)")
+    end
+    local result = async_configuration_function(task_data)
+    if not result.perform_function then
+        error("No perform_function for task " .. serpent.line(task_data) .. ". Check async configuration.")
+    end
+    return result
 end
 
 local function loop_next(loop, current, all_iterators, all_state)
@@ -82,6 +117,9 @@ function Async:dynamic(name, func)
 end
 
 function Async:loop(name, start, stop)
+    if start == nil or stop == nil then
+        error("Unable to loop using start or stop as nil: " .. tostring(start) .. " - " .. tostring(stop))
+    end
     return { type = "loop", identifier = name, start = start, stop = stop }
 end
 
@@ -94,15 +132,16 @@ function Async:loop_values(name, values)
 end
 
 function AsyncTask:restart_loops()
-    self.state = {}
-    self.loops_iterator = nil
-    self.iterators = {}
+    local save_state = self.save_state
+    save_state.state = {}
+    save_state.loops_iterator = nil
+    save_state.iterators = {}
 
-    for loop_index, loop in pairs(self.loops) do
-        local loop = self.loops[loop_index]
-        local it, value = loop_next(loop, nil, self.iterators, self.state)
-        self.iterators[loop_index] = it
-        self.state[loop.identifier] = value
+    for loop_index, loop in pairs(save_state.loops) do
+        local loop = save_state.loops[loop_index]
+        local it, value = loop_next(loop, nil, save_state.iterators, save_state.state)
+        save_state.iterators[loop_index] = it
+        save_state.state[loop.identifier] = value
         if it == nil then
             -- if any of the loops are empty, there is nothing to loop
             self:finished()
@@ -112,13 +151,14 @@ function AsyncTask:restart_loops()
 end
 
 function AsyncTask:next_iteration()
-    local loop_index = self.loop_counts
+    local save_state = self.save_state
+    local loop_index = save_state.loop_counts
 
     while true do
-        local loop = self.loops[loop_index]
-        local it, value = loop_next(loop, self.iterators[loop_index], self.iterators, self.state)
-        self.iterators[loop_index] = it
-        self.state[loop.identifier] = value
+        local loop = save_state.loops[loop_index]
+        local it, value = loop_next(loop, save_state.iterators[loop_index], save_state.iterators, save_state.state)
+        save_state.iterators[loop_index] = it
+        save_state.state[loop.identifier] = value
         if it == nil then
             -- if iterator on loop_index is nil, then the current loop is finished so we must go to the next loop and iterate to the next there
             loop_index = loop_index - 1
@@ -126,7 +166,7 @@ function AsyncTask:next_iteration()
                 self:finished()
                 return
             end
-        elseif self.iterators[loop_index] and loop_index == self.loop_counts then
+        elseif save_state.iterators[loop_index] and loop_index == save_state.loop_counts then
             -- if we're on last loop and last loop is not nil, then we're good to go for next perform call.
             return
         else
@@ -136,67 +176,67 @@ function AsyncTask:next_iteration()
 end
 
 function AsyncTask:finished()
-    self.completions = self.completions + 1
-    self.remaining = self.remaining - 1
+    self.save_state.completions = self.save_state.completions + 1
+    self.save_state.remaining = self.save_state.remaining - 1
     if self.on_finished then
         game.print("Finished")
         game.print(serpent.line(self.on_finished))
-        self.on_finished(self)
+        self.on_finished(self.save_state.task_data)
     end
 end
 
 function AsyncTask:call_perform_function()
 --    log("Call perform with " .. serpent.line(self.state))
-    self.perform_function(self.state)
+    self.perform_function(self.save_state.state)
 end
 
 function AsyncTask:tick(tick)
-    if self.remaining == 0 then
+    if self.save_state.remaining == 0 then
         return
     end
-    if tick % self.interval == 0 then
+    if tick % self.save_state.interval == 0 then
         self:call_perform_function()
         self:next_iteration()
     end
 end
 
 function AsyncTask:is_completed()
-    return self.remaining == 0
+    return self.save_state.remaining == 0
+end
+
+function Async:initialize()
+    game.print("Async:initialize")
+    -- perform configuration step
+    if not global.async_tasks then
+        global.async_tasks = {}
+    end
+    async_tasks = global.async_tasks
+    for _, task_state in pairs(async_tasks) do
+        Async:load_task(task_state)
+    end
 end
 
 function Async:on_tick()
-    if async_tasks == nil then
-        return
+    if not async_initialized then
+        Async:initialize()
+        async_initialized = true
     end
     local tick = game.tick
-    for k, task in pairs(async_tasks) do
+    for _, task in pairs(async_runtimes) do
         task:tick(tick)
     end
     if tick % 3600 == 2700 then
         -- Cleanup tasks
         log("Cleanup async tasks")
-        for k, task in pairs(async_tasks) do
+        for k, task in pairs(async_runtimes) do
             if task:is_completed() then
                 log("Cleaned async task " .. k)
                 async_tasks[k] = nil
+                async_runtimes[k] = nil
             end
         end
         return
     end
-end
-
-function Async:on_load()
-    async_tasks = global.async_tasks
-    if async_tasks then
-        for _, task in pairs(async_tasks) do
-            setmetatable(task, AsyncTask)
-        end
-    end
-end
-
-function Async:on_init()
-    global.async_tasks = global.async_tasks or {}
-    async_tasks = global.async_tasks
 end
 
 return Async

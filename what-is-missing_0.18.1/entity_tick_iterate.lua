@@ -1,5 +1,4 @@
 local Async = require "async"
-local scan_delay = 3600
 
 local function out(txt)
   local debug = true
@@ -23,25 +22,16 @@ function start_scanning(force, perform)
     for _, surface in pairs(game.surfaces) do table.insert(surface_list, surface) end
     return surface_list
   end)
+  local single_force = Async:loop_values("force", { force })
   local entity_types = Async:loop_values("entity_type", { "assembling-machine", "furnace" })
   local entities = Async:loop_func("entity", function(loop_values)
-    return loop_values.surface.find_entities_filtered({type = loop_values.entity_type, force = force})
+    local entit = loop_values.surface.find_entities_filtered({type = loop_values.entity_type, force = loop_values.force})
+    game.print(" size " .. table_size(entit) .. serpent.line(loop_values))
+    return entit
   end)
 
-  local i = 0
-  local iterate_perform = function(values)
-    perform(values.entity)
-  end
-
-  -- Start task and automatically renew it after it expires
-  local on_finished = function(task)
-    game.print("ON FINISHED " .. game.tick)
-    game.print("Sleeping " .. force.name .. game.tick)
-    global.force_tasks[task.force.name] = Async:delayed(scan_delay, function() start_scanning(task.force, perform) end)
-  end
   game.print("Starting " .. force.name .. game.tick)
-  local async_task = Async:perform_once({ surfaces, entity_types, entities }, iterate_perform, on_finished)
-  async_task.force = force
+  local async_task = Async:perform_once({ force = force }, { single_force, surfaces, entity_types, entities })
   global.force_tasks[force.name] = async_task
 end
 
@@ -62,3 +52,8 @@ end
 --  start_scanning()
 --end
 --script.on_event(defines.events.on_force_created, on_force_created)
+
+return {
+  start_scanning = start_scanning,
+  check_iterate_tasks = check_iterate_tasks
+}
