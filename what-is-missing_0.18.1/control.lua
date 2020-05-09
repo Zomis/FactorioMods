@@ -289,7 +289,6 @@ end
 
 -- Add all assembling machines and furnaces in the game to our machines table
 local function onInit()
-    Async:on_init()
     for _, f in pairs(game.forces) do
         for _, surface in pairs(game.surfaces) do
             for _, ent in pairs(surface.find_entities_filtered({ force = f, type = "assembling-machine"})) do
@@ -720,7 +719,7 @@ end
 
 local function on_research_finished(event)
   -- Scan all machines once to detect recipe changes due to old recipes being obsolete
-  entity_tick_iterate.scan_once(event.force, iterate_perform)
+  entity_tick_iterate.scan_once(event.research.force, iterate_perform)
 end
 
 local function onConfigurationChanged(data)
