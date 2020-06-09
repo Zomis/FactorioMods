@@ -1,0 +1,8 @@
+{
+  "name": "ZExport",
+  "version": "0.0.1",
+  "factorio_version": "0.18",
+  "title": "ZExport",
+  "author": "Flagahacker and Zomis",
+  "description": "Adds a command that exports recipe, assembler, miner and resource data in a JSON format"
+}
