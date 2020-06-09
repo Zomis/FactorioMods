@@ -1,3 +1,4 @@
+local json = require "lib/json"
 local default_file = "export.json"
 
 commands.add_command("exportz", nil, function(event)
@@ -38,7 +39,7 @@ commands.add_command("exportz", nil, function(event)
 
     local file = event.parameter or default_file
     game.remove_path(file)
-    game.write_file(file, serpent.block(output), true)
+    game.write_file(file, json:encode_pretty(output), true)
 end
 )
 function recipeTable(recipe)
