@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.18.2
+  Features:
+    - Update for Factorio version 0.18
+
+---------------------------------------------------------------------------------------------------
+Version: 0.17.0
+  Features:
+    - Update for Factorio version 0.17
+
+---------------------------------------------------------------------------------------------------
+Version: 0.16.1
+  Features:
+    - Update for Factorio version 0.16
+
+  Bugfixes:
+    - Fixed bug with opening GUI when there are no GUI Signal Displays on the map (GitHub issue #31)
+
+  Changes:
+    - Make popup GUI more dynamic size
+    - Print title for GUI Signal Display when clicking on it (Thanks to new Factorio Lua API)
+
+---------------------------------------------------------------------------------------------------
+Version: 0.15.7
+  Bugfixes:
+    - Fix a bug that caused problems with removing a GUI Signal Display and then placing one again
+
+---------------------------------------------------------------------------------------------------
+Version: 0.15.6
+  Changes:
+    - Label for the signals will no longer scroll away (You will need to toggle "Show" off and on first for this to work)
+    - Also show both red and green networks in the bigger GUI
+
+---------------------------------------------------------------------------------------------------
+Version: 0.15.5
+  Changes:
+    - Made it possible to have both red and green signals connected at the same time. They will be shown side-by-side with red first, then green. (Previously the mod would prioritize the red network and only show that if there was also a green network connected)
+
+---------------------------------------------------------------------------------------------------
+Version: 0.15.4
+  Changes:
+    - Placed show/hide checkbox on left side and removed the label
+    - Code style improvements
+
+---------------------------------------------------------------------------------------------------
+Version: 0.15.2
+  Bugfixes:
+    - Fixed bug with Multiplayer games. Multiplayer games should now be supported fully
+
+---------------------------------------------------------------------------------------------------
+Version: 0.15.1
+  Changes:
+    - Reduced the cost for research and building it to make it more usable early-/midgame
+
