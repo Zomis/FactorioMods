@@ -52,7 +52,7 @@ local function scan_once(force, perform)
     return entity_list
   end)
 
-  game.print("Scan once " .. force.name .. game.tick)
+--  game.print("Scan once " .. force.name .. game.tick)
   Async:perform_once({ force = force, once = true }, { single_force, surfaces, entity_types, entities })
 end
 
