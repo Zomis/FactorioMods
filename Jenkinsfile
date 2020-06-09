@@ -27,7 +27,7 @@ node {
       }
       println dirs
     }
-
+/*
     stage('License') {
       def licenseFiles = findFiles(glob: '*/LICENSE')
       println licenseFiles
@@ -35,7 +35,7 @@ node {
         sh(script: "diff LICENSE " + file.path)
       }
     }
-
+*/
     stage('Check Async util') {
       def asyncFiles = findFiles(glob: '*/async.lua')
       println asyncFiles
