@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.18.2
+Date: 09.06.2020
+  Changes:
+    - Change how recipe changes are detected
+    - Recipe change messages are only shown if caused by mod changes or research completed
+    - Fix some bugs when entities have been removed in different ways
+---------------------------------------------------------------------------------------------------
+Version: 0.18.1
+Date: 01.02.2020
+  Features:
+    - Update for Factorio 0.18
+---------------------------------------------------------------------------------------------------
+Version: 0.17.0
+Date: 03.03.2019
+  Features:
+    - Update for Factorio 0.17
+  Changes:
+    - Usage improvements
+---------------------------------------------------------------------------------------------------
+Version: 0.16.1
+Date: 17.12.2017
+  Features:
+    - Update for Factorio 0.16
+    - Quicker detections of recipe changes
+    - Add support for multiple surfaces by also keep track of world name (GitHub issue #30)
+    - Add show/hide all button
+  Changes:
+    - Change Stack Overflow warning limit to 50
+  Bugfixes:
+    - Skip rocket check if there is a rocket in the rocket silo (GitHub issue #25)
+    - Print recipe change info only to players within the force
+    - Avoid crashes when recipes are no longer available
+---------------------------------------------------------------------------------------------------
+Version: 0.15.1
+Date: 03.10.2017
+  Changes:
+    - No longer show "recipe changed" message for furnaces (for those who use furnaces for more than one thing)
+    - Remove the useless "Perform" button at the top
+  Bugfixes:
+    - Fixed a possible performance issue when map was scanned too quickly for entities (because of recipe change detection)
