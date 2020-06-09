@@ -166,6 +166,9 @@ local function getOutputsForMachine(entity)
 end
 
 local function addMachine(entity)
+    if not entity then
+        return
+    end
     if entity.type == "assembling-machine" or entity.type == "furnace" then
         local pos = worldAndPos(entity)
         -- out("Add " .. pos)
@@ -330,6 +333,8 @@ end
 -- When we place a new entity, we need to add it to our list of machines
 local function onPlaceEntity(event)
     addMachine(event.created_entity)
+    addMachine(event.entity)
+    addMachine(event.destination)
 end
 
 -- When we remove an entity, we need to remove it from our list of machines
@@ -682,9 +687,13 @@ script.on_load(onLoad)
 
 script.on_event(defines.events.on_built_entity, onPlaceEntity)
 script.on_event(defines.events.on_robot_built_entity, onPlaceEntity)
+script.on_event(defines.events.script_raised_built, onPlaceEntity)
+script.on_event(defines.events.script_raised_revive, onPlaceEntity)
+script.on_event(defines.events.on_entity_cloned, onPlaceEntity)
 
 script.on_event(defines.events.on_pre_player_mined_item, onRemoveEntity)
 script.on_event(defines.events.on_robot_pre_mined, onRemoveEntity)
+script.on_event(defines.events.script_raised_destroy, onRemoveEntity)
 script.on_event(defines.events.on_entity_died, onRemoveEntity)
 
 script.on_event(defines.events.on_tick, onTick)
