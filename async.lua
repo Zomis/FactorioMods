@@ -195,7 +195,8 @@ function AsyncTask:tick(tick)
         return
     end
     if tick % self.save_state.interval == 0 then
-        for i = 1, self.save_state.steps_per_interval do
+        local steps_per_interval = self.save_state.steps_per_interval or 1
+        for i = 1, steps_per_interval do
             if self.save_state.remaining ~= 0 then
                 self:call_perform_function()
                 self:next_iteration()
