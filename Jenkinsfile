@@ -29,7 +29,7 @@ node {
     }
 /*
     stage('License') {
-      def licenseFiles = findFiles(glob: '*/LICENSE')
+      def licenseFiles = findFiles(glob: '* /LICENSE')
       println licenseFiles
       for (def file : licenseFiles) {
         sh(script: "diff LICENSE " + file.path)
