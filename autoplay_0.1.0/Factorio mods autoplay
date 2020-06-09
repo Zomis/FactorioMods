@@ -1,0 +1,81 @@
+https://mods.factorio.com/mod/factoryplanner
+https://mods.factorio.com/mod/PickerExtended
+https://mods.factorio.com/mod/RailSignalPlanner
+
+Implementation:
+- https://lua-api.factorio.com/latest/LuaCustomChartTag.html
+- https://mods.factorio.com/mod/Reserved
+- create ghost entities
+- write text on map?
+
+LuaGameScript
+- show_message_dialog
+
+http://lua-users.org/wiki/FunctionalLibrary
+
+Skip the walking things in MVP. Create ghost entities and stuff instead, and use alerts.
+/c game.player.walking_state = { walking = true, direction = defines.direction.northeast }
+
+Instantly: /c game.player.mine_entity(game.player.selected)
+/c game.player.print(game.entity_prototypes["iron-ore"].mineable_properties.mining_time)
+
+CONCRETE for marking
+/c game.player.surface.set_tiles({ { name = "tutorial-grid", position = { 0, 0 } }, { name = "orange-refined-concrete", position = { 5, 0 } }, { name = "green-refined-concrete", position = { 10, 0 } } })
+orange, purple, red, green, blue, yellow, pink, cyan
+- overwrites water, works on cliffs.
+
+
+
+LuaForce:
+- chart, chart_all, is_chunk_charted, is_chunk_visible
+- print with color
+- game.player.force.add_chart_tag(game.player.surface, { text = "Hello World", position = { 0, 0 }, last_user = game.player })
+- game.player.force.add_chart_tag(game.player.surface, { text = "Hello World", icon = { type = "fluid", name = "water" }, position = { 0, 0 }, last_user = game.player })
+- game.player.force.add_research("automation")
+- inform on research complete?
+- get_train_stops
+- ai_controllable (current usage?)
+
+LuaPlayer:
+- /c game.player.add_alert(game.player.selected, defines.alert_type.no_storage)
+- /c game.player.add_custom_alert(game.player.selected, { type = "fluid", name = "water" }, "Hello", true)
+- /c game.player.set_goal_description("Some text", false)
+- game.player.create_local_flying_text({ text = "Hello", position = game.player.position })
+- game.player.create_local_flying_text({ text = "Hello", position = game.player.position, color = { r = 0, g = 1, b = 1 }, time_to_live = 500, speed = 0.3 })
+- game.player.zoom_to_world(game.player.position, 0.9)
+- game.player.open_map(game.player.position, 0.05)
+- game.player.close_map()
+- afk_time
+- spectator?
+- zoom (write), map_view_settings (write)
+
+
+LuaSurface:
+- create_entity
+
+
+Notes:
+- Cliffs, trees and rocks are entities
+
+
+
+
+Chunk designations
+
+Each chunk is 32x32
+Subdivide into 4x4 or 2x2 (per chunk: 8x8 = 64 or 16x16 = 256)
+
+orange, purple, red, green, blue, yellow, pink, cyan
+MILITARY - Edges of my control area
+POWER - Steam, Solar, Accumulators, other (Krastorio 2 has a few options)
+FARMING - Recipe that only requires some infinite resources
+SMELTING
+PATH - For moving around on the map faster
+TRAINS - For moving around on the map faster, and for item transports
+TRAIN_STATION - For loading or unloading (preferably not both as that causes issues)
+REFINING / OIL_PROCESSING
+MINING - For areas with resources
+RESEARCH
+MALL_AREA - stuff produced and ready to be taken / delivered by bots
+
+Keep track of what small things goes where (belts and pipes, underground or not)

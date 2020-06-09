@@ -1,0 +1,37 @@
+local function async_command_step(event)
+    local player = game.players[event.player_index]
+    if event.command == "async_create" then
+        local surfaces = Async:loop_func("surface", function()
+            local surface_list = {}
+            for _, surface in pairs(game.surfaces) do table.insert(surface_list, surface) end
+            return surface_list
+          end)
+          local entities = Async:loop_func("entity", function(loop_values)
+            return loop_values.surface.find_entities_filtered({type = "rocket-silo", force = force})
+          end)
+        
+        local loop_chunks = Async:chunks("chunk", player.surface)
+        local fnc = function()
+            if player.position.x < 1000 then return nil end
+            return player.position.x
+        end
+        local loop_dynamic = Async:dynamic("dynamic", fnc)
+        local loop1 = Async:loop_values("a", {"ONE", "TWO", "THREE"})
+        local loop_empty = Async:loop_values("empty", {})
+        local loop3 = Async:loop("c", 1, 3)
+        local perform = function(state)
+            game.print("test perform " .. serpent.line(state))
+        end
+        local new_async = Async:perform_once({ surfaces, loop_empty }, perform)
+        game.print("Created loop example task")
+    end
+    if event.command == "async_test" then
+        for _, task in pairs(async_tasks) do
+            task:tick(game.tick)
+        end
+    end
+    if event.command == "async_once" then
+    end
+end
+
+script.on_event(defines.events.on_console_command, async_command_step)

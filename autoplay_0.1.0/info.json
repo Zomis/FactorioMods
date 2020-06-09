@@ -1,0 +1,11 @@
+{
+  "name": "autoplay",
+  "version": "0.1.0",
+  "title": "Autoplay",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.18",
+  "dependencies": ["base >= 0.18"],
+  "description": "Ultimate level of automation: Let the game play itself. Also intended as a library for other modders."
+}

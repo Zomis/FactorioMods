@@ -1,0 +1,13 @@
+Choose something to find
+
+Item - belt/chest/consumer/producer
+Fluid - pipe/container
+Entity (items only) - car/tank/assembling-machines/train/inserter/mining-drill/resource/...
+
+
+Try arrows -- https://lua-api.factorio.com/latest/LuaControl.html#LuaControl.set_gui_arrow
+Or set chart tags.
+
+"Find all" / "Find closest" / "Find furthest"
+
+https://mods.factorio.com/mod/BeastFinder
