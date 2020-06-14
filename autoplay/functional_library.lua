@@ -46,6 +46,16 @@ function filter(func, tbl)
     end
     return newtbl
 end
+
+function any(tbl, func)
+    for i, v in pairs(tbl) do
+        if func(v, i) then
+            return true
+        end
+    end
+    return false
+end
+
 -- head(table)
 -- e.g: head({1,2,3}) -> 1
 function head(tbl)
