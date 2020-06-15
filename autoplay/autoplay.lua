@@ -1,7 +1,7 @@
 local async
 
 async:repeat({  })
---
+--[[
 
 tasks and subtasks.
 
@@ -26,3 +26,4 @@ TOTAL: 91 iron. 25 copper. 5 stone.
 
 
 - 1 electric pole (maybe skip calculating poles, as it is nothing compared to the rest)
+--]]

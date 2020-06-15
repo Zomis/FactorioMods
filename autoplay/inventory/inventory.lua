@@ -28,57 +28,51 @@ function Inventory:change(item, value)
             -- Once you have unlocked a technology, it doesn't go away.
             return
         end
-        if value < 0 then
-            -- You just require the technology once.
-            value = -1
-        end
     end
     local key = key(item)
     if not self.values[key] then
         self.values[key] = 0
     end
     self.values[key] = self.values[key] + value
+    if item.type == "tech" and self.values[key] < 0 then
+        -- You just require a technology once.
+        self.values[key] = -1
+    end
+    if item.type == "tech" and self.values[key] > 0 then
+        -- You just require a technology once.
+        self.values[key] = 1
+    end
+    if self.values[key] == 0 then
+        self.values[key] = nil
+    end
 end
 
 function Inventory:get(item)
     return self.values[key(item)] or 0
 end
 
-function Inventory:research_recipe(recipe)
-    if recipe.enabled then
-        return nil
+function Inventory:determine_best_recipe(possibilities, key)
+    local minv = possibilities[1]
+    for _, v in pairs(possibilities) do
+        print("Possibility for " .. key .. ": " .. v.name .. " has complexity of " .. v.complexity)
+        if v.complexity < minv.complexity then
+            minv = v
+        end
     end
-    local tech_options = self.data.tech_requirements[recipe.name]
-    print("Checking tech-options for " .. json.encode(recipe.name))
-    if table_size(tech_options) ~= 1 then
-        error("There are " .. #tech_options .. " technologies for " .. key)
-    end
-
-    local technology = tech_options[1]
-    if self:get({ type = "tech", name = technology.name }) > 0 then
-        return nil
-    end
-    local prerequisites_and_ingredients = {}
-    for _, v in pairs(technology.ingredients) do table.insert(prerequisites_and_ingredients, v) end
-    for _, v in pairs(technology.requires) do table.insert(prerequisites_and_ingredients, { type = "tech", name = v, amount = 1 }) end
-
-    return {
-        ingredients = prerequisites_and_ingredients,
-        products = { { name = technology.name, type = "tech", amount = 1000 } },
-        energy = technology.research_unit_energy,
-        research_unit_count = technology.research_unit_count
-    }
+    return minv
 end
 
 function Inventory:find_recipe(key)
     local possible_recipes = self.data.recipes_by_product[key]
+    if not possible_recipes then
+        error("No possible recipes for " .. key)
+    end
     print("Recipes for " .. key .. ": " .. json.encode(map(function(r) return r.name end, possible_recipes)))
     if not possible_recipes then error("no recipes for " .. key) end
-    if table_size(possible_recipes) ~= 1 then
-        error("There are " .. #possible_recipes .. " recipes for " .. key)
-    end
-
     local chosen_recipe = possible_recipes[1]
+    if table_size(possible_recipes) ~= 1 then
+        chosen_recipe = self:determine_best_recipe(possible_recipes, key)
+    end
 
     print("Found recipe: " .. chosen_recipe.name)
     return chosen_recipe
@@ -97,7 +91,11 @@ function Inventory:apply_repeatedly(recipe)
     end
 end
 
-function Inventory:resolve_steps()
+function Inventory:has_negative()
+    return any(self.values, function(v) return v < 0 end)
+end
+
+function Inventory:resolve()
     local next = Inventory:new(self.data)
     for k, v in pairs(self.values) do
         if v < 0 then
@@ -105,12 +103,6 @@ function Inventory:resolve_steps()
             print("Fixing " .. k .. " " .. v)
             next:change(k, v) -- Copy current value to next so that it can resolve it
             local recipe = next:find_recipe(k)
-            local research_recipe = self:research_recipe(recipe)
-            if research_recipe then
-                print("Resolve research: " .. json.encode(research_recipe))
-                next:change(research_recipe.products[1], -1)
-                next:apply_repeatedly(research_recipe)
-            end
 
             print("Resolve recipe: " .. json.encode(recipe))
             next:apply_repeatedly(recipe)
@@ -118,6 +110,7 @@ function Inventory:resolve_steps()
     end
     print("")
     print("Next Result: " .. json.encode(next.values))
+    return next
 end
 
 return Inventory

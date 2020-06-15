@@ -19,8 +19,9 @@ function calc.calc(data)
     inv:set("item/rocket-part", -100)
     inv:set("item/satellite", -1)
 
-    local inventory_resolved = inv:resolve_steps()
-    
+    local inventory_resolved = inv
+    inventory_resolved = inventory_resolved:resolve()
+    inventory_resolved = inventory_resolved:resolve()
     return inventory_resolved
 end
 
