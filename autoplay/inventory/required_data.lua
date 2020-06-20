@@ -91,9 +91,36 @@ function FactorioData:_recipe_complexity(recipe)
     return sum
 end
 
+function FactorioData:_prepare_resources()
+    table.insert(self.data.recipes, {
+        -- Add wood recipe so that we know that we can get wood easily. Otherwise solver will try to grow it - from wood.
+        name = "_wood",
+        complexity = 0.5,
+        ingredients = {},
+        time = 2, -- TODO: Not sure about this time.
+        products = { { type = "item", name = "wood", amount = 4 } }
+    })
+    for resource_name, resource in pairs(self.data.resources) do
+        local recipe = {}
+        recipe.complexity = 0.5
+        recipe.ingredients = {}
+        recipe.products = {}
+        recipe.time = resource.mining_time
+        recipe.name = "_" .. resource_name
+        for _, product in pairs(resource.products) do
+            table.insert(recipe.products, { type = product.type, name = product.name, probability = product.probability, amount = product.amount })
+        end
+        if resource.required_fluid then
+            table.insert(recipe.ingredients, { type = "fluid", name = resource.required_fluid, amount = resource.fluid_amount })
+        end
+        table.insert(self.data.recipes, recipe)
+    end
+end
+
 function FactorioData:prepare_recipes()
     self.recipes_by_product = {}
     self:prepare_research()
+    self:_prepare_resources()
     for _, recipe in pairs(self.data.recipes) do
         recipe.complexity = recipe.complexity or self:_recipe_complexity(recipe)
     end

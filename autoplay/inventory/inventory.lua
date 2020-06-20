@@ -98,6 +98,8 @@ end
 function Inventory:resolve()
     local next = Inventory:new(self.data)
     for k, v in pairs(self.values) do
+        -- TODO: Resolve the most complex things first.
+        -- TODO: Improve the recipe chooser to avoid loops with barrels
         if v < 0 then
             print("")
             print("Fixing " .. k .. " " .. v)
