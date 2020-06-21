@@ -66,7 +66,12 @@ local function recreate_table_with_results(section, results, running_time)
     local name_prefix = "result_" .. recipe_name .. "_"
     local recipe_sum = result.amount * result.count
     if recipe_sum > 0 or section.header.show_unused.state then
-      table.add { type = "label", name = name_prefix .. "name", caption = recipe_name }
+      local recipe_display_name = game.recipe_prototypes[recipe_name]
+      if recipe_display_name then
+        recipe_display_name = recipe_display_name.localised_name
+      end
+
+      table.add { type = "label", name = name_prefix .. "name", caption = recipe_display_name or recipe_name }
       table.add { type = "label", name = name_prefix .. "amount", caption = result.amount }
       table.add { type = "label", name = name_prefix .. "count", caption = result.count }
       table.add { type = "label", name = name_prefix .. "sum", caption = recipe_sum }
