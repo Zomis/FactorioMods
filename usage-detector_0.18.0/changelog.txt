@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.18.1
+Date: 21.06.2020
+  Changes:
+    - Show localised name for recipe instead of in-game key
+---------------------------------------------------------------------------------------------------
+Version: 0.18.0
+Date: 01.02.2020
+  Features:
+    - Update for Factorio 0.17
+---------------------------------------------------------------------------------------------------
+Version: 0.17.1
+Date: 05.11.2018
+  Bugfixes:
+    - Fixed a crash, probably caused by migration from older versions. You might need to stop the usage scanning and start it again if you don't see any progress.
+---------------------------------------------------------------------------------------------------
+Version: 0.17.0
+Date: 03.03.2019
+  Features:
+    - Update for Factorio 0.17
+---------------------------------------------------------------------------------------------------
+Version: 0.16.2
+Date: 05.11.2018
+  Features:
+    - Added checkbox to filter currently unused recipes
+    - Added scrollbar when there's so many different recipes
+---------------------------------------------------------------------------------------------------
+Version: 0.16.1
+Date: 31.10.2018
+  Changes:
+    - First release
