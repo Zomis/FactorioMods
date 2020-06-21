@@ -39,18 +39,10 @@ local function scan_once(force, perform)
     return
   end
   -- loop surfaces, entity_types, entities
-  local surfaces = Async:loop_func("surface", function()
-    local surface_list = {}
-    for _, surface in pairs(game.surfaces) do table.insert(surface_list, surface) end
-    return surface_list
-  end)
+  local surfaces = Async:loop_func("surface")
   local single_force = Async:loop_values("force", { force })
   local entity_types = Async:loop_values("entity_type", { "assembling-machine", "furnace" })
-  local entities = Async:loop_func("entity", function(loop_values)
-    local entity_list = loop_values.surface.find_entities_filtered({type = loop_values.entity_type, force = loop_values.force})
-    --game.print(" size " .. table_size(entit) .. serpent.line(loop_values))
-    return entity_list
-  end)
+  local entities = Async:loop_func("entity")
 
 --  game.print("Scan once " .. force.name .. game.tick)
   Async:perform_once({ force = force, once = true }, { single_force, surfaces, entity_types, entities })

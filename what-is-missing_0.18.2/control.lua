@@ -764,6 +764,23 @@ local function onConfigurationChanged(data)
   end
 end
 
+Async:configure_loop_functions(function(loop)
+  if loop == "surface" then
+    return function()
+      local surface_list = {}
+      for _, surface in pairs(game.surfaces) do table.insert(surface_list, surface) end
+      return surface_list
+    end
+  end
+  if loop == "entity" then
+    return function(loop_values)
+      local entity_list = loop_values.surface.find_entities_filtered({type = loop_values.entity_type, force = loop_values.force})
+      --game.print(" size " .. table_size(entit) .. serpent.line(loop_values))
+      return entity_list
+    end
+  end
+end)
+
 Async:configure(function(task)
   if task.once then
     return { perform_function = iterate_perform }

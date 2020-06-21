@@ -11,6 +11,7 @@ local async_tasks = nil
 local async_runtimes = {}
 local async_initialized = false -- can't use configuration_function because that's set before LuaGameScript is available
 local async_configuration_function = nil
+local async_loop_function = nil
 
 local function add_async_task(task)
     if not async_tasks then
@@ -39,12 +40,17 @@ function Async:configure(configuration_function)
     async_configuration_function = configuration_function
 end
 
+function Async:configure_loop_functions(loop_lookup_function)
+    async_loop_function = loop_lookup_function
+end
+
 function Async:load_task(task_state)
     local task = {}
     setmetatable(task, AsyncTask)
     task.save_state = task_state
 
     local task_config = Async:config_lookup(task_state.task_data)
+    task:load_loop_functions()
     task.perform_function = task_config.perform_function
     task.on_finished = task_config.on_finished
     add_async_task(task)
@@ -124,12 +130,26 @@ function Async:loop(name, start, stop)
     return { type = "loop", identifier = name, start = start, stop = stop }
 end
 
-function Async:loop_func(name, func)
-    return { type = "loop_func", identifier = name, func = func }
+function Async:loop_func(name)
+    return { type = "loop_func", identifier = name }
 end
 
 function Async:loop_values(name, values)
     return { type = "loop_values", identifier = name, values = values }
+end
+
+function AsyncTask:load_loop_functions()
+    for _, loop in pairs(self.save_state.loops) do
+        if loop.type == "loop_func" then
+            if not async_loop_function then
+                error("No loop lookup function set. Need to call Async:configure_loop_functions")
+            end
+            loop.func = async_loop_function(loop.identifier)
+            if not loop.func then
+                error("No loop lookup function found for " .. loop.identifier .. ". Need to check Async:configure_loop_functions configuration")
+            end
+        end
+    end
 end
 
 function AsyncTask:restart_loops()
