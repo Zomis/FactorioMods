@@ -67,7 +67,8 @@ logic.enum_types = {
     --, "players"--, active_mods?, connected_players, #item_prototypes?
   },
   ["surface-data"] = {
-    "daytime", "darkness", "wind_speed", "wind_orientation", "wind_orientation_change", "ticks_per_day", "dusk", "dawn", "evening", "morning"
+    "daytime", "darkness", "wind_speed", "wind_orientation", "wind_orientation_change",
+    "ticks_per_day", "dusk", "dawn", "evening", "morning"
     -- "peaceful_mode", "freeze_daytime",
   },
   ["force-data"] = {

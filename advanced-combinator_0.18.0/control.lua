@@ -24,8 +24,11 @@ local function parse_combinator(advanced_combinator)
   if not status then
 --    runtime_combinators[k] = result
 --  else
-    v.entity.force.print("[Advanced Combinator] Unable to parse combinator at " ..
-      common.worldAndPos(v.entity) .. ": " .. result .. " (This is likely a problem with the commands you entered and not a problem with the mod itself)")
+    v.entity.force.print(
+      "[Advanced Combinator] Unable to parse combinator at " ..
+      common.worldAndPos(v.entity) .. ": " .. result ..
+      " (This is likely a problem with the commands you entered and not a problem with the mod itself)"
+      )
   end
 --  for _, player in pairs(v.entity.force.players) do
 --    if player.gui.center["advancedCombinatorUI"] then
@@ -51,8 +54,11 @@ local function updateConfiguration(entity)
       common.worldAndPos(entity))
     return result
   else
-    entity.force.print("[Advanced Combinator] Error parsing combinator at " ..
-      common.worldAndPos(entity) .. result .. " (This is likely a problem with the commands you entered and not a problem with the mod itself)")
+    entity.force.print(
+      "[Advanced Combinator] Error parsing combinator at " ..
+      common.worldAndPos(entity) .. result ..
+      " (This is likely a problem with the commands you entered and not a problem with the mod itself)"
+    )
   end
 end
 

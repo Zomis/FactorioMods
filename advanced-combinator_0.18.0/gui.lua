@@ -1,6 +1,10 @@
 local logic = require "logic"
 local common = require "common"
-local player_opened_map = nil -- Stored in global. Key: player index, Value: { gui = frameRoot, combinator = advanced_combinator }
+
+-- A table stored in `global.player_opened`.
+-- Key: player index
+-- Value: { gui = frameRoot, combinator = advanced_combinator }
+local player_opened_map = nil
 
 local function player_opened(player, new_value)
   global.player_opened = global.player_opened or {}
@@ -60,7 +64,10 @@ local function add_calculation_gui(gui, model, expected_result)
     return
   end
   if expected_result == "string-signal" then
-    gui.add({ type = "choose-elem-button", name = "signal_choice", elem_type = "signal", signal = logic.resolve_signalID(model) })
+    gui.add {
+      type = "choose-elem-button", name = "signal_choice",
+      elem_type = "signal", signal = logic.resolve_signalID(model)
+    }
     return
   end
   if logic.enum_types[expected_result] then
@@ -78,7 +85,10 @@ local function add_calculation_gui(gui, model, expected_result)
   local flow = gui.add({ type = "flow", name = "flow", direction = "horizontal" })
   local function_options = find_functions_for_type(expected_result)
   local selected_index = common.table_indexof(function_options, model.name)
-  local function_name = flow.add({ type = "drop-down", name = "function_name", items = function_options, selected_index = selected_index })
+  local function_name = flow.add {
+    type = "drop-down", name = "function_name",
+    items = function_options, selected_index = selected_index
+  }
   function_name.tooltip = data.description
   flow.add({ type = "label", name = "start_parenthesis", caption = "(" })
 
@@ -99,7 +109,10 @@ local function openGUI(player, advanced_combinator, runtime)
   -- Header: Title(?), update frequency, close GUI button
   local header = frameRoot.add({ type = "flow", name = "header", direction = "horizontal" })
   header.add({ type = "label", name = "label_update_frequency", caption = "Update interval:" })
-  local update_frequency = header.add({ type = "textfield", name = "update_frequency", text = advanced_combinator.updatePeriod })
+  local update_frequency = header.add {
+    type = "textfield", name = "update_frequency",
+    text = advanced_combinator.updatePeriod
+  }
   update_frequency.style.width = 100
 
   -- Undo, Redo
@@ -113,8 +126,10 @@ local function openGUI(player, advanced_combinator, runtime)
   frame.style.maximal_width = 800
   frame.style.maximal_height = 400
 
-  frameRoot.add({ type = "label", name = "editor_label_1", caption = "Commands. Only edit this manually is you know what you are doing." })
-  frameRoot.add({ type = "label", name = "editor_label_2", caption = "Can be used for copy-pasting and sharing your creation." })
+  frameRoot.add({ type = "label", name = "editor_label_1",
+    caption = "Commands. Only edit this manually is you know what you are doing." })
+  frameRoot.add({ type = "label", name = "editor_label_2",
+    caption = "Can be used for copy-pasting and sharing your creation." })
 
   local editor = frameRoot.add({ type = "text-box", name = "commands", text = advanced_combinator.config })
   editor.word_wrap = false
@@ -122,7 +137,8 @@ local function openGUI(player, advanced_combinator, runtime)
   editor.style.height = 300
 
   if not runtime then
-    -- Combinator was not parsed correctly, so don't draw the more or less helpful GUI, let user use the text editor created above.
+    -- Combinator was not parsed correctly, so don't draw the more or less helpful GUI
+    -- Just let user use the text editor created above.
     player.print("[Advanced Combinator] This Advanced Combinator has invalid code.")
     return
   end
@@ -133,11 +149,14 @@ local function openGUI(player, advanced_combinator, runtime)
     -- Move Up, Move Down, Delete
     local flow = list.add({ type = "flow", name = "index" .. k, direction = "horizontal" })
     local button
-    button = flow.add({ type = "button", name = "delete_button", caption = "X", style = "advanced_combinator_small_button" })
+    button = flow.add { type = "button", name = "delete_button",
+      caption = "X", style = "advanced_combinator_small_button" }
     button.tooltip = "Delete this command"
-    button = flow.add({ type = "button", name = "move_up", caption = "U", style = "advanced_combinator_small_button" })
+    button = flow.add { type = "button", name = "move_up",
+      caption = "U", style = "advanced_combinator_small_button" }
     button.tooltip = "Move this command up"
-    button = flow.add({ type = "button", name = "move_down", caption = "D", style = "advanced_combinator_small_button" })
+    button = flow.add { type = "button", name = "move_down",
+      caption = "D", style = "advanced_combinator_small_button" }
     button.tooltip = "Move this command down"
 
     flow = flow.add({ type = "flow", name = "command", direction = "horizontal" })
@@ -202,7 +221,8 @@ local function get_default_model(function_name, advanced_combinator)
     elseif param_type == "boolean" then
       table.insert(params, { name = "compare", params = get_default_model("compare", advanced_combinator).params })
     elseif param_type == "command" then
-      table.insert(params, { name = "set_simple", params = get_default_model("set_simple", advanced_combinator).params })
+      table.insert(params, {
+        name = "set_simple", params = get_default_model("set_simple", advanced_combinator).params })
     else
       error("No default model specified for type " .. param_type)
     end
