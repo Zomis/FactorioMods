@@ -4,7 +4,7 @@
 local gui = require "gui"
 local model = require "model"
 local common = require "common"
-local advanced_combinators = {}
+local advanced_combinators = nil
 local runtime_combinators = {}
 require "interface"
 

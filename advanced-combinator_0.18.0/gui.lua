@@ -89,10 +89,6 @@ local function add_calculation_gui(gui, model, expected_result)
 end
 
 local function openGUI(player, advanced_combinator, runtime)
-  if not runtime then
-    player.print("This Advanced Combinator was not parsed correctly.")
-    return
-  end
   if player.gui.center["advancedCombinatorUI"] then
     player.gui.center["advancedCombinatorUI"].destroy()
   end
@@ -125,6 +121,11 @@ local function openGUI(player, advanced_combinator, runtime)
   editor.style.width = 400
   editor.style.height = 300
 
+  if not runtime then
+    -- Combinator was not parsed correctly, so don't draw the more or less helpful GUI, let user use the text editor created above.
+    player.print("[Advanced Combinator] This Advanced Combinator has invalid code.")
+    return
+  end
   common.print_recursive_table(runtime, "data")
 
   local list = frame
