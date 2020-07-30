@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.18.0
+Date: 2020-07-30
+  Features:
+    - Initial Release
+    - Copying settings from an assembling machine to a constant combinator will set signals for the recipe on the combinator

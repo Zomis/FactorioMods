@@ -1,0 +1,11 @@
+{
+  "name": "copy-paste-recipe-signals",
+  "version": "0.0.1",
+  "title": "Copy-Paste Recipe Signals",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.18",
+  "dependencies": ["base >= 0.18"],
+  "description": "Copying settings from an Assembling Machine to a Constant Combinator will paste signals describing the recipe"
+}
