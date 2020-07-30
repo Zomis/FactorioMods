@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.18.1
+Date: 2020-07-30
+  Bugfixes:
+    - Fix possible crash when making manual edits to the code that result in incorrect code
+    - Fix problem with not being able to close GUI
+  Changes:
+    - Make it possible to fix an Advanced Combinator that was saved with invalid code
+---------------------------------------------------------------------------------------------------
+Version: 0.18.0
+Date: 2020-02-01
+  Features:
+    - Update for Factorio 0.18
+---------------------------------------------------------------------------------------------------
+Version: 0.17.0
+Date: 2019-03-03
+  Features:
+    - Update for Factorio 0.17
+  Bugfixes:
+    - Fix some possible bugs
+---------------------------------------------------------------------------------------------------
+Version: 0.16.3
+Date: 2018-02-05
+  Features:
+    - Add `random` function to produce a random value within a range
+    - Add `print` function to print a message
+    - Add functions for bitwise operations to numbers
+    - Add remote interface for other mods to add new functions themselves
+  Bugfixes:
+    - Fix bug with boundary check not preventing 0 as signal index
+---------------------------------------------------------------------------------------------------
+Version: 0.16.2
+Date: 2018-01-14
+  Changes:
+    - Initial Release
