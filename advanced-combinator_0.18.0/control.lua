@@ -27,11 +27,11 @@ local function parse_combinator(advanced_combinator)
     v.entity.force.print("[Advanced Combinator] Unable to parse combinator at " ..
       common.worldAndPos(v.entity) .. ": " .. result)
   end
-  for _, player in pairs(v.entity.force.players) do
-    if player.gui.center["advancedCombinatorUI"] then
-      player.gui.center["advancedCombinatorUI"].destroy()
-    end
-  end
+--  for _, player in pairs(v.entity.force.players) do
+--    if player.gui.center["advancedCombinatorUI"] then
+--      player.gui.center["advancedCombinatorUI"].destroy()
+--    end
+--  end
   if status then
     return result
   end
@@ -133,8 +133,6 @@ script.on_event(defines.events.on_gui_elem_changed, onGuiChange)
 script.on_event(defines.events.on_gui_selection_state_changed, onGuiChange)
 script.on_event(defines.events.on_gui_text_changed, onGuiChange)
 
---script.on_event(defines.events.on_gui_click, onClick)
---script.on_event(defines.events.on_gui_elem_changed, onChosenElementChanged)
 --script.on_event(defines.events.on_gui_checked_state_changed, onCheckboxClick)
 --script.on_event(defines.events.on_selected_entity_changed, onSelectedEntityChanged)
 --script.on_event(defines.events.on_entity_settings_pasted, onPasteSettings) !!!

@@ -1,6 +1,17 @@
 local logic = require "logic"
 local common = require "common"
-local current = {} -- Key: player index, Value: { gui = frameRoot, combinator = advanced_combinator }
+local player_opened_map = nil -- Stored in global. Key: player index, Value: { gui = frameRoot, combinator = advanced_combinator }
+
+local function player_opened(player, new_value)
+  global.player_opened = global.player_opened or {}
+  if not player_opened_map then
+    player_opened_map = global.player_opened
+  end
+  if new_value then
+    player_opened_map[player.index] = new_value
+  end
+  return player_opened_map[player.index]
+end
 
 local function is_in_gui_heirarchy(element, expected)
   local el = element
@@ -87,7 +98,7 @@ local function openGUI(player, advanced_combinator, runtime)
   end
 
   local frameRoot = player.gui.center.add({ type = "frame", name = "advancedCombinatorUI", direction = "vertical" })
-  current[player.index] = { gui = frameRoot, combinator = advanced_combinator }
+  player_opened(player, { gui = frameRoot, combinator = advanced_combinator })
 
   -- Header: Title(?), update frequency, close GUI button
   local header = frameRoot.add({ type = "flow", name = "header", direction = "horizontal" })
@@ -273,7 +284,7 @@ local function change_verified(player_current, element)
 end
 
 local function change(player, element)
-  local player_current = current[player.index]
+  local player_current = player_opened(player)
   if not player_current then
     return
   end
@@ -290,7 +301,17 @@ local function saveAndRebuildGUI(player, player_current, update_callback)
 end
 
 local function click(player, element, update_callback)
-  local player_current = current[player.index]
+  local rootUI = player.gui.center.advancedCombinatorUI
+  if rootUI and element == player.gui.center.advancedCombinatorUI.header.close_button then
+    -- Support the case when player_current is mismatching.
+    rootUI.destroy()
+    if global.player_opened then
+      global.player_opened[player.index] = nil
+    end
+    return
+  end
+
+  local player_current = player_opened(player)
   if not player_current then
     return
   end
@@ -298,11 +319,6 @@ local function click(player, element, update_callback)
     player_current.combinator.updatePeriod = tonumber(player_current.gui.header.update_frequency.text)
     player_current.combinator.config = player_current.gui.commands.text
     update_callback(player_current.combinator.entity)
-    return
-  end
-  if element == player_current.gui.header.close_button then
-    player_current.gui.destroy()
-    current[player.index] = nil
     return
   end
   if element == player_current.gui.command_list.add_button then
