@@ -50,7 +50,7 @@ local function parseCalculation(text, advanced_combinator, entity)
         unfinished_params = unfinished_params .. param .. ","
       end
     end
-    return { name = function_name, params = params }
+    return { name = function_name, params = params, func = logic.parse(logic_data, params, entity) }
   end
   return error("No parenthesis found in " .. text)
 end

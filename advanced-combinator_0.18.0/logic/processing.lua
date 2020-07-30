@@ -1,6 +1,6 @@
 return {
   current = {
-    description = "A previously calculated value in the current iteration",
+    description = "A previously calculated value in the current tick",
     parameters = { "string-number" },
     result = "number",
     parse = function(params)
@@ -14,7 +14,7 @@ return {
     end
   },
   previous = {
-    description = "The calculated value of the last iteration",
+    description = "The calculated value of the last tick",
     parameters = { "string-number" },
     result = "number",
     parse = function(params)
