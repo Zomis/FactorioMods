@@ -1,0 +1,10 @@
+{
+  "name": "team-base-trade",
+  "version": "0.0.1",
+  "title": "Base Trade",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "0.18",
+  "description": "Players are on different forces. Available recipes and technologies are split between all forces. Each force has its own designated area."
+}
