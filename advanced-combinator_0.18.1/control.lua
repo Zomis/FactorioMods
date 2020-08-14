@@ -10,6 +10,7 @@ require "interface"
 
 local function onInit()
   global.advanced_combinators = {}
+  advanced_combinators = global.advanced_combinators
 end
 
 local function onLoad()
