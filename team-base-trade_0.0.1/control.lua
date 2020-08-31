@@ -27,13 +27,13 @@ local function on_tick(event)
     if not forces_bounds then return end
     for _, player in pairs(game.players) do
         -- Loop through all players and check if they are within their designated area.
-        if forces_bounds[player.force.name] then
+        if player.character and forces_bounds[player.force.name] then
             local angle = math.atan(player.position.x, player.position.y)
             local force_data = forces_bounds[player.force.name]
     --        player.print("Your angle is " .. angle)
             if angle < force_data.angle_start or angle >= force_data.angle_end then
                 player.print("You are outside your area: " .. force_data.angle_start .. ".." .. force_data.angle_end)
-                if player.character then
+                if player.position.x * player.position.x > 10 or player.position.y * player.position.y > 10 then
                     player.character.damage(1, "neutral")
                 end
             end
