@@ -1,6 +1,9 @@
 local random = math.random
 
--- Explosions = { "explosion", "explosion-hit", "ground-explosion", "massive-explosion", "medium-explosion", "nuke-explosion", "crash-site-explosion-smoke"
+-- Explosions = {
+-- "explosion", "explosion-hit", "ground-explosion", "massive-explosion",
+-- "medium-explosion", "nuke-explosion", "crash-site-explosion-smoke"
+-- }
 
 local exploding_trees = {
 	["tree-01"] = true,
@@ -34,15 +37,13 @@ local exploding_trees = {
 	["tree-09-stump"] = true
 }
 
-local function get_random_position(box, x_scale, y_scale)
-	local x_scale = x_scale or 1
-	local y_scale = y_scale or 1
+local function get_random_position(box)
 	local x1 = box.left_top.x
 	local y1 = box.left_top.y
 	local x2 = box.right_bottom.x
 	local y2 = box.right_bottom.y
-	local x = ((x2 - x1) * x_scale * (random() - 0.5)) + ((x1 + x2) / 2)
-	local y = ((y2 - y1) * y_scale * (random() - 0.5)) + ((y1 + y2) / 2)
+	local x = ((x2 - x1) * (random() - 0.5)) + ((x1 + x2) / 2)
+	local y = ((y2 - y1) * (random() - 0.5)) + ((y1 + y2) / 2)
 	return {x, y}
 end
 
@@ -51,10 +52,10 @@ local function explode(entity)
 	local effects = 1
 
 	local box = entity.bounding_box
-	
-	for k = 1, effects do
+
+	for _ = 1, effects do
         local position = get_random_position(box, 0.8, 0.5)
-        local effect = surface.create_entity {
+        surface.create_entity {
             name = "explosion",
             position = position
         }
