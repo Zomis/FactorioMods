@@ -1,0 +1,11 @@
+{
+  "name": "factorio-search-engine",
+  "version": "0.0.1",
+  "factorio_version": "1.0",
+  "title": "Factorio Search Engine",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://www.github.com/Zomis/FactorioMods",
+  "description": "Unified search experience, no matter what you are searching for. Search and you will find.",
+  "dependencies": ["flib >= 0.4.1"]
+}
