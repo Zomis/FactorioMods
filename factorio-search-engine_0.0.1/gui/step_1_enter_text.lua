@@ -1,11 +1,20 @@
+-- Enter text, pass on to next step.
+-- TODO: Or select a thing in a selector
+
 local event = require("__flib__.event")
 local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
 local mod_gui = require("__core__.lualib.mod-gui")
+local step2 = require("gui/step_2_choose_things")
+local searcher = require("searcher/main_searcher")
 
 local function perform_search(event, search)
     local player = game.players[event.player_index]
-    player.print("Searching for " .. search)
+    local matching_text = searcher:find_things_matching_text(player.force, search)
+    local player_table = global.players[player.index]
+    local results_gui = player_table.small_search_gui.elems.results
+
+    step2.add_matching_text_results(results_gui, matching_text, searcher)
 end
 
 local function destroy_guis(player)
@@ -75,7 +84,8 @@ local function open_small_gui(player)
           {template="frame_action_button", handlers="small_search_window.titlebar.close", caption="X"}
         }},
         {type="textfield", save_as="search_text", handlers="small_search_window.search_text"},
-        {type="button", save_as="search_button", handlers="small_search_window.search_button", caption = { "search_engine.search_button" }}
+        {type="button", save_as="search_button", handlers="small_search_window.search_button", caption = { "search_engine.search_button" }},
+        {type="flow", save_as="results", direction="vertical"}
       }}
     })
     elems.search_text.focus()

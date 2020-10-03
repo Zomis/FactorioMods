@@ -1,5 +1,6 @@
 local event = require("__flib__.event")
 local gui = require("__flib__.gui")
+local Async = require "async"
 
 event.on_init(function()
 	gui.init()
@@ -23,6 +24,8 @@ event.on_player_removed(function(e)
     gui.remove_player_filters(e.player_index)
 end)
 
-require "small_search_window"
+require "gui/step_1_enter_text"
+require "gui/step_2_choose_things"
 
 gui.register_handlers()
+event.on_tick(function (e) Async:on_tick(e) end)
