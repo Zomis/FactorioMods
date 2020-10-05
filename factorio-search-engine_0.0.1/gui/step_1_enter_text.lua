@@ -13,8 +13,12 @@ local function perform_search(event, search)
     local matching_text = searcher:find_things_matching_text(player.force, search)
     local player_table = global.players[player.index]
     local results_gui = player_table.small_search_gui.elems.results
+    local context = {
+      player = player,
+      parent = results_gui
+    }
 
-    step2.add_matching_text_results(results_gui, matching_text, searcher)
+    step2.add_matching_text_results(context, matching_text, searcher)
 end
 
 local function destroy_guis(player)
@@ -32,9 +36,9 @@ gui.add_templates {
     mouse_filter = { type = "button", mouse_button_filter = { "left" } },
     drag_handle = { type = "empty-widget", style = "flib_titlebar_drag_handle", elem_mods = { ignored_by_interaction = true } },
     frame_action_button = { template = "mouse_filter", style = "frame_action_button" }
-  }
+}
   
-  gui.add_handlers {
+gui.add_handlers {
     small_search_window = {
       titlebar = {
         close = {

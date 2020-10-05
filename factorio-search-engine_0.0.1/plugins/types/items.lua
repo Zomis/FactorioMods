@@ -1,5 +1,6 @@
 local search_utils = require "search_utils"
 local table = require "__flib__.table"
+local gui = require "__flib__.gui"
 
 local plugin = {
     options_type = "items",
@@ -9,9 +10,9 @@ local plugin = {
         end)
         return table.map(filtered, function(_, key) return key end)
     end,
-    options_render = function(parent, results)
+    options_render = function(context, results)
         for name in pairs(results) do
-            parent.add {
+            local sprite_button = context.parent.add {
                 type = "sprite-button",
                 name = "result_slot_button__" .. name,
                 style = "slot_button",
