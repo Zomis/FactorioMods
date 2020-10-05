@@ -14,12 +14,14 @@ local plugin = {
         for name in pairs(results) do
             local sprite_button = context.parent.add {
                 type = "sprite-button",
-                name = "result_slot_button__" .. name,
+                name = "items_result__" .. name,
                 style = "slot_button",
                 sprite = "item/" .. name,
                 number = count
             }
+            sprite_button.tooltip = {"item-name." .. name}
         end
+        gui.update_filters("small_search_window.choose_things.result_button", context.player.index, {"items_result"}, "add")
     end
 }
 
