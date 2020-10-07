@@ -5,6 +5,7 @@ function Searcher:new()
     local searcher = {}
     setmetatable(searcher, Searcher)
     searcher.type_plugins = {}
+    searcher.search_plugins = {}
     return searcher
 end
 
@@ -16,6 +17,21 @@ function Searcher:add_type_plugin(type_plugin)
         error("Colliding type plugins, " .. type_plugin.options_type .. " is already defined.")
     end
     self.type_plugins[type_plugin.options_type] = type_plugin
+end
+
+function Searcher:add_search_plugin(search_plugin)
+    -- TODO: Do some validation to check that it contains all the necessary functions
+    if not search_plugin.search_options then error("search_plugin is missing search_options") end
+
+    for type, search_options in pairs(search_plugin.search_options) do
+        self.search_plugins[type] = self.search_plugins[type] or {}
+        for _, search_option in pairs(search_options) do
+            if self.search_plugins[type][search_option] then
+                error("Colliding search plugins, " .. type .. "/" .. search_option .. " is already defined.")
+            end
+            self.search_plugins[type][search_option] = search_plugin
+        end
+    end
 end
 
 function Searcher:find_things_matching_text(force, text)

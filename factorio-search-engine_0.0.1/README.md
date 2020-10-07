@@ -26,6 +26,7 @@ Use Async to perform the search in many cases. Use a somewhat good filter for th
 - Favorite searches - especially for "Find my car" and similar?
 - Some kind of share feature... Add icon to other players GUI's? "Simon is sharing XYZ with you"
   - Player specific config to allow sharing of stuff. Maybe even allow sharing from specific people?
+- Aliases? Such as "LTN" -> logistics-train-stop (entity name in this case)
 
 ## Random thoughts not mentioned in GUI Flow
 
@@ -37,6 +38,8 @@ Search free text word-by-word multi search.
 Search for burnable items, or other categories
 Search for prototypes - item consumers for example (such as science packs, especially in Höllenmodpack)
 Search for prototypes - electric generators, electric distributors, logistics-related things... ("type")
+Search as soon as you click the first search button, search for all possibilities and show the total results for each as time goes by
+Handle special items, such as "item with inventory"
 
 - Item filters: Logistics requests
 - Recipe filters: Craftable
@@ -55,7 +58,7 @@ TODO: Should step 1 - 3 be in the same GUI window and selectable first? (which i
         Recipes: ... (everything *named* something with "iron")
         Items: ore / pellets / ingots ...
         Fluid: Molten Iron
-        Entities: (none)
+        Entities: Iron Chest
       "Car" ->
         Recipe: Car
         Item: Car, Cargo Wagon
