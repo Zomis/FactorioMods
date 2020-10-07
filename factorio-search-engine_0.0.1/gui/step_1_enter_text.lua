@@ -4,7 +4,7 @@
 local event = require("__flib__.event")
 local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
-local mod_gui = require("__core__.lualib.mod-gui")
+local mod_gui = require("__core__.lualib.mod-gui") -- TODO: Remove dependency and related functionality.
 local step2 = require("gui/step_2_choose_things")
 local searcher = require("searcher/main_searcher")
 

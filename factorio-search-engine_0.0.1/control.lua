@@ -27,6 +27,7 @@ end)
 require "searcher/main_searcher"
 require "gui/step_1_enter_text"
 require "gui/step_2_choose_things"
+require "gui/step_3_progress_and_result"
 require "async_config"
 
 gui.register_handlers()
