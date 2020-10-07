@@ -5,29 +5,35 @@ return {
         items = { CONTAINERS }
     },
     search_loops = {
-        function(player, query)
-        end
-    },
-    create_task = function(player, query)
-        -- TODO: Start by checking matching item prototypes
-        return player.surface.find_entities_filtered {
-            type = "container", -- TODO: Add other inventories as well (furnace, assembling-machine...)
-            force = player.force
-        }
-    end,
-    step = function(task, item)
-        local inventory = item.get_output_inventory()
-        if not inventory then return nil end
-        for k in inventory.get_contents() do
-            if string.find(k, task.text) then
-                return {
-                    entity = item.entity,
-                    location = item.entity.position,
-                    owner = item.last_user
+        items = {
+            [CONTAINERS] = function(_, _, task_data)
+                local player = game.get_player(task_data.player_index)
+                return player.surface.find_entities_filtered {
+                    type = "container",
+                    force = player.force
                 }
             end
-        end
-    end,
-    result = function()
-    end
+        }
+    },
+    search_filters = {
+        items = {
+            [CONTAINERS] = {
+                function(player, search_params, item)
+                    local inventory = item.get_inventory(defines.inventory.chest)
+                    if not inventory then return nil end
+                    for k, v in pairs(inventory.get_contents()) do
+                        if k == search_params.name then
+                            return {
+                                entity = item,
+                                location = item.position,
+                                owner = item.last_user,
+                                count = v
+                            }
+                        end
+                    end
+                end
+            }
+        }
+    }
+    -- game.print(tostring(#game.player.surface.find_entities_filtered { type="transport-belt", force=game.player.force }))
 }

@@ -4,6 +4,8 @@
 
 local event = require("__flib__.event")
 local gui = require("__flib__.gui")
+local searcher = require "searcher/main_searcher"
+local step3 = require "gui/step_3_progress_and_result"
 
 local function perform_search(event, search)
     -- TODO: Left-click = Search directly, right click -> add to search? Or Shift+Click or something
@@ -26,7 +28,7 @@ local function perform_search(event, search)
       name = search_for_name,
       search_options = search_options
     }
---    local search = searcher:create_search(player, search_params)
+    local search = searcher:create_search(player, search_params)
 --    step3.progress_gui(search)
 end
 

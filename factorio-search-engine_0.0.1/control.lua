@@ -24,8 +24,10 @@ event.on_player_removed(function(e)
     gui.remove_player_filters(e.player_index)
 end)
 
+require "searcher/main_searcher"
 require "gui/step_1_enter_text"
 require "gui/step_2_choose_things"
+require "async_config"
 
 gui.register_handlers()
 event.on_tick(function (e) Async:on_tick(e) end)

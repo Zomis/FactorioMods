@@ -44,4 +44,51 @@ function Searcher:find_things_matching_text(force, text)
     return results
 end
 
+function Searcher:loop_function(loop)
+    local type = loop.type
+    local search_options = loop.search_options[1] -- FIXME: Add support for multiple search options!
+
+    local search_plugins_for_type = self.search_plugins[type]
+    local search_plugins_for_options = search_plugins_for_type[search_options]
+
+    local search_loops = search_plugins_for_options.search_loops
+    local search_loops_for_type = search_loops[type]
+    return search_loops_for_type[search_options]
+end
+
+function Searcher:create_search(player, search_params)
+    global.searches_active = global.searches_active or {}
+    local task_data = {
+        player_index = player.index,
+        id = player.index .. "_" .. game.tick,
+        type = "search",
+        search_params = search_params,
+        results = {}
+    }
+    local loops = { Async:loop_func("item", search_params) }
+
+    local task = Async:perform_once(task_data, loops)
+    task.steps_per_interval = 100
+    global.searches_active[task_data.id] = task
+    return task
+end
+
+function Searcher:search_step(task_data, values)
+    local type = task_data.search_params.type
+    local search_options = task_data.search_params.search_options[1] -- FIXME: Add support for multiple search options!
+
+    local search_plugins_for_type = self.search_plugins[type]
+    local search_plugins_for_options = search_plugins_for_type[search_options]
+
+    local search_filters = search_plugins_for_options.search_filters
+    local search_filters_for_type = search_filters[type]
+    local search_filters_func = search_filters_for_type[search_options][1] -- TODO: Add support for multiple search filters? Or change API to not be a table.
+
+    local player = game.get_player(task_data.player_index)
+    local filter_result = search_filters_func(player, task_data.search_params, values.item)
+    if filter_result then
+        table.insert(task_data.results, filter_result)
+    end
+end
+
 return Searcher

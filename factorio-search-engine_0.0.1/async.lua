@@ -88,7 +88,7 @@ function Async:config_lookup(task_data)
     return result
 end
 
-local function loop_next(loop, current, all_iterators, all_state)
+local function loop_next(loop, current, all_iterators, all_state, task_data)
     if loop.type == "loop" then
         if current == nil then
             return loop.start, loop.start
@@ -104,7 +104,7 @@ local function loop_next(loop, current, all_iterators, all_state)
         return value, value
     elseif loop.type == "loop_func" then
         if current == nil then
-            loop.values = loop.func(all_state, all_iterators)
+            loop.values = loop.func(all_state, all_iterators, task_data)
         end
         return next(loop.values, current)
     elseif loop.type == "dynamic" then
@@ -130,8 +130,11 @@ function Async:loop(name, start, stop)
     return { type = "loop", identifier = name, start = start, stop = stop }
 end
 
-function Async:loop_func(name)
-    return { type = "loop_func", identifier = name }
+function Async:loop_func(identifier, func_lookup_parameter)
+    if not func_lookup_parameter then
+        func_lookup_parameter = identifier
+    end
+    return { type = "loop_func", identifier = identifier, func_lookup_parameter = func_lookup_parameter }
 end
 
 function Async:loop_values(name, values)
@@ -144,7 +147,7 @@ function AsyncTask:load_loop_functions()
             if not async_loop_function then
                 error("No loop lookup function set. Need to call Async:configure_loop_functions")
             end
-            loop.func = async_loop_function(loop.identifier)
+            loop.func = async_loop_function(loop.func_lookup_parameter)
             if not loop.func then
                 error("No loop lookup function found for " .. loop.identifier .. ". Need to check Async:configure_loop_functions configuration")
             end
@@ -160,7 +163,7 @@ function AsyncTask:restart_loops()
 
     for loop_index, loop in pairs(save_state.loops) do
         local loop = save_state.loops[loop_index]
-        local it, value = loop_next(loop, nil, save_state.iterators, save_state.state)
+        local it, value = loop_next(loop, nil, save_state.iterators, save_state.state, save_state.task_data)
         save_state.iterators[loop_index] = it
         save_state.state[loop.identifier] = value
         if it == nil then
