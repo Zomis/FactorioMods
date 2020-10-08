@@ -1,11 +1,11 @@
 local function expected_amount(product)
-  local expected_amount = product.amount
-  if not expected_amount then
-      expected_amount = (product.amount_min + product.amount_max) / 2.0
+  local expected = product.amount
+  if not expected then
+    expected = (product.amount_min + product.amount_max) / 2.0
   end
   local probability = product.probability or 1
 
-  return expected_amount * probability
+  return expected * probability
 end
 
 script.on_event(defines.events.on_entity_settings_pasted, function(event)
@@ -26,13 +26,25 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     local signals = {}
     if ingredients_multiplier ~= 0 then
       for _, ingredient in pairs(recipe.ingredients) do
-        table.insert(signals, { signal = { type = ingredient.type, name = ingredient.name }, count = ingredient.amount * ingredients_multiplier })
+        table.insert(signals, {
+          signal = {
+            type = ingredient.type,
+            name = ingredient.name
+          },
+          count = ingredient.amount * ingredients_multiplier
+        })
       end
     end
     if products_multiplier ~= 0 then
       for _, product in pairs(recipe.products) do
         local expected = expected_amount(product)
-        table.insert(signals, { signal = { type = product.type, name = product.name }, count = expected * products_multiplier })
+        table.insert(signals, {
+          signal = {
+            type = product.type,
+            name = product.name
+          },
+          count = expected * products_multiplier
+        })
       end
     end
     if add_ticks then

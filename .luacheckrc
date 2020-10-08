@@ -1,3 +1,3 @@
-globals = { "global", "game", "data", "settings", "remote" }
+globals = { "global", "game", "data", "settings", "remote", "table_size" }
 read_globals = { "defines", "script" }
 color = false
