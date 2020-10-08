@@ -34,5 +34,9 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
         behavior.set_signal(index, signal)
       end
     end
+
+    for index = table_size(signals) + 1, behavior.signals_count do
+      behavior.set_signal(index, nil)
+    end
   end
 end)
