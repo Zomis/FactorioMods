@@ -19,7 +19,6 @@ Use Async to perform the search in many cases. Use a somewhat good filter for th
   - Apply filter: Within 50m
   - Send ALL in chat message to self
 
-
 ## Features
 
 - Recent searches
@@ -27,6 +26,7 @@ Use Async to perform the search in many cases. Use a somewhat good filter for th
 - Some kind of share feature... Add icon to other players GUI's? "Simon is sharing XYZ with you"
   - Player specific config to allow sharing of stuff. Maybe even allow sharing from specific people?
 - Aliases? Such as "LTN" -> logistics-train-stop (entity name in this case)
+- Search selector: Select area, show options about what is in that area (transport belt, items on belt, inserters, machines, recipes in machines, inputs, outputs...)
 
 ## Random thoughts not mentioned in GUI Flow
 
@@ -39,6 +39,8 @@ Search for burnable items, or other categories
 Search for prototypes - item consumers for example (such as science packs, especially in Höllenmodpack)
 Search for prototypes - electric generators, electric distributors, logistics-related things... ("type")
 Search as soon as you click the first search button, search for all possibilities and show the total results for each as time goes by
+Search for train stop name - Where the hell are all those "Unused" stations anyway?
+WiM integration - click on something in WiM (left/right-click like FNEI) to launch search for producers/consumers with extra filter not-enough-ingredients-of-that-kind
 Handle special items, such as "item with inventory"
 
 - Item filters: Logistics requests
@@ -103,11 +105,12 @@ Actions:
 - All:
   - Pop-out/Pin (minimap if has location)
 - Has location:
-  - Show on map (enable map, zoom a bit in, and on to the location)
+  - player.zoom_to_world / player.open_map
     - Scroll through (Previous / Next, currently showing 1 / 135)
-  - Send in chat message to (self / other player) `(Thing) is 123m (direction) at [gps=...]`
-  - Mark on map (add LuaChartTag)
-  - Alert
+  - player.print (self / other player) `(Thing) is 123m (direction) at [gps=...]`
+  - player.force.add_chart_tag
+  - player.add_custom_alert
+  - player.create_local_flying_text ?
 - Signals:
   - View
   - Search for connected entity

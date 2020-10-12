@@ -16,10 +16,9 @@ local plugin = {
                 type = "sprite-button",
                 name = "items_result__" .. name,
                 style = "slot_button",
-                sprite = "item/" .. name,
-                number = count
+                sprite = "item/" .. name
             }
-            sprite_button.tooltip = {"item-name." .. name}
+            sprite_button.tooltip = game.item_prototypes[name].localised_name
         end
         gui.update_filters("small_search_window.choose_things.result_button", context.player.index, {"items_result"}, "add")
     end
