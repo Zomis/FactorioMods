@@ -18,17 +18,18 @@ return {
     search_filters = {
         items = {
             [CONTAINERS] = {
-                function(player, search_params, item)
+                function(player, search_params, item, results)
+                    if not item.valid then return end
                     local inventory = item.get_inventory(defines.inventory.chest)
                     if not inventory then return nil end
                     for k, v in pairs(inventory.get_contents()) do
                         if k == search_params.name then
-                            return {
+                            table.insert(results, {
                                 entity = item,
                                 location = item.position,
                                 owner = item.last_user,
                                 count = v
-                            }
+                            })
                         end
                     end
                 end

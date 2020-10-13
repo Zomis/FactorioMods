@@ -96,7 +96,11 @@ local function show_results(search)
     local total_results = table_size(search.results)
     local count_sum = 0
     if result_columns.count then
-        count_sum = tables.reduce(search.results, function(acc, v) return acc + v.count end, 0)
+        for _, v in pairs(search.results) do -- Can't use tables.reduce because it's a table with keys, not an array
+            if v and v.count then
+                count_sum = count_sum + v.count
+            end
+        end
     end
 
     local elems = gui.build(window_elems.status, {

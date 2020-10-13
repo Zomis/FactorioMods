@@ -85,10 +85,7 @@ function Searcher:search_step(task_data, values)
     local search_filters_func = search_filters_for_type[search_options][1] -- TODO: Add support for multiple search filters? Or change API to not be a table.
 
     local player = game.get_player(task_data.player_index)
-    local filter_result = search_filters_func(player, task_data.search_params, values.item)
-    if filter_result then
-        table.insert(task_data.results, filter_result)
-    end
+    search_filters_func(player, task_data.search_params, values.item, task_data.results)
 end
 
 return Searcher
