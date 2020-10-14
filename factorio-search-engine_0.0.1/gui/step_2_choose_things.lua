@@ -45,6 +45,7 @@ gui.add_handlers {
 }
 
 local function add_matching_text_results(context, results, searcher)
+    context.parent.clear()
     for result_type, v in pairs(results) do
         local elems = gui.build(context.parent, {
             {type="flow", direction="vertical", children={

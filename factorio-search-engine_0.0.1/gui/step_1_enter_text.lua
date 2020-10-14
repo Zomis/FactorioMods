@@ -80,11 +80,9 @@ local function open_small_gui(player)
   
     local elems = gui.build(player.gui.screen, {
       {type="frame", direction="vertical", handlers="small_search_window.window", save_as="window", children={
-        -- save_as - dot-deliminated path to save this element to in `inventory_elems`
         {type="flow", save_as="titlebar.flow", children={
           {type="label", style="frame_title", caption={"search_engine.header"}, elem_mods={ignored_by_interaction=true}},
           {template="drag_handle"},
-          -- you can assign multiple elements to the same handler group
           {template="frame_action_button", handlers="small_search_window.titlebar.close", caption="X"}
         }},
         {type="textfield", save_as="search_text", handlers="small_search_window.search_text"},

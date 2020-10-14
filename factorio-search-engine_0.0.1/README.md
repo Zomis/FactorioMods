@@ -11,25 +11,26 @@ Use Async to perform the search in many cases. Use a somewhat good filter for th
 
 ## TODO Next steps
 
-- Design API for pluggability
-- Make a single end-to-end search
-  - Search for "iron"
-  - Search for "iron ore"
-  - Search for containers
-  - Apply filter: Within 50m
-  - Send ALL in chat message to self
+- Progress bar (especially important for Signals search)
+- Fluid search
+- Entity search
+- Possibility to search for multiple items/signals/fluids at the same time (such as all "Induction Furnace") - selection is possible with flib styles
+- Producer/Consumer search (for items and fluids)
+- Improve view of results
 
 ## Features
 
 - Recent searches
 - Favorite searches - especially for "Find my car" and similar?
 - Some kind of share feature... Add icon to other players GUI's? "Simon is sharing XYZ with you"
-  - Player specific config to allow sharing of stuff. Maybe even allow sharing from specific people?
 - Aliases? Such as "LTN" -> logistics-train-stop (entity name in this case)
 - Search selector: Select area, show options about what is in that area (transport belt, items on belt, inserters, machines, recipes in machines, inputs, outputs...)
+- Add more results to existing search
+- Filter existing search results, add/remove filters?
 
 ## Random thoughts not mentioned in GUI Flow
 
+Print count of force entities: /c game.print(tonumber(table_size(game.player.surface.find_entities_filtered { force = game.player.force })))
 Search recipe chains - "Nutrient Pulp and Plastics, how are those connected?" (Nutrient Pulp ingredient, Plastics result)
 Search circuit network, search which thing provides signal in network? (combinators, containers, inserters, belts)
 Search free text word-by-word multi search.
@@ -40,6 +41,8 @@ Search for prototypes - item consumers for example (such as science packs, espec
 Search for prototypes - electric generators, electric distributors, logistics-related things... ("type")
 Search as soon as you click the first search button, search for all possibilities and show the total results for each as time goes by
 Search for train stop name - Where the hell are all those "Unused" stations anyway?
+GROUP BY functionality? Such as "Find all assembling machines, group by product/recipe" (show grouped-by-thing, count, sum of count property?)
+ORDER BY functionality? Such as "closest" or "highest count"
 WiM integration - click on something in WiM (left/right-click like FNEI) to launch search for producers/consumers with extra filter not-enough-ingredients-of-that-kind
 Handle special items, such as "item with inventory"
 
