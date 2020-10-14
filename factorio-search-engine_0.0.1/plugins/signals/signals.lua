@@ -17,7 +17,7 @@ local plugin = {
         local results = {}
         tables.for_each(filtered_items, add_to_table(results, "item"))
         tables.for_each(filtered_fluids, add_to_table(results, "fluid"))
-        tables.for_each(filtered_signals, add_to_table(results, "signal"))
+        tables.for_each(filtered_signals, add_to_table(results, "virtual-signal"))
         return results
     end,
     options_render = function(context, results)
