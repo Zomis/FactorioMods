@@ -38,6 +38,9 @@ gui.add_handlers {
 local function show_window(search)
     global.search_windows = global.search_windows or {}
     local search_id = search.id
+    if global.search_windows[search_id] then
+        return global.search_windows[search_id].elems
+    end
     local player = game.get_player(search.player_index)
     local elems = gui.build(player.gui.screen, {
         {type="frame", direction="vertical", save_as="window", children={
@@ -79,8 +82,52 @@ local function add_to_table(search_id, element, result_columns)
     end
 end
 
-local function show_results(search)
+local function progress_gui(search_task)
+    if global.search_windows[search_id] then
+        return global.search_windows[search_id].elems
+    end
+    local elems = show_window(search_task.task_data)
+    elems.status.clear()
+    -- TODO: Show table over loops: identifier (label), step / total (label), progressbar
+
+    local table_children = {}
+    for _, loop in pairs(search_task.loops) do
+        table.insert(table_children, {type="label", caption=loop.identifier})
+        table.insert(table_children, {type="label", save_as="loops." .. loop.identifier .. ".status"})
+        table.insert(table_children, {type="progressbar", save_as="loops." .. loop.identifier .. ".progressbar"})
+    end
+    local elems = gui.build(elems.status, {
+        {type="table", column_count=3, children=table_children}
+    })
+    search_task.task_data.status_progress_gui = elems
+end
+
+local function update_progress_gui(search_task)
+    local task_data = search_task.save_state.task_data
+    local search_id = task_data.id
+    if not global.search_windows[search_id] then
+        return
+    end
+    local status = search_task:get_status()
+    local status_progress_gui = task_data.status_progress_gui
+    if not status_progress_gui then
+        return
+    end
+    for _, loop in pairs(status.loops) do
+        if loop.step then
+            status_progress_gui.loops[loop.identifier].status.caption = loop.step .. " / " .. loop.total
+            status_progress_gui.loops[loop.identifier].progressbar.value = loop.step / loop.total
+        else
+            status_progress_gui.loops[loop.identifier].status.caption = "??? / " .. loop.total
+            status_progress_gui.loops[loop.identifier].progressbar.value = 0
+        end
+    end
+end
+
+local function show_results(search, search_task)
     local window_elems = show_window(search)
+    window_elems.status.clear()
+    search.status_progress_gui = nil
 
     -- TODO: Use plugin approach. local result_renders = searcher:result_renders(search)
 
@@ -115,5 +162,7 @@ local function show_results(search)
 end
 
 return {
-    search_completed = show_results
+    search_completed = show_results,
+    search_progress = update_progress_gui,
+    progress_gui = progress_gui,
 }

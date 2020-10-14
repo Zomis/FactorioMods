@@ -11,17 +11,19 @@ Use Async to perform the search in many cases. Use a somewhat good filter for th
 
 ## TODO Next steps
 
-- Progress bar (especially important for Signals search)
+- Producer/Consumer search (for items and fluids)
+- Table-like results when searching for text, avoid huge window (such as when searching for "signal")
+- Possibility to search for multiple items/signals/fluids at the same time (such as all "Induction Furnace") - selection is possible with flib styles
+- Filter signals by "connected to entity" (LTN input for example)
 - Fluid search
 - Entity search
-- Possibility to search for multiple items/signals/fluids at the same time (such as all "Induction Furnace") - selection is possible with flib styles
-- Producer/Consumer search (for items and fluids)
 - Improve view of results
 
 ## Features
 
 - Recent searches
-- Favorite searches - especially for "Find my car" and similar?
+- Favorite searches
+- Saved search results - especially for "Find my car" and similar?
 - Some kind of share feature... Add icon to other players GUI's? "Simon is sharing XYZ with you"
 - Aliases? Such as "LTN" -> logistics-train-stop (entity name in this case)
 - Search selector: Select area, show options about what is in that area (transport belt, items on belt, inserters, machines, recipes in machines, inputs, outputs...)
@@ -43,7 +45,8 @@ Search as soon as you click the first search button, search for all possibilitie
 Search for train stop name - Where the hell are all those "Unused" stations anyway?
 GROUP BY functionality? Such as "Find all assembling machines, group by product/recipe" (show grouped-by-thing, count, sum of count property?)
 ORDER BY functionality? Such as "closest" or "highest count"
-WiM integration - click on something in WiM (left/right-click like FNEI) to launch search for producers/consumers with extra filter not-enough-ingredients-of-that-kind
+WiM integration - click on something in WiM (left/right-click like FNEI) to launch search for producers/consumers
+ with extra filter not-enough-ingredients-of-that-kind
 Handle special items, such as "item with inventory"
 
 - Item filters: Logistics requests

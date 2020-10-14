@@ -52,6 +52,7 @@ function Async:load_task(task_state)
     local task_config = Async:config_lookup(task_state.task_data)
     task:load_loop_functions()
     task.perform_function = task_config.perform_function
+    task.progress_function = task_config.progress_function
     task.on_finished = task_config.on_finished
     add_async_task(task)
     return task
@@ -105,6 +106,7 @@ local function loop_next(loop, current, all_iterators, all_state, task_data)
     elseif loop.type == "loop_func" then
         if current == nil then
             loop.values = loop.func(all_state, all_iterators, task_data)
+            loop.size = table_size(loop.values)
         end
         return next(loop.values, current)
     elseif loop.type == "dynamic" then
@@ -153,6 +155,26 @@ function AsyncTask:load_loop_functions()
             end
         end
     end
+end
+
+function AsyncTask:get_status()
+    local result = {
+        tasks_completed = self.save_state.completions,
+        tasks_remaining = self.save_state.remaining,
+        loops = { }
+    }
+    for loop_index, loop in pairs(self.save_state.loops) do
+        if loop.type == "loop_func" then
+            table.insert(result.loops, {
+                identifier = loop.identifier,
+                step = self.save_state.iterators[loop_index],
+                total = loop.size,
+            })
+        else
+            error("No get_status() support for loop of type " .. loop.type)
+        end
+    end
+    return result
 end
 
 function AsyncTask:restart_loops()
@@ -204,13 +226,19 @@ function AsyncTask:finished()
     self.save_state.remaining = self.save_state.remaining - 1
     if self.on_finished then
         -- game.print("Finished")
-        self.on_finished(self.save_state.task_data)
+        self.on_finished(self.save_state.task_data, self.save_state)
     end
 end
 
 function AsyncTask:call_perform_function()
 --    log("Call perform with " .. serpent.line(self.state))
-    self.perform_function(self.save_state.state, self.save_state.task_data)
+    self.perform_function(self.save_state.state, self.save_state.task_data, self)
+end
+
+function AsyncTask:call_progress_update_function()
+    if self.progress_function then
+        self:progress_function()
+    end
 end
 
 function AsyncTask:tick(tick)
@@ -225,6 +253,7 @@ function AsyncTask:tick(tick)
                 self:next_iteration()
             end
         end
+        self:call_progress_update_function()
     end
 end
 

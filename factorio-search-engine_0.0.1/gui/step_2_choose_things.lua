@@ -28,8 +28,8 @@ local function perform_search(event, search)
       name = search_for_name,
       search_options = search_options
     }
-    local search = searcher:create_search(player, search_params)
---    step3.progress_gui(search)
+    local search_task = searcher:create_search(player, search_params)
+    step3.progress_gui(search_task)
 end
 
 gui.add_handlers {
