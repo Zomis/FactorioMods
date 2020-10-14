@@ -11,7 +11,7 @@ local function check_networks(entity, signal_id, connection, results)
         red = entity.get_circuit_network(defines.wire_type.red)
         green = entity.get_circuit_network(defines.wire_type.green)
     end
-    if red and red.get_signal(signal_id) > 0 and not results[red.network_id] then
+    if red and red.get_signal(signal_id) ~= 0 and not results[red.network_id] then
         results[red.network_id] = {
             entity = entity,
             wire_type = "red",
@@ -22,7 +22,7 @@ local function check_networks(entity, signal_id, connection, results)
             count = red.get_signal(signal_id)
         }
     end
-    if green and green.get_signal(signal_id) > 0 and not results[green.network_id] then
+    if green and green.get_signal(signal_id) ~= 0 and not results[green.network_id] then
         results[green.network_id] = {
             entity = entity,
             wire_type = "green",
