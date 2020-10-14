@@ -49,7 +49,7 @@ local function add_matching_text_results(context, results, searcher)
     for result_type, v in pairs(results) do
         local elems = gui.build(context.parent, {
             {type="flow", direction="vertical", children={
-              {type="label", caption={"search_engine.types." .. result_type}},
+              {type="label", caption={"search_engine.types_" .. result_type}},
               {type="flow", direction="horizontal", save_as="content", children={}},
               {type="flow", direction="vertical", save_as="search_options", children={}},
             }}
@@ -59,7 +59,7 @@ local function add_matching_text_results(context, results, searcher)
           elems.search_options.add {
             type = "checkbox",
             name = search_plugin_name,
-            caption = { "search_engine.types." .. result_type .. "." .. search_plugin_name },
+            caption = { "search_engine.types_" .. result_type .. "_" .. search_plugin_name },
             state = true
           }
         end
