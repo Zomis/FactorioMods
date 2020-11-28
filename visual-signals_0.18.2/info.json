@@ -5,8 +5,8 @@
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://github.com/Zomis/FactorioMods",
-  "factorio_version": "0.18",
-  "dependencies": ["base >= 0.18"],
+  "factorio_version": "1.1",
+  "dependencies": ["base >= 1.1"],
   "description":
     "Allows you to keep track of chosen circuit networks on the left hand side in your GUI. Originally a fork of CircuitsUI by Fumelgo."
 }

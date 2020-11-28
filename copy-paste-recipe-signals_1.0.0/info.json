@@ -5,7 +5,7 @@
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://github.com/Zomis/FactorioMods",
-  "factorio_version": "1.0",
-  "dependencies": ["base >= 1.0"],
+  "factorio_version": "1.1",
+  "dependencies": ["base >= 1.1"],
   "description": "Copying settings from an Assembling Machine to a Constant Combinator will paste signals describing the recipe"
 }

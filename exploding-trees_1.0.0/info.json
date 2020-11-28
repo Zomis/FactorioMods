@@ -1,12 +1,12 @@
 {
   "name": "exploding-trees",
   "version": "1.0.0",
-  "factorio_version": "1.0",
+  "factorio_version": "1.1",
   "title": "Exploding Trees",
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://www.github.com/Zomis/FactorioMods",
   "description":
     "'You have forests all over the world. You don’t have fires like you do in California. You know, in Europe they have forest cities. You look at countries, Austria, you look at so many countries, they live in the forest. They’re considered forest cities, so many of them. And they don’t have fires like this. And they have more explosive trees.' - Donald J. Trump",
-  "dependencies": ["base >= 1.0"]
+  "dependencies": ["base >= 1.1"]
 }
