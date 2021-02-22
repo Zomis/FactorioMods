@@ -83,7 +83,7 @@ local function add_to_table(search_id, element, result_columns)
 end
 
 local function progress_gui(search_task)
-    if global.search_windows[search_id] then
+    if global.search_windows and global.search_windows[search_id] then
         return global.search_windows[search_id].elems
     end
     local elems = show_window(search_task.task_data)
