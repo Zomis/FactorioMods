@@ -68,12 +68,12 @@ local function parse(advanced_combinator, entity)
       -- If entity is invalid then there's not much to do
       return
     end
-    local control = entity.get_control_behavior()
+    local control = entity.get_or_create_control_behavior()
     local result = {}
     for _, command in ipairs(commands) do
       logic.resolve(command, ent, result)
     end
-    control.parameters = { parameters = result }
+    control.parameters = result
   end
   return { commands = commands, func = perform_function }
 end

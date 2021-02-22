@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2020-11-28
+  Features:
+    - Update for Factorio 1.1
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2020-10-08
+  Features:
+    - Player-specific setting to change ingredient multiplier (0 to turn off), defaults to -1
+    - Player-specific setting to change product multiplier (0 to turn off), defaults to 1
+    - Player-specific setting to include recipe time in ticks, defaults to true
+    - Player-specific setting to include recipe time in seconds, defaults to true
+    - Previous signals on the combinator are now cleared
+  Changes:
+    - Set required Factorio version to 1.0
+
+---------------------------------------------------------------------------------------------------
+Version: 0.18.0
+Date: 2020-07-30
+  Features:
+    - Initial Release
+    - Copying settings from an assembling machine to a constant combinator will set signals for the recipe on the combinator
