@@ -1,4 +1,4 @@
-/c
+-- /c
 function shuffle(list)
 	for i = #list, 2, -1 do
 		local j = math.random(i);
