@@ -774,6 +774,9 @@ Async:configure_loop_functions(function(loop)
   end
   if loop == "entity" then
     return function(loop_values)
+      if not loop_values.surface.valid then
+        return {}
+      end
       local entity_list = loop_values.surface.find_entities_filtered({type = loop_values.entity_type, force = loop_values.force})
       --game.print(" size " .. table_size(entit) .. serpent.line(loop_values))
       return entity_list
