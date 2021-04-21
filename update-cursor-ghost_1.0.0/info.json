@@ -1,0 +1,11 @@
+{
+  "name": "update-cursor-ghost",
+  "version": "1.0.0",
+  "factorio_version": "1.1",
+  "title": "Update Ghost Cursor",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://www.github.com/Zomis/FactorioMods",
+  "description": "Automatically puts item in your cursor when it becomes available instead of a ghost.",
+  "dependencies": []
+}
