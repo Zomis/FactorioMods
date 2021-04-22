@@ -3,7 +3,7 @@ local gui = require("__flib__.gui-beta")
 --Buttons: Entities / Recipes / ...
 --  On-click, change subsection
 --Subsection: Depending on button active
---  Entities: Assembling machines, furnaces, belts, pipes, vehicles, containers, constant combinators, decider combinator, arithmetic combinator, programmable speaker
+--  Entities: belts, pipes, decider combinator, arithmetic combinator
 
 local loop_plugins = require("v2/plugins/loops/loops")
 local filter_plugins = require("v2/plugins/filters/filters")
@@ -12,13 +12,19 @@ local gui_generic = require("v2/gui/gui_generic")
 
 local function search_params_gui(search_id)
     return {
-        type = "frame", direction = "vertical", style = "inside_shallow_frame_with_padding", style_mods = {padding = 12},
+        type = "frame",
+        direction = "vertical",
+        style = "inside_shallow_frame_with_padding",
+        style_mods = {padding = 12},
         children = {
             {
                 type = "label", caption = {"search_engine.looking_for"}
             },
             {
-                type = "flow", direction = "horizontal", ref = { "loop_plugins" }, children = loop_plugins.gui_elements()
+                type = "flow",
+                direction = "horizontal",
+                ref = { "loop_plugins" },
+                children = loop_plugins.gui_elements()
             },
             {
                 type = "flow", direction = "vertical", ref = { "loop_params" }
@@ -91,18 +97,17 @@ local function determine_provides(search)
     return provides
 end
 
-local function start_search(msg, e)
+local function start_search(msg)
     local search = global.searches[msg.search_id]
     local loop_id = gui.get_tags(search.gui.loop_plugins.children[1]).loop_id
     local loop_data = loop_plugins.create_loop(loop_id, search)
     local loop_provides = loop_plugins.provides(loop_id)
 
-    local data_fillers = { "position", "circuit_networks", "recipe" }
     -- TODO: search.plugins = { filters = ..., data_fillers = ..., gui = ... } ???
     search.results = {}
     search.results_count = 0
     search.result_headers = { loop_provides }
-    
+
     search.job = {
         loop_provides = loop_provides,
         running = true,
@@ -110,7 +115,7 @@ local function start_search(msg, e)
         loop_id = loop_id,
         loop_data = loop_data,
         loop_data_count = table_size(loop_data),
-        data_fillers = data_fillers
+        data_fillers = { "position", "circuit_networks", "recipe" }
     }
     search.provides = determine_provides(search)
 end

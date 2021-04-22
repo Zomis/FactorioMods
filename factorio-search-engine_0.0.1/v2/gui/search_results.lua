@@ -17,7 +17,7 @@ local function create_result_guis(search, enabled_gui_plugins, columns)
 end
 
 local function handle_action(action, e)
-    local search = global.searches[action.search_id]
+    -- local search = global.searches[action.search_id]
     if action.type == "result" or action.type == "results_batch" then
         result_gui.handle_action(action, e)
     end
@@ -27,8 +27,7 @@ local function show_results(search)
     search.gui.internal.children[1].destroy()
 
     local enabled_gui_plugins = result_gui.plugins_support.enabled_plugins(search)
-    local columns = result_gui.columns(search, enabled_gui_plugins)
-    game.print("columns: " .. serpent.line(columns))
+    local columns = result_gui.columns(enabled_gui_plugins)
 
     local results = gui.build(search.gui.internal, {
         {
@@ -65,6 +64,7 @@ local function show_results(search)
             }
         }
     })
+    search.gui.results = results
 end
 
 return {

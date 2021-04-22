@@ -1,6 +1,6 @@
 local plugins_support = require("v2/plugins/plugins_support")
 
-local function check_networks(data, entity, connection, results)
+local function check_networks(entity, connection, results)
     local red
     local green
     if connection then
@@ -59,17 +59,17 @@ local data_fillers = {
                     -- such as boiler, generator, entity-ghost, and a lot of others
                     -- Use this check to skip the entities that don't have a circuit connection
 
-                    -- TODO: To improve performance, the entity-types with/without a possible circuit connection can be stored in a lookup map.
-                    --       This lookup map would probably reset whenever on_configuration_changed and set all entities to "unknown"?
+                    -- TODO: For performance, store entity-types with/without possible circuit connection in a map.
+                    --   Reset lookup map whenever on_configuration_changed and set all entities to "unknown"?
                     return nil
                 end
 
                 local results = {}
                 if entity.type == "decider-combinator" or entity.type == "arithmetic-combinator" then
-                    check_networks(data, entity, defines.circuit_connector_id.combinator_input, results)
-                    check_networks(data, entity, defines.circuit_connector_id.combinator_output, results)
+                    check_networks(entity, defines.circuit_connector_id.combinator_input, results)
+                    check_networks(entity, defines.circuit_connector_id.combinator_output, results)
                 else
-                    check_networks(data, entity, nil, results)
+                    check_networks(entity, nil, results)
                 end
                 return results
             end

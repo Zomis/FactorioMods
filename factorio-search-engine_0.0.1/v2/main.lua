@@ -1,4 +1,4 @@
-local event = require("__flib__.event")
+local events = require("__flib__.event")
 local gui = require("__flib__.gui-beta")
 
 local gui_step1 = require("v2/gui/step_1_search_spec")
@@ -43,14 +43,14 @@ gui.hook_events(function(e)
 	end
 end)
 
-event.on_lua_shortcut(function(event)
+events.on_lua_shortcut(function(event)
 	if event.prototype_name == "factorio-search-engine" then
 		gui_step1.open_small_gui(game.players[event.player_index])
 	end
 end)
 
-event.register("factorio-search-engine-open-search", function(event)
+events.register("factorio-search-engine-open-search", function(event)
 	gui_step1.open_small_gui(game.players[event.player_index])
 end)
 
-event.on_tick(function (e) search.on_tick(e) end)
+events.on_tick(function (e) search.on_tick(e) end)

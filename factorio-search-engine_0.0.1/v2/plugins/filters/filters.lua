@@ -10,18 +10,18 @@ local function compare_options()
 end
 
 local function compare(value1, comparison, value2)
-    local compare = comparison.items[comparison.selected_index]
-    if compare == "<" then
+    local compare_type = comparison.items[comparison.selected_index]
+    if compare_type == "<" then
         return value1 < value2
-    elseif compare == "<=" then
+    elseif compare_type == "<=" then
         return value1 <= value2
-    elseif compare == ">" then
+    elseif compare_type == ">" then
         return value1 > value2
-    elseif compare == ">=" then
+    elseif compare_type == ">=" then
         return value1 >= value2
-    elseif compare == "=" then
+    elseif compare_type == "=" then
         return value1 == value2
-    elseif compare == "!=" then
+    elseif compare_type == "!=" then
         return value1 ~= value2
     end
 end
@@ -101,7 +101,7 @@ local filters = {
                 }
             }
         end,
-        filter = function(data, filter_gui, search)
+        filter = function(data, filter_gui)
             local match = false
             if not data.circuit_networks then
                 return false
@@ -125,7 +125,6 @@ local filters = {
                 local entity = data.entity
                 if not entity.valid then return false end
                 if entity.type == "container" and product.type == "item" then
-                    local inventory = entity.get_inventory(defines.inventory.chest)
                     return entity.get_item_count(product.name) > 0
                 end
                 if entity.type == "storage-tank" and product.type == "fluid" then
@@ -134,7 +133,9 @@ local filters = {
                 return false
             end
             if data.recipe then
-                return recipe_produces(recipe, product.type, product.name) or recipe_consumes(recipe, product.type, product.name)
+                local recipe = data.recipe
+                local produced = recipe_produces(recipe, product.type, product.name)
+                return produced or recipe_consumes(recipe, product.type, product.name)
             end
         end
     },
@@ -165,12 +166,13 @@ local filters = {
             if not data.recipe then return false end
             if not data.recipe.valid then return false end
             local product = item_or_fluid_values(filter_gui)
-            return recipe_produces(data.recipe, product.type, product.name) or recipe_consumes(data.recipe, product.type, product.name)
+            local produced = recipe_produces(data.recipe, product.type, product.name)
+            return produced or recipe_consumes(data.recipe, product.type, product.name)
         end
     }
 }
 
-local function handle_action(action, event)
+local function handle_action(action)
     local search_id = action.search_id
     local search = global.searches[search_id]
     if action.action == "add" then

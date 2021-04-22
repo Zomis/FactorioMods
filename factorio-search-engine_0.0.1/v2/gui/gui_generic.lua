@@ -1,6 +1,6 @@
 -- create mod_gui button top left
 local function create_guis(player)
-    local location_button = mod_gui.get_button_flow(player).add {
+    mod_gui.get_button_flow(player).add {
         type = "button",
         style = mod_gui.button_style,
         caption = "Search",

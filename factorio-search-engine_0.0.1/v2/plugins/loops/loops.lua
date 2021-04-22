@@ -1,5 +1,3 @@
-local tables = require("__flib__/table")
-
 local loop_plugins = {
     entities = {
         provides = "entity",
@@ -9,12 +7,17 @@ local loop_plugins = {
                     type = "drop-down",
                     ref = { "entity_type" },
                     items = {
-                        "container", "storage-tank", "any-machine", "assembling-machine", "furnace", "constant-combinator", "programmable-speaker", "lamp", "radar", "vehicle"
+                        "container", "storage-tank",
+                        "any-machine", "assembling-machine", "furnace",
+                        "constant-combinator", "programmable-speaker",
+                        "lamp", "radar",
+                        "vehicle"
                     },
                     selected_index = 1
                 }
-                --   and show generic component for entity name:  text input (starts with / exact match / fuzzy search, default to fuzzy here)
-                  -- fuzzy search = https://codereview.stackexchange.com/questions/111957/vc-as-in-vancouver-or-valencia
+                -- TODO: generic component for name search: text input
+                  -- (contains / starts with / exact match / fuzzy search, default to fuzzy here)
+                  -- fuzzy: https://codereview.stackexchange.com/questions/111957/vc-as-in-vancouver-or-valencia
             }
         end,
         func = function(search)
@@ -38,7 +41,7 @@ local loop_plugins = {
             }
         end,
         func = function()
-            -- TODO: Use https://lua-api.factorio.com/latest/LuaGameScript.html#LuaGameScript.get_filtered_recipe_prototypes
+            -- TODO: Use LuaGameScript.get_filtered_recipe_prototypes
             return game.recipe_prototypes
         end
     }

@@ -23,6 +23,7 @@ local function expected_amount(product)
 end
 
 local function sprite_button_type_name_amount(type, name, amount, color)
+    local prototype = nil
     if type == "item" then
         prototype = game.item_prototypes[name]
     elseif type == "fluid" then
@@ -46,7 +47,7 @@ local function signal_to_sprite_button(signal, color)
     end
     return sprite_button_type_name_amount(signal_type, signal.signal.name, signal.count, color)
 end
-  
+
 local result_gui = {
     entity_icon = {
         requires = { "entity" },
@@ -139,7 +140,7 @@ local result_gui = {
 
                 local products = {}
                 for k, product in ipairs(recipe.products) do
-                    products[k] = sprite_button_type_name_amount(product.type, product.name, product.amount)
+                    products[k] = sprite_button_type_name_amount(product.type, product.name, expected_amount(product))
                 end
                 return {
                     type = "table", style = "slot_table", column_count = 5, children = products
@@ -172,7 +173,9 @@ local result_gui = {
                         type = "button",
                         caption = {"search_engine.results-actions-send_messages"},
                         actions = {
-                            on_click = { type = "results_batch", action = "send_messages", search_id = search.search_id }
+                            on_click = {
+                                type = "results_batch", action = "send_messages", search_id = search.search_id
+                            }
                         }
                     },
                 }
@@ -182,7 +185,7 @@ local result_gui = {
     entity_actions = {
         requires = { "entity" },
         displays = {
-            actions = function(data, data_keys)
+            actions = function(_, data_keys)
                 return {
                     type = "flow", direction = "horizontal", children = {
                         {
@@ -226,12 +229,17 @@ local function handle_action(action, event)
         if action.action == "chart_tag" then
             if not data.entity then return end
             if not data.entity.valid then return end
-            player.force.add_chart_tag(player.surface, { position = data.entity.position, icon = gui_common.signal_for_entity(data.entity) })
+            player.force.add_chart_tag(player.surface, {
+                position = data.entity.position, icon = gui_common.signal_for_entity(data.entity)
+            })
         end
         if action.action == "print" then
             if not data.entity then return end
             if not data.entity.valid then return end
-            player.print("[entity=" .. data.entity.name .. "] @ " .. "[gps=" .. data.entity.position.x .. "," .. data.entity.position.y .. "]")
+            player.print(
+              "[entity=" .. data.entity.name .. "] @ " ..
+              "[gps=" .. data.entity.position.x .. "," .. data.entity.position.y .. "]"
+            )
         end
     elseif action.type == "results_batch" then
         local search = global.searches[action.search_id]
@@ -240,14 +248,19 @@ local function handle_action(action, event)
             for _, data in pairs(search.results) do
                 if not data.entity then return end
                 if not data.entity.valid then return end
-                player.print("[entity=" .. data.entity.name .. "] @ " .. "[gps=" .. data.entity.position.x .. "," .. data.entity.position.y .. "]")
+                player.print(
+                    "[entity=" .. data.entity.name .. "] @ " ..
+                    "[gps=" .. data.entity.position.x .. "," .. data.entity.position.y .. "]"
+                )
             end
         end
         if action.action == "chart_tags" then
             for _, data in pairs(search.results) do
                 if not data.entity then return end
                 if not data.entity.valid then return end
-                player.force.add_chart_tag(player.surface, { position = data.entity.position, icon = gui_common.signal_for_entity(data.entity) })
+                player.force.add_chart_tag(player.surface, {
+                    position = data.entity.position, icon = gui_common.signal_for_entity(data.entity)
+                })
             end
         end
         if action.action == "show_alerts" then
@@ -260,7 +273,7 @@ local function handle_action(action, event)
     end
 end
 
-local function columns(search, plugins)
+local function columns(plugins)
     local found = {}
     local results = {}
     for _, plugin in pairs(plugins) do
