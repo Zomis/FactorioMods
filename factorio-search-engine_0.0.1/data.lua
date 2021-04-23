@@ -1,4 +1,19 @@
-data:extend{
+function create_sprite_icon(name)
+  return {
+    type = "sprite",
+    name = "search_engine_" .. name,
+    filename = "__factorio-search-engine__/graphics/sprites/" .. name .. ".png",
+    priority = "medium",
+    width = 32,
+    height = 32
+  }
+end
+
+data:extend {
+  create_sprite_icon("magnify")
+}
+
+data:extend {
   {
       type = 'custom-input',
       name = 'factorio-search-engine-open-search',
@@ -7,7 +22,7 @@ data:extend{
   },
 }
 
-data:extend({
+data:extend {
   {
     type = "shortcut",
     name = "factorio-search-engine",
@@ -25,4 +40,4 @@ data:extend({
       size = 48
     },
   },
-})
+}

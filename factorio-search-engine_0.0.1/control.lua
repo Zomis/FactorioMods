@@ -1,18 +1,16 @@
 local event = require("__flib__.event")
+local gui_generic = require("v2/gui/gui_generic")
 
 event.on_init(function()
 	global.searches = {}
-	global.players = {}
-	for i in pairs(game.players) do
-		global.players[i] = {}
+	for _, player in pairs(game.players) do
+		gui_generic.create_mod_gui_button(player)
 	end
 end)
 
 event.on_player_created(function(e)
-	global.players[e.player_index] = global.players[e.player_index] or {}
-end)
-event.on_player_removed(function(e)
-    global.players[e.player_index] = nil
+	local player = game.players[e.player_index]
+	gui_generic.create_mod_gui_button(player)
 end)
 
 require "v2/main"

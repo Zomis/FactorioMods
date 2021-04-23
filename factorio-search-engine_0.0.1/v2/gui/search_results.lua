@@ -54,6 +54,9 @@ local function show_results(search)
                                 {
                                     type = "table",
                                     column_count = table_size(columns),
+                                    draw_vertical_lines = true,
+                                    draw_horizontal_lines = true,
+                                    draw_horizontal_line_after_headers = true,
                                     ref = {"slot_table"},
                                     children = create_result_guis(search, enabled_gui_plugins, columns)
                                 }

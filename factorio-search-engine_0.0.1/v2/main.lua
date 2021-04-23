@@ -1,10 +1,12 @@
 local events = require("__flib__.event")
 local gui = require("__flib__.gui-beta")
 
+local gui_generic = require("v2/gui/gui_generic")
 local gui_step1 = require("v2/gui/step_1_search_spec")
 local search_results = require("v2/gui/search_results")
 local search = require("v2/search/searcher")
 local filters = require("v2/plugins/filters/filters")
+local migration = require("__flib__.migration")
 
 local function handle_action(msg, e)
 --    game.print("HANDLE ACTION " .. game.tick)
@@ -54,3 +56,11 @@ events.register("factorio-search-engine-open-search", function(event)
 end)
 
 events.on_tick(function (e) search.on_tick(e) end)
+
+events.on_configuration_changed(function(e)
+	if migration.on_config_changed(e, {}) then
+	  	for _, player in pairs(game.players) do
+			gui_generic.create_mod_gui_button(player)
+        end
+	end
+end)
