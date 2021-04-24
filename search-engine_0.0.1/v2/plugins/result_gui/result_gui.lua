@@ -88,6 +88,7 @@ local result_gui = {
             end
         },
     },
+    machine_status = require("v2/plugins/result_gui/machine_status"),
     recipe = {
         requires = { "recipe" },
         displays = {
