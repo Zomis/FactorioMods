@@ -55,12 +55,11 @@ local result_gui = {
             icon = function(data)
                 if not data.entity then return empty_widget end
                 if not data.entity.valid then return empty_widget end
-                local signal = gui_common.signal_for_entity(data.entity)
                 local prototype = data.entity.prototype
                 return {
                     type = "sprite-button",
                     style = "slot_button",
-                    sprite = "item/" .. signal.name,
+                    sprite = "entity/" .. data.entity.name,
                     tooltip = prototype.localised_name,
                 }
             end

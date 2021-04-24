@@ -29,7 +29,7 @@ local function show_results(search)
     local enabled_gui_plugins = result_gui.plugins_support.enabled_plugins(search)
     local columns = result_gui.columns(enabled_gui_plugins)
 
-    local results = gui.build(search.gui.internal, {
+    local gui_contents = {
         {
             type = "flow",
             direction = "vertical",
@@ -66,7 +66,9 @@ local function show_results(search)
                 }
             }
         }
-    })
+    }
+
+    local results = gui.build(search.gui.internal, gui_contents)
     search.gui.results = results
 end
 
