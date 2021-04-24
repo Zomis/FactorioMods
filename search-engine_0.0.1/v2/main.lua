@@ -37,7 +37,6 @@ local function handle_action(msg, e)
     end
 end
 
-
 gui.hook_events(function(e)
 	local msg = gui.read_action(e)
 	if msg then
@@ -46,12 +45,12 @@ gui.hook_events(function(e)
 end)
 
 events.on_lua_shortcut(function(event)
-	if event.prototype_name == "factorio-search-engine" then
+	if event.prototype_name == "search-engine" then
 		gui_step1.open_small_gui(game.players[event.player_index])
 	end
 end)
 
-events.register("factorio-search-engine-open-search", function(event)
+events.register("search-engine-open-search", function(event)
 	gui_step1.open_small_gui(game.players[event.player_index])
 end)
 
