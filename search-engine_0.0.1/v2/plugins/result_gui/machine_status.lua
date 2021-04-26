@@ -1,30 +1,45 @@
 local empty_widget = { type = "empty-widget" }
 
+local status_descriptions = {}
+for status, number in pairs(defines.entity_status) do
+    status_descriptions[number] = {"entity-status." .. status:gsub("_", "-")}
+end
+
 local entity_status = {
-    [defines.entity_status.working] = { description = "working", signal = "signal-green" },
-    [defines.entity_status.normal] = { description = "normal", signal = "signal-green" },
-    [defines.entity_status.no_power] = { description = "no_power", signal = "signal-red" },
-    [defines.entity_status.low_power] = { description = "low_power", signal = "signal-yellow" },
-    [defines.entity_status.no_fuel] = { description = "no_fuel", signal = "signal-red" },
-    [defines.entity_status.disabled_by_script] = { description = "disabled_by_script", signal = "signal-black" },
-    [defines.entity_status.marked_for_deconstruction] = { description = "marked_for_deconstruction", signal = "signal-red" },
-    [defines.entity_status.no_recipe] = { description = "no_recipe", signal = "signal-red" },
-    [defines.entity_status.no_ingredients] = { description = "no_ingredients", signal = "signal-red" },
-    [defines.entity_status.no_input_fluid] = { description = "no_input_fluid", signal = "signal-red" },
-    [defines.entity_status.fluid_ingredient_shortage] = { description = "fluid_ingredient_shortage", signal = "signal-red" },
-    [defines.entity_status.full_output] = { description = "full_output", signal = "signal-blue" },
-    [defines.entity_status.item_ingredient_shortage] = { description = "item_ingredient_shortage", signal = "signal-red" }
+    [defines.entity_status.working] = "green",
+    [defines.entity_status.normal] = "green",
+    [defines.entity_status.no_power] = "red",
+    [defines.entity_status.low_power] = "yellow",
+    [defines.entity_status.no_fuel] = "red",
+    [defines.entity_status.disabled_by_script] = "black",
+    [defines.entity_status.marked_for_deconstruction] = "red",
+    [defines.entity_status.no_recipe] = "red",
+    [defines.entity_status.no_ingredients] = "red",
+    [defines.entity_status.no_input_fluid] = "red",
+    [defines.entity_status.fluid_ingredient_shortage] = "red",
+    [defines.entity_status.full_output] = "blue",
+    [defines.entity_status.item_ingredient_shortage] = "red"
 }
 
 local function sprite_button_for_status(status)
     if not status then return empty_widget end
-    local entry = entity_status[status] or nil
-    if not entry then return empty_widget end
+    local color = entity_status[status] or nil
+    if not color then return empty_widget end
+
     return {
-        type = "sprite-button",
-        style = "slot_button",
-        sprite = "virtual-signal/" .. entry.signal,
-        tooltip = { "search_engine_" .. entry.description }
+        type = "flow",
+        style = "flib_indicator_flow",
+        children = {
+            {
+                type = "sprite",
+                style = "flib_indicator",
+                sprite = "flib_indicator_" .. color
+            },
+            {
+                type = "label",
+                caption = status_descriptions[status]
+            }
+        }
     }
 end
 

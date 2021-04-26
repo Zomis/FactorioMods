@@ -21,6 +21,11 @@ local loop_plugins = {
             }
         end,
         func = function(search)
+            -- TODO: Search in area:
+            -- local cursor_stack = player.cursor_stack
+			-- cursor_stack.clear()
+			-- cursor_stack.set_stack({name="search-engine-area-filter", type="selection-tool", count = 1})
+
             -- TODO: Support ghosts somehow? Especially showing what kind of ghost it is
             search.params.force = search.player.force
             local drop_down = search.gui_loop_params.entity_type
