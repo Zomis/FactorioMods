@@ -10,6 +10,9 @@ local function handle_action(action, event)
         local train = train_data.train
         player.zoom_to_world(train.front_stock.position, 0.5)
     end
+    if action.action == "position" then
+        player.zoom_to_world(action.position, 0.5)
+    end
 end
 
 local function sprite_button_type_name_amount(type, name, amount, color)
@@ -26,7 +29,8 @@ local function sprite_button_type_name_amount(type, name, amount, color)
         style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
         sprite = type .. "/" .. name,
         number = amount,
-        tooltip = prototype and prototype.localised_name or "No prototype for " .. type .. "/" .. name
+        tooltip = prototype.name .. " (" .. amount .. ")"
+        -- tooltip = prototype and prototype.localised_name or "No prototype for " .. type .. "/" .. name
     }
 end
 
@@ -110,10 +114,10 @@ local function events_row(train_data, index, children)
             tooltip = misc.ticks_to_timestring(last_change, true)
         }
         -- table.insert(event_children, delay_button)
-        if event.state then
+        if event.state and false then
             table.insert(event_children, sprite_button_for_state(event.state))
         end
-        if event.schedule then
+        if event.schedule and false then
             table.insert(event_children, {
                 type = "sprite-button",
                 sprite = "train_log_train",
@@ -127,21 +131,46 @@ local function events_row(train_data, index, children)
                 })
             end
         end
+        if event.position then
+            table.insert(event_children, {
+                type = "sprite-button",
+                sprite = "virtual-signal/signal-dot",
+                tooltip = { "train-log.temporary-stop-at", event.position.x, event.position.y },
+                actions = {
+                    on_click = { type = "table", action = "position", position = event.position }
+                }
+            })
+        end
         if event.station then
             table.insert(event_children, {
                 type = "sprite-button",
                 sprite = "entity/" .. event.station.name,
-                tooltip = {"train-log.station-name", event.station.backer_name}
+                tooltip = {"train-log.station-name", event.station.backer_name},
+                actions = {
+                    on_click = { type = "table", action = "position", position = event.position }
+                }
             })
         end
-        if event.contents then
-            for name, count in pairs(event.contents) do
-                table.insert(event_children, sprite_button_type_name_amount("item", name, count))
+        if event.contents and false then -- This is not stored in any log event, just temporarily in train_data
+            if event.contents.items then
+                for name, count in pairs(event.contents.items) do
+                    table.insert(event_children, sprite_button_type_name_amount("item", name, count))
+                end
+            end
+            if event.contents.fluids then
+                for name, count in pairs(event.contents.fluids) do
+                    table.insert(event_children, sprite_button_type_name_amount("fluid", name, count))
+                end
             end
         end
-        if event.fluids then
-            for name, count in pairs(event.fluids) do
-                table.insert(event_children, sprite_button_type_name_amount("fluid", name, count))
+        if event.diff then
+            for name, count in pairs(event.diff.items) do
+                local color = count > 0 and "green" or "red"
+                table.insert(event_children, sprite_button_type_name_amount("item", name, count, color))
+            end
+            for name, count in pairs(event.diff.fluids) do
+                local color = count > 0 and "green" or "red"
+                table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, color))
             end
         end
         last_change = event.tick
@@ -194,10 +223,11 @@ local function create_events_table(gui_id)
     local children_guis = create_result_guis(histories, { "train", "timestamp", "events" })
     train_log_gui.gui.internal.clear()
 
-    gui.build(train_log_gui.gui.internal, {
+    return gui.build(train_log_gui.gui.internal, {
         {
             type = "scroll-pane",
             style = "flib_naked_scroll_pane_no_padding",
+            ref = { "scroll_pane" },
             style_mods = {height = 400},
             children = {
                 {

@@ -2,7 +2,8 @@ local events_table = require("gui/events_table")
 
 local function handle_action(action, event)
     if action.action == "refresh" then
-        events_table.create_events_table(action.gui_id)
+        local gui_contents = events_table.create_events_table(action.gui_id)
+        -- gui_contents.scroll_pane.scroll_to_bottom() -- Doesn't work. Perhaps needs to wait a tick?
     end
 end
 

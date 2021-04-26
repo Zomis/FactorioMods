@@ -9,8 +9,25 @@ local function new_current(train)
         train = train,
         started_at = game.tick,
         last_change = game.tick,
+        contents = {},
         events = {}
     }
+end
+
+local function diff(old_values, new_values)
+    local result = {}
+    if old_values then
+        for k, v in pairs(old_values) do
+            result[k] = -v
+        end
+    end
+    if new_values then
+        for k, v in pairs(new_values) do
+            local old_value = result[k] or 0
+            result[k] = old_value + v
+        end
+    end
+    return result
 end
 
 local function train_data(train, train_id)
@@ -52,34 +69,35 @@ local interesting_states = {
     [defines.train_state.path_lost] = true,
     [defines.train_state.no_schedule] = true,
     [defines.train_state.no_path] = true,
-    [defines.train_state.wait_signal] = true,
+    [defines.train_state.wait_signal] = false, -- TODO: Add wait at signal info later
     [defines.train_state.wait_station] = true,
     [defines.train_state.manual_control_stop] = true,
     [defines.train_state.manual_control] = true,
     [defines.train_state.destination_full] = true
 }
 
+local function read_contents(train)
+    return {
+        items = train.get_contents(),
+        fluids = train.get_fluid_contents()
+    }
+end
+
 events.on_train_changed_state(function(event)
     local train = event.train
     local train_id = train.id
     local train_data = train_data(train, train_id)
 
-    local interesting_event = interesting_states[event.old_state] or interesting_states[train.state]
+    local new_state = train.state
+    local interesting_event = interesting_states[event.old_state] or interesting_states[new_state]
     if not interesting_event then
         return
     end
 
-    if event.old_state == defines.train_state.wait_station and event.train.state == defines.train_state.arrive_station then
+    --if event.old_state == defines.train_state.wait_station and new_state == defines.train_state.arrive_station then
         -- Temporary stop at the same position as a station (common with LTN)
-        return
-    end
-
-
-
-    -- Save waiting for signals, start and end in the same
-       -- time waited at signal, signal entity + position
-    -- Save waiting at temporary stop, as long as it doesn't change from wait_station to arrive_stations
-    -- Save waiting at train station
+    --    return
+    --end
 
     local log = {
         tick = game.tick,
@@ -87,13 +105,36 @@ events.on_train_changed_state(function(event)
         state = train.state
     }
     if event.old_state == defines.train_state.wait_station then
-        log.contents = train.get_contents()
-        log.fluids = train.get_fluid_contents()
+        local diff_items = diff(train_data.contents.items, train.get_contents())
+        local diff_fluids = diff(train_data.contents.fluids, train.get_fluid_contents())
+        train_data.contents = read_contents(train)
+        log.diff = {
+            items = diff_items,
+            fluids = diff_fluids
+        }
+        -- end old entry, but save timestamp somewhere
     end
-    if train.state == defines.train_state.wait_station then
-        -- TODO: if it is a temporary train stop, then save position instead and show something like virtual/signal-dot (use material design icon)
-        log.station = train.station
+    if new_state == defines.train_state.wait_station then
+        -- create new entry
+        -- train_data.contents_on_enter = ...
+
+        -- always log position
+        log.position = train.front_stock.position
+        if train.station then
+            train_data.contents = read_contents(train)
+            log.contents = train_data.contents.items
+            log.fluids = train_data.contents.fluids
+            log.station = train.station
+        end
     end
+
+    -- Show train, time since last station, station name, entered with contents, and content diff
+
+    -- Save waiting for signals, start and end in the same
+       -- time waited at signal, signal entity + position
+    -- Save waiting at temporary stop, as long as it doesn't change from wait_station to arrive_station
+    -- Save waiting at train station
+
     add_log(train_data, log)
 
     if train.state == defines.train_state.wait_station and train.schedule.current == 1 then
