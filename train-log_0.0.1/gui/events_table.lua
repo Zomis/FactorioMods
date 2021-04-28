@@ -31,7 +31,7 @@ local function sprite_button_type_name_amount(type, name, amount, color)
         style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
         sprite = type .. "/" .. name,
         number = amount,
-        tooltip = prototype.name .. " (" .. amount .. ")"
+        tooltip = prototype.localised_name
     }
 end
 
@@ -223,7 +223,7 @@ local function create_result_guis(results, filters, columns)
     for _, column in pairs(columns) do
         table.insert(children, {
             type = "label",
-            caption = column
+            caption = { "train-log.table-header-" .. column }
         })
     end
     tables.for_each(results, function(result)
@@ -269,7 +269,7 @@ local function create_events_table(gui_id)
             style = "flib_naked_scroll_pane_no_padding",
             ref = { "scroll_pane" },
             vertical_scroll_policy = "always",
-            style_mods = {width = 600, height = 400},
+            style_mods = {width = 650, height = 400, padding = 6},
             children = {
                 {
                     type = "table",
