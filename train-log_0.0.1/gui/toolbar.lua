@@ -54,7 +54,7 @@ local function create_toolbar(gui_id)
                         selected_index = time_filter.default_index,
                         ref = { "filter", "time_period" },
                         actions = {
-                            on_gui_selection_state_changed = { type = "toolbar", action = "refresh", gui_id = gui_id }
+                            on_selection_state_changed = { type = "toolbar", action = "refresh", gui_id = gui_id }
                         }
                     },
                     {
@@ -92,7 +92,7 @@ local function create_toolbar(gui_id)
                                 tooltip = { "train-log.filter-station-name" },
                                 ref = { "filter", "station_name" },
                                 actions = {
-                                    on_gui_text_changed = {
+                                    on_confirmed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
                                         filter = "station_name"
                                     }
@@ -114,7 +114,7 @@ local function create_toolbar(gui_id)
                                 tooltip = { "train-log.filter-item-tooltip" },
                                 ref = { "filter", "item" },
                                 actions = {
-                                    on_gui_elem_changed = {
+                                    on_elem_changed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
                                         filter = "item"
                                     }
@@ -130,7 +130,7 @@ local function create_toolbar(gui_id)
                                 tooltip = { "train-log.filter-fluid-tooltip" },
                                 ref = { "filter", "fluid" },
                                 actions = {
-                                    on_gui_elem_changed = {
+                                    on_elem_changed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
                                         filter = "fluid"
                                     }
