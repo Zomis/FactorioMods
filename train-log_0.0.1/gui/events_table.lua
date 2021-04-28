@@ -233,6 +233,16 @@ local function matches_filter(result, filters)
     return false
 end
 
+local function iterate_backwards_iterator(tbl, i)
+    i = i - 1
+    if i ~= 0 then
+        return i, tbl[i]
+    end
+end
+local function iterate_backwards(tbl)
+    return iterate_backwards_iterator, tbl, table_size(tbl) + 1
+end
+
 local function create_result_guis(results, filters, columns)
     local children = {}
     for _, column in pairs(columns) do
@@ -241,11 +251,11 @@ local function create_result_guis(results, filters, columns)
             caption = { "train-log.table-header-" .. column }
         })
     end
-    tables.for_each(results, function(result)
+    for _, result in iterate_backwards(results) do
         if matches_filter(result, filters) then
             events_row(result, children)
         end
-    end)
+    end
     return children
 end
 
