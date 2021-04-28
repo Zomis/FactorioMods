@@ -82,8 +82,6 @@ local function signal_for_entity(entity)
 end
 
 local function events_row(train_data, children)
-    local train_icon = { type = "empty-widget" }
-
     if train_data.train.valid and train_data.train.front_stock.valid then
         local prototype = train_data.train.front_stock.prototype
         train_icon = {
@@ -95,6 +93,12 @@ local function events_row(train_data, children)
             actions = {
                 on_click = { type = "table", action = "open-train", train_id = train_data.train.id }
             }
+        }
+    else
+        train_icon = {
+            type = "sprite-button",
+            sprite = "train_log_train",
+            tooltip = {"train-log.train-removed"},
         }
     end
 
@@ -142,14 +146,25 @@ local function events_row(train_data, children)
             })
         end
         if event.station then
-            table.insert(event_children, {
-                type = "sprite-button",
-                sprite = "entity/" .. event.station.name,
-                tooltip = {"train-log.station-name", event.station.backer_name},
-                actions = {
-                    on_click = { type = "table", action = "position", position = event.position }
-                }
-            })
+            if event.station.valid then
+                table.insert(event_children, {
+                    type = "sprite-button",
+                    sprite = "entity/" .. event.station.name,
+                    tooltip = {"train-log.station-name", event.station.backer_name},
+                    actions = {
+                        on_click = { type = "table", action = "position", position = event.position }
+                    }
+                })
+            else
+                table.insert(event_children, {
+                    type = "sprite-button",
+                    sprite = "train_log_train",
+                    tooltip = {"train-log.station-removed"},
+                    actions = {
+                        on_click = { type = "table", action = "position", position = event.position }
+                    }
+                })
+            end
         end
         if event.contents and false then -- This is not stored in any log event, just temporarily in train_data
             if event.contents.items then
