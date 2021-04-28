@@ -4,14 +4,14 @@ local gui = require("__flib__.gui-beta")
 local trains = require("__flib__.train")
 
 local function handle_action(action, event)
-    local player = game.players[event.player_index]
-    if action.action == "icon" then
+    if action.action == "open-train" then
         local train_id = action.train_id
         local train_data = global.trains[train_id]
         local train = train_data.train
-        player.zoom_to_world(train.front_stock.position, 0.5)
+        trains.open_gui(event.player_index, train)
     end
     if action.action == "position" then
+        local player = game.players[event.player_index]
         player.zoom_to_world(action.position, 0.5)
     end
 end
@@ -95,7 +95,7 @@ local function events_row(train_data, index, children)
             number = train_data.train.id,
             tooltip = prototype.localised_name,
             actions = {
-                on_click = { type = "table", action = "icon", train_id = train_data.train.id }
+                on_click = { type = "table", action = "open-train", train_id = train_data.train.id }
             }
         }
     end
