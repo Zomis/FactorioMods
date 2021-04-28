@@ -2,6 +2,7 @@ local tables = require("__flib__.table")
 local misc = require("__flib__.misc")
 local gui = require("__flib__.gui-beta")
 local trains = require("__flib__.train")
+local time_filter = require("filter-time")
 
 local function handle_action(action, event)
     if action.action == "open-train" then
@@ -31,7 +32,6 @@ local function sprite_button_type_name_amount(type, name, amount, color)
         sprite = type .. "/" .. name,
         number = amount,
         tooltip = prototype.name .. " (" .. amount .. ")"
-        -- tooltip = prototype and prototype.localised_name or "No prototype for " .. type .. "/" .. name
     }
 end
 
@@ -81,9 +81,7 @@ local function signal_for_entity(entity)
     return empty_signal
 end
 
-local function events_row(train_data, index, children)
-    -- Show train icon, timestamp HMS, events
-
+local function events_row(train_data, children)
     local train_icon = { type = "empty-widget" }
 
     if train_data.train.valid and train_data.train.front_stock.valid then
@@ -189,7 +187,38 @@ local function events_row(train_data, index, children)
     table.insert(children, event_flow)
 end
 
-local function create_result_guis(results, columns)
+local function matches_filter(result, filters)
+    if result.last_change < filters.time_period then
+        return false
+    end
+
+    local matches_item = filters.item == nil
+    local matches_fluid = filters.fluid == nil
+    local matches_station = filters.station_name == ""
+    if matches_item and matches_fluid and matches_station then
+        return true
+    end
+    for _, event in pairs(result.events) do
+        if not matches_item and event.contents then
+            matches_item = event.contents[filters.item]
+        end
+        if not matches_fluid and event.fluids then
+            matches_fluid = event.fluids[filters.fluid]
+        end
+        if not matches_station and event.station then
+            local station_name = event.station.valid and event.station.backer_name or ""
+            if station_name:lower():find(filters.station_name) then
+                matches_station = true
+            end
+        end
+        if matches_item and matches_fluid and matches_station then
+            return true
+        end
+    end
+    return false
+end
+
+local function create_result_guis(results, filters, columns)
     local children = {}
     for _, column in pairs(columns) do
         table.insert(children, {
@@ -197,8 +226,10 @@ local function create_result_guis(results, columns)
             caption = column
         })
     end
-    tables.for_each(results, function(result, index)
-        events_row(result, index, children)
+    tables.for_each(results, function(result)
+        if matches_filter(result, filters) then
+            events_row(result, children)
+        end
     end)
     return children
 end
@@ -222,7 +253,14 @@ local function create_events_table(gui_id)
 
     table.sort(histories, function(a, b) return a.last_change < b.last_change end)
 
-    local children_guis = create_result_guis(histories, { "train", "timestamp", "events" })
+    local filters = {
+        item = train_log_gui.gui.filter.item.elem_value,
+        fluid = train_log_gui.gui.filter.fluid.elem_value,
+        station_name = train_log_gui.gui.filter.station_name.text:lower(),
+        time_period = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
+    }
+
+    local children_guis = create_result_guis(histories, filters, { "train", "timestamp", "events" })
     train_log_gui.gui.internal.clear()
 
     return gui.build(train_log_gui.gui.internal, {

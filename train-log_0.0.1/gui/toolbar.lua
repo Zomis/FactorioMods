@@ -1,44 +1,39 @@
 local events_table = require("gui/events_table")
 local tables = require("__flib__.table")
+local time_filter = require("filter-time")
 
-local function handle_action(action, event)
-    if action.action == "refresh" then
-        local gui_contents = events_table.create_events_table(action.gui_id)
-        -- gui_contents.scroll_pane.scroll_to_bottom() -- Doesn't work. Perhaps needs to wait a tick?
-    end
+local function refresh(gui_id)
+    events_table.create_events_table(gui_id)
+    -- gui_contents.scroll_pane.scroll_to_bottom() -- Doesn't work. Perhaps needs to wait a tick?
 end
 
-local time_period_items = {
-    {
-        time = 60*2,
-        text = "train-log.time-2m"
-    },
-    {
-        time = 60*15,
-        text = "train-log.time-15m"
-    },
-    {
-        time = 60*60*1,
-        text = "train-log.time-1h"
-    },
-    {
-        time = 60*60*3,
-        text = "train-log.time-3h"
-    },
-    {
-        time = 60*60*6,
-        text = "train-log.time-6h"
-    },
-    {
-        time = 60*60*12,
-        text = "train-log.time-12h"
-    },
-    {
-        time = 60*60*24,
-        text = "train-log.time-24h"
-    }
-}
-local time_period_default_index = 2
+local function handle_action(action, event)
+    if action.action == "clear-older" then
+        -- loop through datas, remove if: older than time frame AND belonging to current force
+    end
+    if action.action == "refresh" then
+        refresh(action.gui_id)
+    end
+    if action.action == "apply-filter" then
+        local train_log_gui = global.guis[action.gui_id]
+        local filter_guis = train_log_gui.gui.filter
+
+        if action.filter == "item" then
+            filter_guis.fluid.elem_value = nil
+        elseif action.filter == "fluid" then
+            filter_guis.item.elem_value = nil
+        end
+        refresh(action.gui_id)
+    end
+    if action.action == "clear-filter" then
+        local train_log_gui = global.guis[action.gui_id]
+        local filter_guis = train_log_gui.gui.filter
+        filter_guis.station_name.text = ""
+        filter_guis.item.elem_value = nil
+        filter_guis.fluid.elem_value = nil
+        refresh(action.gui_id)
+    end
+end
 
 local function create_toolbar(gui_id)
     return {
@@ -55,8 +50,8 @@ local function create_toolbar(gui_id)
                     },
                     {
                         type = "drop-down",
-                        items = tables.map(time_period_items, function(v) return {v.text} end),
-                        selected_index = time_period_default_index,
+                        items = time_filter.time_period_items,
+                        selected_index = time_filter.default_index,
                         ref = { "filter", "time_period" },
                         actions = {
                             on_gui_selection_state_changed = { type = "toolbar", action = "refresh", gui_id = gui_id }
@@ -75,7 +70,7 @@ local function create_toolbar(gui_id)
                         style = "red_button",
                         caption = { "train-log.clear-older" },
                         actions = {
-                            on_click = { type = "toolbar", action = "clear" }
+                            on_click = { type = "toolbar", action = "clear-older" }
                         }
                     }
                 }
@@ -97,7 +92,10 @@ local function create_toolbar(gui_id)
                                 tooltip = { "train-log.filter-station-name" },
                                 ref = { "filter", "station_name" },
                                 actions = {
-                                    on_gui_text_changed = { type = "toolbar", action = "apply-filter", gui_id = gui_id }
+                                    on_gui_text_changed = {
+                                        type = "toolbar", action = "apply-filter", gui_id = gui_id,
+                                        filter = "station_name"
+                                    }
                                 }
                             }
                         }
@@ -107,16 +105,24 @@ local function create_toolbar(gui_id)
                         direction = "horizontal",
                         children = {
                             {
+                                type = "label",
+                                caption = { "train-log.filter-item-label" }
+                            },
+                            {
                                 type = "choose-elem-button",
                                 elem_type = "item",
                                 tooltip = { "train-log.filter-item-tooltip" },
                                 ref = { "filter", "item" },
                                 actions = {
-                                    on_gui_selection_state_changed = {
+                                    on_gui_elem_changed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
                                         filter = "item"
                                     }
                                 }
+                            },
+                            {
+                                type = "label",
+                                caption = { "train-log.filter-or-fluid-label" }
                             },
                             {
                                 type = "choose-elem-button",
@@ -124,15 +130,15 @@ local function create_toolbar(gui_id)
                                 tooltip = { "train-log.filter-fluid-tooltip" },
                                 ref = { "filter", "fluid" },
                                 actions = {
-                                    on_gui_selection_state_changed = {
+                                    on_gui_elem_changed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
                                         filter = "fluid"
                                     }
                                 }
                             },
                             {
-                                type = "sprite-button",
-                                sprite = "train_log_backspace",
+                                type = "button",
+                                caption = { "train-log.filter-clear" },
                                 tooltip = { "train-log.filter-clear" },
                                 actions = {
                                     on_click = { type = "toolbar", action = "clear-filter", gui_id = gui_id }
