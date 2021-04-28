@@ -1,6 +1,7 @@
 local tables = require("__flib__.table")
 local misc = require("__flib__.misc")
 local gui = require("__flib__.gui-beta")
+local trains = require("__flib__.train")
 
 local function handle_action(action, event)
     local player = game.players[event.player_index]
@@ -134,7 +135,8 @@ local function events_row(train_data, index, children)
         if event.position then
             table.insert(event_children, {
                 type = "sprite-button",
-                sprite = "virtual-signal/signal-dot",
+                sprite = "train_log_crosshairs-gps",
+--                sprite = "virtual-signal/signal-dot",
                 tooltip = { "train-log.temporary-stop-at", event.position.x, event.position.y },
                 actions = {
                     on_click = { type = "table", action = "position", position = event.position }
@@ -228,7 +230,8 @@ local function create_events_table(gui_id)
             type = "scroll-pane",
             style = "flib_naked_scroll_pane_no_padding",
             ref = { "scroll_pane" },
-            style_mods = {height = 400},
+            vertical_scroll_policy = "always",
+            style_mods = {width = 600, height = 400},
             children = {
                 {
                     type = "table",

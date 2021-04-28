@@ -10,6 +10,7 @@ function create_sprite_icon(name)
 end
 
 data:extend {
+  create_sprite_icon("crosshairs-gps"),
   create_sprite_icon("train"),
   create_sprite_icon("timer-outline")
 }
