@@ -100,7 +100,7 @@ local function events_row(train_data, index, children)
         }
     end
 
-    local last_change = train_data.started_at
+    local last_change = train_data.last_change
     local timestamp = {
         type = "label",
         caption = misc.ticks_to_timestring(last_change, true)
