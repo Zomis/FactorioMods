@@ -19,7 +19,8 @@ local function header(gui_id)
             {type = "label", style = "frame_title", caption = {"train-log.header"}, ignored_by_interaction = true},
             {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
             {
-                type = "sprite-button",
+                type = "button",
+                caption = "x",
                 style = "frame_action_button",
                 actions = {
                     on_click = { type = "generic", action = "close-window", gui_id = gui_id },

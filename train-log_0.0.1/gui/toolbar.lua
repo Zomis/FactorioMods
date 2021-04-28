@@ -1,6 +1,7 @@
 local events_table = require("gui/events_table")
 local tables = require("__flib__.table")
 local time_filter = require("filter-time")
+local train_log = require("train_log")
 
 local function refresh(gui_id)
     events_table.create_events_table(gui_id)
@@ -9,7 +10,12 @@ end
 
 local function handle_action(action, event)
     if action.action == "clear-older" then
-        -- loop through datas, remove if: older than time frame AND belonging to current force
+        local train_log_gui = global.guis[action.gui_id]
+        local older_than = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
+        local player = game.players[event.player_index]
+        local force = player.force
+        train_log.clear_older(event.player_index, older_than)
+        force.print { "train-log.player-cleared-history", player.name }
     end
     if action.action == "refresh" then
         refresh(action.gui_id)
@@ -70,7 +76,7 @@ local function create_toolbar(gui_id)
                         style = "red_button",
                         caption = { "train-log.clear-older" },
                         actions = {
-                            on_click = { type = "toolbar", action = "clear-older" }
+                            on_click = { type = "toolbar", action = "clear-older", gui_id = gui_id }
                         }
                     }
                 }

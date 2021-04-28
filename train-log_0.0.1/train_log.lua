@@ -1,6 +1,13 @@
 local events = require("__flib__.event")
+local tables = require("__flib__.table")
 
--- TODO: Auto-delete events after 6h or so?
+local function clear_older(player_index, older_than)
+    -- TODO: Auto-delete events after 6h or so?
+    local force_index = game.players[player_index].force.index
+    global.history = tables.filter(global.history, function(v)
+        return v.force_index ~= force_index or v.last_change >= older_than
+    end, true)
+end
 
 local function new_current(train)
     return {
@@ -143,5 +150,6 @@ events.on_train_changed_state(function(event)
 end)
 
 return {
+    clear_older = clear_older,
     get_logs = get_logs
 }
