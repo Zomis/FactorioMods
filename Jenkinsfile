@@ -90,6 +90,9 @@ node {
         if (file.path.startsWith('luacheck-')) {
             continue
         }
+        if (file.path.startsWith('deprecated')) {
+            continue
+        }
         println 'Scanning file ' + file.path
 
         def exitStatus = sh(script: './luacheck-' + LUA_CHECK + '/bin/luacheck ' + file.path + ' > build_out.txt',
