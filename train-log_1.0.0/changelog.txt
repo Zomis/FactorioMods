@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2021-05-01
+  Features:
+    - Add summary tab showing most visited stations and most common loaded items/fluids
+    - Add button inside the mod-gui flow
+    - Auto-close GUI (allow having multiple open by holding Control or Shift)
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2021-05-01
+  Features:
+    - Read Train Logs for stations visited and items/fluids loaded and unloaded
+    - Filter Train Logs
