@@ -41,7 +41,30 @@ local function open_gui(player)
                 header(gui_id),
                 toolbar.create_toolbar(gui_id),
                 {
-                    type = "flow", direction = "vertical", ref = { "internal" }
+                    type = "tabbed-pane",
+                    ref = { "tabs", "pane" },
+                    children = {
+                        {
+                            type = "tab",
+                            caption = { "train-log.tab-events" },
+                            ref = { "tabs", "events" }
+                        },
+                        {
+                            type = "tab",
+                            caption = { "train-log.tab-summary" },
+                            ref = { "tabs", "summary" }
+                        },
+                        {
+                            type = "flow",
+                            direction = "vertical",
+                            ref = { "tabs", "events_contents" }
+                        },
+                        {
+                            type = "flow",
+                            direction = "vertical",
+                            ref = { "tabs", "summary_contents" }
+                        },
+                    }
                 },
             }
         }
@@ -54,6 +77,10 @@ local function open_gui(player)
     }
     train_log_gui.titlebar.drag_target = train_log_gui.window
     train_log_gui.window.force_auto_center()
+    local tabs = train_log_gui.tabs
+    local tabbed_pane = tabs.pane
+    tabbed_pane.add_tab(tabs.events, tabs.events_contents)
+    tabbed_pane.add_tab(tabs.summary, tabs.summary_contents)
 
     events_table.create_events_table(gui_id)
 end

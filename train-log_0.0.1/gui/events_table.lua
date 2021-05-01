@@ -3,6 +3,7 @@ local misc = require("__flib__.misc")
 local gui = require("__flib__.gui-beta")
 local trains = require("__flib__.train")
 local time_filter = require("filter-time")
+local summary_gui = require("gui/summary")
 
 local function handle_action(action, event)
     if action.action == "open-train" then
@@ -81,7 +82,7 @@ local function signal_for_entity(entity)
     return empty_signal
 end
 
-local function events_row(train_data, children)
+local function events_row(train_data, children, summary)
     if train_data.train.valid and train_data.train.front_stock.valid then
         local prototype = train_data.train.front_stock.prototype
         train_icon = {
@@ -111,12 +112,14 @@ local function events_row(train_data, children)
     local event_children = {}
     for _, event in pairs(train_data.events) do
         local delay = event.tick - last_change
+        --[[
         local delay_button = {
             type = "sprite-button",
             sprite = "train_log_timer-outline",
             tooltip = misc.ticks_to_timestring(last_change, true)
         }
-        -- table.insert(event_children, delay_button)
+        table.insert(event_children, delay_button)
+        ]]--
         if event.state and false then
             table.insert(event_children, sprite_button_for_state(event.state))
         end
@@ -136,6 +139,7 @@ local function events_row(train_data, children)
         end
 
         if event.station then
+            summary_gui.add_station_stop(event, summary)
             if event.station.valid then
                 table.insert(event_children, {
                     type = "sprite-button",
@@ -179,6 +183,7 @@ local function events_row(train_data, children)
             end
         end
         if event.diff then
+            summary_gui.add_diff(event, summary)
             for name, count in pairs(event.diff.items) do
                 local color = count > 0 and "green" or "red"
                 table.insert(event_children, sprite_button_type_name_amount("item", name, count, color))
@@ -245,6 +250,7 @@ end
 
 local function create_result_guis(results, filters, columns)
     local children = {}
+    local summary = summary_gui.create_new_summary()
     for _, column in pairs(columns) do
         table.insert(children, {
             type = "label",
@@ -253,10 +259,10 @@ local function create_result_guis(results, filters, columns)
     end
     for _, result in iterate_backwards(results) do
         if matches_filter(result, filters) then
-            events_row(result, children)
+            events_row(result, children, summary)
         end
     end
-    return children
+    return children, summary
 end
 
 local function create_events_table(gui_id)
@@ -285,10 +291,29 @@ local function create_events_table(gui_id)
         time_period = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
     }
 
-    local children_guis = create_result_guis(histories, filters, { "train", "timestamp", "events" })
-    train_log_gui.gui.internal.clear()
+    local children_guis, summary = create_result_guis(histories, filters, { "train", "timestamp", "events" })
+    local tabs = train_log_gui.gui.tabs
+    tabs.events_contents.clear()
+    tabs.summary_contents.clear()
 
-    return gui.build(train_log_gui.gui.internal, {
+    gui.build(tabs.summary_contents, {
+        {
+            type = "scroll-pane",
+            style = "flib_naked_scroll_pane_no_padding",
+            ref = { "scroll_pane" },
+            vertical_scroll_policy = "always",
+            style_mods = {width = 650, height = 400, padding = 6},
+            children = {
+                {
+                    type = "flow",
+                    direction = "vertical",
+                    children = summary_gui.create_gui(summary)
+                }
+            }
+        }
+    })
+
+    return gui.build(tabs.events_contents, {
         {
             type = "scroll-pane",
             style = "flib_naked_scroll_pane_no_padding",
