@@ -196,6 +196,11 @@ local function events_row(train_data, children, summary)
         last_change = event.tick
     end
 
+    if not next(event_children) then
+        -- no events to display, no need to show row
+        return
+    end
+
     local event_flow = {
         type = "flow",
         direction = "horizontal",
