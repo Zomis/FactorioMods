@@ -134,17 +134,7 @@ local function events_row(train_data, children)
                 })
             end
         end
-        if event.position then
-            table.insert(event_children, {
-                type = "sprite-button",
-                sprite = "train_log_crosshairs-gps",
---                sprite = "virtual-signal/signal-dot",
-                tooltip = { "train-log.temporary-stop-at", event.position.x, event.position.y },
-                actions = {
-                    on_click = { type = "table", action = "position", position = event.position }
-                }
-            })
-        end
+
         if event.station then
             if event.station.valid then
                 table.insert(event_children, {
@@ -165,7 +155,17 @@ local function events_row(train_data, children)
                     }
                 })
             end
+        elseif event.position then
+            table.insert(event_children, {
+                type = "sprite-button",
+                sprite = "train_log_crosshairs-gps",
+                tooltip = { "train-log.temporary-stop-at", event.position.x, event.position.y },
+                actions = {
+                    on_click = { type = "table", action = "position", position = event.position }
+                }
+            })
         end
+
         if event.contents and false then -- This is not stored in any log event, just temporarily in train_data
             if event.contents.items then
                 for name, count in pairs(event.contents.items) do
