@@ -1,6 +1,6 @@
 local events = require("__flib__.event")
 local migration = require("__flib__.migration")
-local mod_gui_button = require("gui/mod_gui/button")
+local mod_gui_button = require("gui/mod_gui_button")
 
 local migrations = {
     ["1.0.0"] = function()
