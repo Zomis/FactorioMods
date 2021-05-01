@@ -3,14 +3,6 @@ local gui = require("__flib__.gui-beta")
 local toolbar = require("gui/toolbar")
 local events_table = require("gui/events_table")
 
-local function handle_action(action)
-    if action.action == "close-window" then
-        local train_log_gui = global.guis[action.gui_id]
-        train_log_gui.gui.window.destroy()
-        global.guis[action.gui_id] = nil
-    end
-end
-
 local function header(gui_id)
     return {
         type = "flow",
@@ -83,6 +75,18 @@ local function open_gui(player)
     tabbed_pane.add_tab(tabs.summary, tabs.summary_contents)
 
     events_table.create_events_table(gui_id)
+end
+
+local function handle_action(action, event)
+    if action.action == "close-window" then
+        local train_log_gui = global.guis[action.gui_id]
+        train_log_gui.gui.window.destroy()
+        global.guis[action.gui_id] = nil
+    end
+    if action.action == "open-train-log" then
+        local player = game.players[event.player_index]
+        open_gui(player)
+    end
 end
 
 gui.hook_events(function(event)
