@@ -53,3 +53,5 @@ luac.out
 mod-settings\.json
 
 *.höllenmodpack
+
+.vscode/
