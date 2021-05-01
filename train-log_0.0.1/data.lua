@@ -1,4 +1,4 @@
-function create_sprite_icon(name, size)
+local function create_sprite_icon(name, size)
   return {
     type = "sprite",
     name = "train_log_" .. name,

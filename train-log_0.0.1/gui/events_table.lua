@@ -1,4 +1,3 @@
-local tables = require("__flib__.table")
 local misc = require("__flib__.misc")
 local gui = require("__flib__.gui-beta")
 local trains = require("__flib__.train")
@@ -63,7 +62,7 @@ local function sprite_button_for_state(state)
     end
     return {
         type = "sprite-button",
-        style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
+        style = "flib_slot_button_default",
         sprite = "item/iron-plate",
         number = state,
         tooltip = description
@@ -75,7 +74,7 @@ local function signal_for_entity(entity)
     if not entity then return empty_signal end
     if not entity.valid then return empty_signal end
 
-    k, v = next(entity.prototype.items_to_place_this)
+    local k, v = next(entity.prototype.items_to_place_this)
     if k then
         return { type = "item", name = v.name }
     end
@@ -83,6 +82,7 @@ local function signal_for_entity(entity)
 end
 
 local function events_row(train_data, children, summary)
+    local train_icon
     if train_data.train.valid and train_data.train.front_stock.valid then
         local prototype = train_data.train.front_stock.prototype
         train_icon = {
@@ -111,8 +111,8 @@ local function events_row(train_data, children, summary)
 
     local event_children = {}
     for _, event in pairs(train_data.events) do
-        local delay = event.tick - last_change
         --[[
+        local delay = event.tick - last_change
         local delay_button = {
             type = "sprite-button",
             sprite = "train_log_timer-outline",

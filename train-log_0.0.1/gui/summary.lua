@@ -4,8 +4,8 @@ local function flat_map(tbl, mapper)
     local output = {}
     for k, v in pairs(tbl) do
         local result = mapper(v, k)
-        for _, v in pairs(result) do
-            table.insert(output, v)
+        for _, item in pairs(result) do
+            table.insert(output, item)
         end
     end
     return output
@@ -60,7 +60,7 @@ local function create_gui(summary)
     table.sort(items, function(a, b) return a.loaded > b.loaded end)
     table.sort(fluids, function(a, b) return a.loaded > b.loaded end)
 
-    _, stations_top = tables.for_n_of(stations, nil, 10, function(station)
+    local _, stations_top = tables.for_n_of(stations, nil, 10, function(station)
         return {
             icon = {
                 type = "sprite-button",
@@ -80,7 +80,7 @@ local function create_gui(summary)
         }
     end)
 
-    _, items_top = tables.for_n_of(items, nil, 30, function(item)
+    local _, items_top = tables.for_n_of(items, nil, 30, function(item)
         return {
             type = "sprite-button",
             sprite = "item/" .. item.name,
@@ -89,7 +89,7 @@ local function create_gui(summary)
         }
     end)
 
-    _, fluids_top = tables.for_n_of(fluids, nil, 30, function(fluid)
+    local _, fluids_top = tables.for_n_of(fluids, nil, 30, function(fluid)
         return {
             type = "sprite-button",
             sprite = "fluid/" .. fluid.name,

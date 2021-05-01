@@ -1,5 +1,4 @@
 local events_table = require("gui/events_table")
-local tables = require("__flib__.table")
 local time_filter = require("filter-time")
 local train_log = require("train_log")
 

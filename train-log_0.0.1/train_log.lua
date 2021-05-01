@@ -37,7 +37,7 @@ local function diff(old_values, new_values)
     return result
 end
 
-local function train_data(train, train_id)
+local function get_train_data(train, train_id)
     if not global.trains[train_id] then
         global.trains[train_id] = new_current(train)
     end
@@ -64,7 +64,7 @@ end
 events.on_train_schedule_changed(function(event)
     local train = event.train
     local train_id = train.id
-    local train_data = train_data(train, train_id)
+    local train_data = get_train_data(train, train_id)
     add_log(train_data, {
         tick = game.tick,
         schedule = train.schedule,

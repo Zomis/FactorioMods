@@ -1,4 +1,3 @@
-local events = require("__flib__.event")
 local gui = require("__flib__.gui-beta")
 local toolbar = require("gui/toolbar")
 local events_table = require("gui/events_table")
