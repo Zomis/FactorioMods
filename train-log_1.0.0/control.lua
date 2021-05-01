@@ -12,5 +12,5 @@ events.on_init(function()
 end)
 
 events.register("train-log-open", function(event)
-	train_log_gui.open(game.players[event.player_index])
+	train_log_gui.open_or_close_gui(game.players[event.player_index])
 end)

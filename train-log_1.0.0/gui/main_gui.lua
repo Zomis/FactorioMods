@@ -76,15 +76,38 @@ local function open_gui(player)
     events_table.create_events_table(gui_id)
 end
 
+local function destroy_gui(gui_id)
+    local train_log_gui = global.guis[gui_id]
+    train_log_gui.gui.window.destroy()
+    global.guis[gui_id] = nil
+end
+
+local function open_or_close_gui(player, always_open)
+    if always_open then
+        -- open a new gui either way
+        open_gui(player)
+        return
+    end
+
+    -- close existing gui if one is open
+    for gui_id, train_log_gui in pairs(global.guis) do
+        if train_log_gui.player == player then
+            destroy_gui(gui_id)
+            return
+        end
+    end
+
+    -- no existing gui for player, open a new gui
+    open_gui(player)
+end
+
 local function handle_action(action, event)
     if action.action == "close-window" then
-        local train_log_gui = global.guis[action.gui_id]
-        train_log_gui.gui.window.destroy()
-        global.guis[action.gui_id] = nil
+        destroy_gui(action.gui_id)
     end
-    if action.action == "open-train-log" then
+    if action.action == "open-train-log" then -- mod-gui-button
         local player = game.players[event.player_index]
-        open_gui(player)
+        open_or_close_gui(player, event.control or event.shift)
     end
 end
 
@@ -102,5 +125,6 @@ gui.hook_events(function(event)
 end)
 
 return {
+    open_or_close_gui = open_or_close_gui,
     open = open_gui
 }
