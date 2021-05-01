@@ -93,7 +93,7 @@ end
 events.on_train_changed_state(function(event)
     local train = event.train
     local train_id = train.id
-    local train_data = train_data(train, train_id)
+    local train_data = get_train_data(train, train_id)
 
     local new_state = train.state
     local interesting_event = interesting_states[event.old_state] or interesting_states[new_state]

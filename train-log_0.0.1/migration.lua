@@ -1,3 +1,4 @@
+local events = require("__flib__.event")
 local migration = require("__flib__.migration")
 local mod_gui_button = require("gui/mod_gui/button")
 
@@ -11,7 +12,7 @@ local migrations = {
     end
 }
 
-event.on_configuration_changed(function(e)
+events.on_configuration_changed(function(e)
     -- this does return true or false, but we don't care about the result at this time.
     migration.on_config_changed(e, migrations)
 end)

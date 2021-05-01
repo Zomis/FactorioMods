@@ -193,7 +193,7 @@ local function events_row(train_data, children, summary)
                 table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, color))
             end
         end
-        last_change = event.tick
+        -- last_change = event.tick
     end
 
     if not next(event_children) then
