@@ -10,9 +10,11 @@ local function header(gui_id)
             {type = "label", style = "frame_title", caption = {"train-log.header"}, ignored_by_interaction = true},
             {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
             {
-                type = "button",
-                caption = "x",
+                type = "sprite-button",
                 style = "frame_action_button",
+                sprite = "utility/close_white",
+                hovered_sprite = "utility/close_black",
+                clicked_sprite = "utility/close_black",
                 actions = {
                     on_click = { type = "generic", action = "close-window", gui_id = gui_id },
                 }
