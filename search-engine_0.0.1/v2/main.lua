@@ -38,28 +38,28 @@ local function handle_action(msg, e)
 end
 
 gui.hook_events(function(e)
-	local msg = gui.read_action(e)
-	if msg then
-	  handle_action(msg, e)
-	end
+    local msg = gui.read_action(e)
+    if msg then
+        handle_action(msg, e)
+    end
 end)
 
 events.on_lua_shortcut(function(event)
-	if event.prototype_name == "search-engine" then
-		gui_step1.open_small_gui(game.players[event.player_index])
-	end
+    if event.prototype_name == "search-engine" then
+        gui_step1.open_small_gui(game.players[event.player_index])
+    end
 end)
 
 events.register("search-engine-open-search", function(event)
-	gui_step1.open_small_gui(game.players[event.player_index])
+    gui_step1.open_small_gui(game.players[event.player_index])
 end)
 
 events.on_tick(function (e) search.on_tick(e) end)
 
 events.on_configuration_changed(function(e)
-	if migration.on_config_changed(e, {}) then
-	  	for _, player in pairs(game.players) do
-			gui_generic.create_mod_gui_button(player)
+    if migration.on_config_changed(e, {}) then
+        for _, player in pairs(game.players) do
+            gui_generic.create_mod_gui_button(player)
         end
-	end
+    end
 end)
