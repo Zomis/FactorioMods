@@ -26,12 +26,14 @@ local function sprite_button_type_name_amount(type, name, amount, color)
     elseif type == "virtual-signal" then
         prototype = game.virtual_signal_prototypes[name]
     end
+    local sprite = prototype and (type .. "/" .. name) or nil
+    local tooltip = prototype and prototype.localised_name or (type .. "/" .. name)
     return {
         type = "sprite-button",
         style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
-        sprite = type .. "/" .. name,
+        sprite = sprite,
         number = amount,
-        tooltip = prototype.localised_name
+        tooltip = tooltip
     }
 end
 

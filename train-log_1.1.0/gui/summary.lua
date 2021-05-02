@@ -81,20 +81,26 @@ local function create_gui(summary)
     end)
 
     local _, items_top = tables.for_n_of(items, nil, 30, function(item)
+        local prototype = game.item_prototypes[item.name]
+        local sprite = prototype and ("item/" .. item.name) or nil
+        local tooltip = prototype and prototype.localised_name or ("item/" .. item.name)
         return {
             type = "sprite-button",
-            sprite = "item/" .. item.name,
+            sprite = sprite,
             number = item.loaded,
-            tooltip = game.item_prototypes[item.name].localised_name
+            tooltip = tooltip
         }
     end)
 
     local _, fluids_top = tables.for_n_of(fluids, nil, 30, function(fluid)
+        local prototype = game.fluid_prototypes[fluid.name]
+        local sprite = prototype and ("fluid/" .. fluid.name) or nil
+        local tooltip = prototype and prototype.localised_name or ("fluid/" .. fluid.name)
         return {
             type = "sprite-button",
-            sprite = "fluid/" .. fluid.name,
+            sprite = sprite,
             number = fluid.loaded,
-            tooltip = game.fluid_prototypes[fluid.name].localised_name
+            tooltip = tooltip
         }
     end)
 
