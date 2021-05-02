@@ -1,4 +1,4 @@
-function create_sprite_icon(name)
+local function create_sprite_icon(name)
   return {
     type = "sprite",
     name = "search_engine_" .. name,
