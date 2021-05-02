@@ -8,7 +8,7 @@ It's good to have a basic understanding about LTN before reading this.
 
 Many other issues you can experience when using LTN comes from the fact that your cargo/fluid wagons are not empty when they go back to the depot.
 
-A simple start to keep an eye on this is to connect an alarm using green/red wires to all your depot stations and have the stations read train contents. Then have it go off on the signal ANYTHING > 0.
+A good start to keep an eye on this is to connect a programmable speaker using a green or red wire to all your depot stations and have the stations read train contents. Then have the programmable speaker set to alert on the signal ANYTHING > 0, with global playback on high volume.
 
 (TODO: Write about how to disable depot exit if a train have had items in it)
 (TODO: Write about what to do if there is no power for the alarm: Disable entrance to depot)
