@@ -6,7 +6,7 @@ local function signal_for_entity(entity)
     local items = entity.prototype.items_to_place_this
     if not items then return empty_signal end
 
-    k, v = next(items)
+    local k, v = next(items)
     if k then
         return { type = "item", name = v.name }
     end
