@@ -79,6 +79,7 @@ node {
     def filesWithWarnings = 0
     def fileCount = 0
     def fileList = []
+    def ignoredCount = 0
 
     // Avoid some not-serializable problem by putting a non-serializable list in a serializable one
     for (file in luaFiles) {
@@ -91,6 +92,7 @@ node {
             continue
         }
         if (file.path.startsWith('deprecated')) {
+            ignoredCount++
             continue
         }
         println 'Scanning file ' + file.path
@@ -119,7 +121,7 @@ node {
     }
 
     stage('Report') {
-      def resultMessage = "Scanned $fileCount files. $totalWarnings warnings found in $filesWithWarnings files."
+      def resultMessage = "Scanned $fileCount files. Ignored an additional $ignoredCount files. $totalWarnings warnings found in $filesWithWarnings files."
       println resultMessage
 
       if (maxExitStatus > 1) {
