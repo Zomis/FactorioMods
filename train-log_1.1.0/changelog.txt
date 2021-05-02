@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2021-05-02
+  Features:
+    - Small GUI improvements
+  Bugfixes:
+    - Fix crashes when item or fluid prototypes no longer exist
+
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2021-05-01
   Features:
