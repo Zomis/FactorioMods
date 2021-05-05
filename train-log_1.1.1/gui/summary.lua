@@ -89,7 +89,10 @@ local function create_gui(summary, gui_id)
             sprite = sprite,
             number = item.loaded,
             actions = {
-                on_click = { type = "toolbar", action = "filter", filter = "item", value = item.name, gui_id = gui_id }
+                on_click = {
+                    type = "toolbar", action = "filter",
+                    filter = "item", value = item.name, gui_id = gui_id
+                }
             },
             tooltip = tooltip
         }
@@ -104,7 +107,10 @@ local function create_gui(summary, gui_id)
             sprite = sprite,
             number = fluid.loaded,
             actions = {
-                on_click = { type = "toolbar", action = "filter", filter = "fluid", value = fluid.name, gui_id = gui_id }
+                on_click = {
+                    type = "toolbar", action = "filter",
+                    filter = "fluid", value = fluid.name, gui_id = gui_id
+                }
             },
             tooltip = tooltip
         }

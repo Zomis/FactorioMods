@@ -10,7 +10,6 @@ end
 local function handle_action(action, event)
     local train_log_gui = global.guis[action.gui_id]
     if action.action == "clear-older" then
-        local train_log_gui = global.guis[action.gui_id]
         local older_than = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
         local player = game.players[event.player_index]
         local force = player.force
@@ -32,7 +31,6 @@ local function handle_action(action, event)
         end
     end
     if action.action == "apply-filter" then
-        local train_log_gui = global.guis[action.gui_id]
         local filter_guis = train_log_gui.gui.filter
 
         if action.filter == "item" then
@@ -43,7 +41,6 @@ local function handle_action(action, event)
         refresh(action.gui_id)
     end
     if action.action == "clear-filter" then
-        local train_log_gui = global.guis[action.gui_id]
         local filter_guis = train_log_gui.gui.filter
         filter_guis.station_name.text = ""
         filter_guis.item.elem_value = nil
