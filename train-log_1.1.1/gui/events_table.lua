@@ -17,7 +17,7 @@ local function handle_action(action, event)
     end
 end
 
-local function sprite_button_type_name_amount(type, name, amount, color)
+local function sprite_button_type_name_amount(type, name, amount, color, gui_id)
     local prototype = nil
     if type == "item" then
         prototype = game.item_prototypes[name]
@@ -33,6 +33,9 @@ local function sprite_button_type_name_amount(type, name, amount, color)
         style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
         sprite = sprite,
         number = amount,
+        actions = {
+            on_click = { type = "toolbar", action = "filter", filter = type, value = name, gui_id = gui_id }
+        },
         tooltip = tooltip
     }
 end
@@ -83,7 +86,7 @@ local function signal_for_entity(entity)
     return empty_signal
 end
 
-local function events_row(train_data, children, summary)
+local function events_row(train_data, children, summary, gui_id)
     local train_icon
     if train_data.train.valid and train_data.train.front_stock.valid then
         local prototype = train_data.train.front_stock.prototype
@@ -175,12 +178,12 @@ local function events_row(train_data, children, summary)
         if event.contents and false then -- This is not stored in any log event, just temporarily in train_data
             if event.contents.items then
                 for name, count in pairs(event.contents.items) do
-                    table.insert(event_children, sprite_button_type_name_amount("item", name, count))
+                    table.insert(event_children, sprite_button_type_name_amount("item", name, count, nil, gui_id))
                 end
             end
             if event.contents.fluids then
                 for name, count in pairs(event.contents.fluids) do
-                    table.insert(event_children, sprite_button_type_name_amount("fluid", name, count))
+                    table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, nil, gui_id))
                 end
             end
         end
@@ -188,11 +191,11 @@ local function events_row(train_data, children, summary)
             summary_gui.add_diff(event, summary)
             for name, count in pairs(event.diff.items) do
                 local color = count > 0 and "green" or "red"
-                table.insert(event_children, sprite_button_type_name_amount("item", name, count, color))
+                table.insert(event_children, sprite_button_type_name_amount("item", name, count, color, gui_id))
             end
             for name, count in pairs(event.diff.fluids) do
                 local color = count > 0 and "green" or "red"
-                table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, color))
+                table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, color, gui_id))
             end
         end
         -- last_change = event.tick
@@ -255,7 +258,7 @@ local function iterate_backwards(tbl)
     return iterate_backwards_iterator, tbl, table_size(tbl) + 1
 end
 
-local function create_result_guis(results, filters, columns)
+local function create_result_guis(results, filters, columns, gui_id)
     local children = {}
     local summary = summary_gui.create_new_summary()
     for _, column in pairs(columns) do
@@ -266,7 +269,7 @@ local function create_result_guis(results, filters, columns)
     end
     for _, result in iterate_backwards(results) do
         if matches_filter(result, filters) then
-            events_row(result, children, summary)
+            events_row(result, children, summary, gui_id)
         end
     end
     return children, summary
@@ -298,7 +301,7 @@ local function create_events_table(gui_id)
         time_period = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
     }
 
-    local children_guis, summary = create_result_guis(histories, filters, { "train", "timestamp", "events" })
+    local children_guis, summary = create_result_guis(histories, filters, { "train", "timestamp", "events" }, gui_id)
     local tabs = train_log_gui.gui.tabs
     tabs.events_contents.clear()
     tabs.summary_contents.clear()
@@ -314,7 +317,7 @@ local function create_events_table(gui_id)
                 {
                     type = "flow",
                     direction = "vertical",
-                    children = summary_gui.create_gui(summary)
+                    children = summary_gui.create_gui(summary, gui_id)
                 }
             }
         }

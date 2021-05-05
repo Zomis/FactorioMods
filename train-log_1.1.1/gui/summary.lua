@@ -51,7 +51,7 @@ local function add_station_stop(event, summary)
     end
 end
 
-local function create_gui(summary)
+local function create_gui(summary, gui_id)
     local stations = tables.filter(summary.stations, function() return true end, true)
     local items = tables.filter(summary.items, function() return true end, true)
     local fluids = tables.filter(summary.fluids, function() return true end, true)
@@ -88,6 +88,9 @@ local function create_gui(summary)
             type = "sprite-button",
             sprite = sprite,
             number = item.loaded,
+            actions = {
+                on_click = { type = "toolbar", action = "filter", filter = "item", value = item.name, gui_id = gui_id }
+            },
             tooltip = tooltip
         }
     end)
@@ -100,6 +103,9 @@ local function create_gui(summary)
             type = "sprite-button",
             sprite = sprite,
             number = fluid.loaded,
+            actions = {
+                on_click = { type = "toolbar", action = "filter", filter = "fluid", value = fluid.name, gui_id = gui_id }
+            },
             tooltip = tooltip
         }
     end)

@@ -8,6 +8,7 @@ local function refresh(gui_id)
 end
 
 local function handle_action(action, event)
+    local train_log_gui = global.guis[action.gui_id]
     if action.action == "clear-older" then
         local train_log_gui = global.guis[action.gui_id]
         local older_than = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
@@ -18,6 +19,17 @@ local function handle_action(action, event)
     end
     if action.action == "refresh" then
         refresh(action.gui_id)
+    end
+    if action.action == "filter" then
+        local filter = action.filter
+        if filter == "item" and game.item_prototypes[action.value] then
+            train_log_gui.gui.filter.item.elem_value = action.value
+            action.action = "apply-filter"
+        end
+        if filter == "fluid" and game.fluid_prototypes[action.value] then
+            train_log_gui.gui.filter.fluid.elem_value = action.value
+            action.action = "apply-filter"
+        end
     end
     if action.action == "apply-filter" then
         local train_log_gui = global.guis[action.gui_id]
