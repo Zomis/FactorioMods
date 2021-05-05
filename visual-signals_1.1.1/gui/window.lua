@@ -41,10 +41,16 @@ local function create_window(player, display_guis)
         }
     })
     gui_result.titlebar.drag_target = gui_result.window
-    gui_result.window.force_auto_center()
     global.guis[gui_id] = { player = player, gui = gui_result }
 end
-  
+
+local function destroy(gui_id)
+    local player_gui = global.guis[gui_id]
+    player_gui.gui.window.destroy()
+    global.guis[gui_id] = nil
+end
+
 return {
-    create_window = create_window
+    create_window = create_window,
+    destroy = destroy
 }

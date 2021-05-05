@@ -56,15 +56,24 @@ local function update_slot_table(slot_table, circuit_network, i, delete)
 end
 
 local function update(visual_signal_key, visual_signal_gui)
-    local label = visual_signal_gui.label
     local slot_table = visual_signal_gui.slot_table
     local visual_signal_entry = global.visual_signals[visual_signal_key]
+
+    local label = visual_signal_gui.label
+    if label then
+        label.caption = visual_signal_entry.title
+    end
+
     local entity = visual_signal_entry.entity
+    if not entity.valid then
+        return false
+    end
     local circuit_red = entity.get_circuit_network(defines.wire_type.red)
     local circuit_green = entity.get_circuit_network(defines.wire_type.green)
     local i = update_slot_table(slot_table, circuit_red, 0)
     i = update_slot_table(slot_table, circuit_green, i)
     update_slot_table(slot_table, nil, i, true)
+    return true
 end
 
 local function for_display(visual_signal_key)
@@ -73,6 +82,7 @@ local function for_display(visual_signal_key)
     return {
         type = "flow",
         direction = "vertical",
+        ref = { "displays", visual_signal_key, "flow" },
         children = {
             {
                 type = "label",
@@ -103,7 +113,45 @@ local function for_display(visual_signal_key)
     }
 end
 
+local function editable_title(_, visual_signal_key)
+    local visual_signal_entry = global.visual_signals[visual_signal_key]
+    return {
+        type = "flow",
+        direction = "vertical",
+        children = {
+            {
+                type = "textfield",
+                text = visual_signal_entry.title,
+                actions = {
+                    on_text_changed = { type = "big-gui", action = "title-change", key = visual_signal_key }
+                }
+            },
+            {
+                type = "frame",
+                style = "slot_button_deep_frame",
+                children = {
+                    {
+                        type = "scroll-pane",
+                        style = "flib_naked_scroll_pane_no_padding",
+                        --style_mods = {height = 200},
+                        children = {
+                            {
+                                type = "table",
+                                style = "slot_table",
+                                -- style_mods = { width = 400 },
+                                column_count = 10,
+                                ref = { "displays", visual_signal_key, "slot_table" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+end
+
 return {
     for_display = for_display,
+    editable_title = editable_title,
     update = update
 }
