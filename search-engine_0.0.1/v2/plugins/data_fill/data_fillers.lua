@@ -46,6 +46,21 @@ local data_fillers = {
             end
         }
     },
+    products_finished = {
+        requires = { "entity" },
+        provides = {
+            products_finished = function(data)
+                local entity = data.entity
+                if not entity then return nil end
+                if not entity.valid then return nil end
+                local entity_type = entity.type
+                if entity.type == "assembling-machine" or entity.type == "furnace" then
+                    return entity.products_finished
+                end
+                return nil
+            end
+        }
+    },
     circuit_networks = {
         requires = { "entity" },
         provides = {

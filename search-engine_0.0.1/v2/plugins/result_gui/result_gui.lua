@@ -89,6 +89,18 @@ local result_gui = {
         },
     },
     machine_status = require("v2/plugins/result_gui/machine_status"),
+    products_finished = {
+        requires = { "products_finished" },
+        displays = {
+            products_finished = function(data)
+                if not data.products_finished then return empty_widget end
+                return {
+                    type = "label",
+                    caption = data.products_finished
+                }
+            end
+        }
+    },
     recipe = {
         requires = { "recipe" },
         displays = {

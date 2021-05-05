@@ -115,7 +115,7 @@ local function start_search(msg)
         loop_id = loop_id,
         loop_data = loop_data,
         loop_data_count = table_size(loop_data),
-        data_fillers = { "position", "circuit_networks", "recipe" }
+        data_fillers = { "position", "circuit_networks", "recipe", "products_finished" }
     }
     search.provides = determine_provides(search)
 end
