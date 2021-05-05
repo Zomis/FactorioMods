@@ -23,6 +23,13 @@ local function update_slot_table(slot_table, circuit_network, i, delete)
         return i
     end
     if circuit_network and circuit_network.valid then
+        local style = "flib_slot_button_default"
+        if circuit_network.wire_type == defines.wire_type.green then
+            style = "flib_slot_button_green"
+        elseif circuit_network.wire_type == defines.wire_type.red then
+            style = "flib_slot_button_red"
+        end
+
         for _, v in pairs(circuit_network.signals) do
             i = i + 1
             local type = v.signal.type
@@ -30,13 +37,14 @@ local function update_slot_table(slot_table, circuit_network, i, delete)
             local prototype = find_prototype(type, name)
             local child = children[i]
             if child then
+                child.style = style
                 child.sprite = type .. "/" .. name
                 child.number = v.count
                 child.tooltip = prototype.localised_name
             else
                 slot_table.add {
                     type = "sprite-button",
-                    style = "slot_button",
+                    style = style,
                     sprite = type .. "/" .. name,
                     number = v.count,
                     tooltip = prototype.localised_name
