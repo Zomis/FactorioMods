@@ -34,14 +34,8 @@ local function create_window(player, display_guis)
                     }
                 },
                 {
-                    type = "frame", style = "inside_shallow_frame_with_padding", style_mods = {padding = 12},
-                    children = {
-                        {
-                            type = "flow",
-                            direction = "vertical",
-                            children = display_guis
-                        }
-                    }
+                    type = "flow", direction = "vertical",
+                    children = display_guis
                 }
             }
         }
