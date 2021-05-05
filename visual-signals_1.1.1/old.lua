@@ -79,39 +79,6 @@ local function onInit()
   combinatorsToUI = global.fum_uic
 end
 
-local function onConfigurationChanged(data)
-  for _, player in pairs(game.players) do
-    if player.gui.top["visual_signals"] then
-      player.gui.top["visual_signals"].style = "slot_button"
-    end
-
-    local pane = player.gui.left
-    if pane["gui_signal_display"] then
-      local parent = pane["gui_signal_display"]["gui_signal_panel"]
-      for _, element_name in ipairs(parent.children_names) do
-        -- 0.16 changed the style name to "slot_button"
-        local panel = parent[element_name]
-        if panel.signals then
-          for _, el in ipairs(panel.signals.children_names) do
-            local signalElement = panel.signals[el].icon
-            if signalElement.type == "sprite-button" then
-              signalElement.style = "slot_button"
-            end
-          end
-        end
-
-        -- Migration code to fix #27 in version 0.15.6
-        if string.find(element_name, "label") then
-          local key = string.sub(element_name, 6)
-          if not parent["panel" .. key] then
-            parent["label" .. key].destroy()
-          end
-        end
-      end
-    end
-  end
-end
-
 local function onLoad()
   combinatorsToUI = global.fum_uic
 end
@@ -328,7 +295,6 @@ local function onGuiOpened(event)
 end
 
 script.on_init(onInit)
-script.on_configuration_changed(onConfigurationChanged)
 script.on_load(onLoad)
 
 script.on_event(defines.events.on_gui_opened, onGuiOpened)
