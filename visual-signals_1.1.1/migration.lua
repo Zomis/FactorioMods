@@ -1,6 +1,8 @@
 local event = require("__flib__.event")
 local migration = require("__flib__.migration")
-local gui2 = require("gui2")
+local window_gui = require("gui/window")
+local display_gui = require("gui/display")
+local big_gui = require("gui/big_gui")
 
 local function migrate_global()
     local old_global = global.fum_uic
@@ -37,27 +39,27 @@ local migrations = {
         
             local pane = player.gui.left
             if pane["gui_signal_display"] then
-              local parent = pane["gui_signal_display"]["gui_signal_panel"]
-              for _, element_name in ipairs(parent.children_names) do
-                -- 0.16 changed the style name to "slot_button"
-                local panel = parent[element_name]
-                if panel.signals then
-                  for _, el in ipairs(panel.signals.children_names) do
-                    local signalElement = panel.signals[el].icon
-                    if signalElement.type == "sprite-button" then
-                      signalElement.style = "slot_button"
+                local parent = pane["gui_signal_display"]["gui_signal_panel"]
+                for _, element_name in ipairs(parent.children_names) do
+                    -- 0.16 changed the style name to "slot_button"
+                    local panel = parent[element_name]
+                    if panel.signals then
+                        for _, el in ipairs(panel.signals.children_names) do
+                            local signalElement = panel.signals[el].icon
+                            if signalElement.type == "sprite-button" then
+                                signalElement.style = "slot_button"
+                            end
+                        end
                     end
-                  end
-                end
         
-                -- Migration code to fix #27 in version 0.15.6
-                if string.find(element_name, "label") then
-                  local key = string.sub(element_name, 6)
-                  if not parent["panel" .. key] then
-                    parent["label" .. key].destroy()
-                  end
+                    -- Migration code to fix #27 in version 0.15.6
+                    if string.find(element_name, "label") then
+                    local key = string.sub(element_name, 6)
+                        if not parent["panel" .. key] then
+                            parent["label" .. key].destroy()
+                        end
+                    end
                 end
-              end
             end
         end
     end,
@@ -69,7 +71,7 @@ local migrations = {
         for _, player in pairs(game.players) do
             if player.gui.top.visual_signals then
                 player.gui.top.visual_signals.destroy()
-                gui2.add_mod_gui_button(player)
+                big_gui.add_mod_gui_button(player)
             end
             local new_guis = {}
 
@@ -78,19 +80,18 @@ local migrations = {
                 if old.gui_signal_panel then
                     for _, diff in pairs(global_change) do
                         if old.gui_signal_panel["label" .. diff.old_key] then
-                            table.insert(new_guis, gui2.for_display(diff.new_key))
+                            table.insert(new_guis, display_gui.for_display(diff.new_key))
                         end
                     end
                 end
                 old.destroy()
-                gui2.create_gui(player, new_guis)
+                window_gui.create_window(player, new_guis)
             end
         end
     end
 }
 
 event.on_configuration_changed(function(e)
-    if migration.on_config_changed(e, migrations) then
-        -- this does return true or false, but we don't care about the result.
-    end
+    -- this does return true or false, but we don't care about the result.
+    migration.on_config_changed(e, migrations)
 end)
