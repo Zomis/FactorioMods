@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2021-05-06
+  Features:
+    - Player-specific setting to adjust time signals according to speed of machine, defaults to false for backwards-compatibility
+    - Add support for copy-pasting also from furnaces
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2020-11-28
   Features:
