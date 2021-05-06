@@ -38,3 +38,12 @@ data:extend({
         default_value = true
 	}
 })
+data:extend({
+	{
+		type = "bool-setting",
+		name = "copy-paste-recipe-time-includes-modules",
+		setting_type = "runtime-per-user",
+        order = "d",
+        default_value = false
+	}
+})

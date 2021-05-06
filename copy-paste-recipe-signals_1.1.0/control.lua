@@ -18,6 +18,7 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     local products_multiplier = player_settings["copy-paste-recipe-signals-product-multiplier"].value
     local add_ticks = player_settings["copy-paste-recipe-signals-include-ticks"].value
     local add_seconds = player_settings["copy-paste-recipe-signals-include-seconds"].value
+    local time_includes_modules = player_settings["copy-paste-recipe-time-includes-modules"].value
 
     local recipe = event.source.get_recipe()
     if not recipe then return end
@@ -47,11 +48,18 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
         })
       end
     end
+    local speed_adjustment = time_includes_modules and event.source.crafting_speed or 1
     if add_ticks then
-      table.insert(signals, { signal = { type = "virtual", name = "signal-T" }, count = recipe.energy * 60 })
+      table.insert(signals, {
+        signal = { type = "virtual", name = "signal-T" },
+        count = recipe.energy * 60 / speed_adjustment
+      })
     end
     if add_seconds then
-      table.insert(signals, { signal = { type = "virtual", name = "signal-S" }, count = recipe.energy })
+      table.insert(signals, {
+        signal = { type = "virtual", name = "signal-S" },
+        count = recipe.energy / speed_adjustment
+      })
     end
 
     for index, signal in pairs(signals) do
