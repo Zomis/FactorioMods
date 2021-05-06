@@ -12,7 +12,10 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
   if event.destination.valid and event.destination.name ~= "constant-combinator" then
     return
   end
-  if event.source.valid and event.source.prototype.type == "assembling-machine" then
+  if not event.source.valid then
+    return
+  end
+  if event.source.prototype.type == "assembling-machine" or event.source.prototype.type == "furnace" then
     local player_settings = settings.get_player_settings(event.player_index)
     local ingredients_multiplier = player_settings["copy-paste-recipe-signals-ingredient-multiplier"].value
     local products_multiplier = player_settings["copy-paste-recipe-signals-product-multiplier"].value
@@ -21,6 +24,9 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     local time_includes_modules = player_settings["copy-paste-recipe-time-includes-modules"].value
 
     local recipe = event.source.get_recipe()
+    if not recipe and event.source.prototype.type == "furnace" then
+      recipe = event.source.previous_recipe
+    end
     if not recipe then return end
     local behavior = event.destination.get_or_create_control_behavior()
 
