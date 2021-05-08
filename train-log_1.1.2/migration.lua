@@ -9,6 +9,6 @@ local function add_mod_gui_buttons()
     end
 end
 
-events.on_configuration_changed(function(e)
+events.on_configuration_changed(function()
     add_mod_gui_buttons()
 end)
