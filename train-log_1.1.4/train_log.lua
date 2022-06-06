@@ -1,12 +1,18 @@
 local events = require("__flib__.event")
 local tables = require("__flib__.table")
+local MAX_KEEP = 60 * 60 * 60 * 24 -- ticks * seconds * minutes * hours
 
-local function clear_older(player_index, older_than)
-    -- TODO: Auto-delete events after 6h or so?
-    local force_index = game.players[player_index].force.index
+local function clear_older_force(force_index, older_than)
+    -- local old_size = table_size(global.history)
     global.history = tables.filter(global.history, function(v)
         return v.force_index ~= force_index or v.last_change >= older_than
     end, true)
+    -- game.print("Clear older " .. old_size .. " => " .. table_size(global.history) .. " for force " .. force_index)
+end
+
+local function clear_older(player_index, older_than)
+    local force_index = game.players[player_index].force.index
+    clear_older_force(force_index, older_than)
 end
 
 local function new_current(train)
@@ -58,7 +64,9 @@ end
 
 local function finish_current_log(train, train_id, train_data)
     table.insert(global.history, train_data)
-    global.trains[train_id] = new_current(train)
+    local new_data = new_current(train)
+    global.trains[train_id] = new_data
+    clear_older_force(new_data.force_index, game.tick - MAX_KEEP)
 end
 
 events.on_train_schedule_changed(function(event)
