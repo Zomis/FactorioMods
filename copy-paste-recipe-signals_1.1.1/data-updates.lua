@@ -1,13 +1,20 @@
-for _, entity_type in pairs(data.raw["assembling-machine"]) do
+local function make_pastable(entity_type)
     if not entity_type.additional_pastable_entities then
         entity_type.additional_pastable_entities = {}
     end
+
     table.insert(entity_type.additional_pastable_entities, "constant-combinator")
+
+    if mods["LTN_Combinator_Modernized"] then
+        table.insert(entity_type.additional_pastable_entities, "ltn-combinator")
+    end
+end
+
+
+for _, entity_type in pairs(data.raw["assembling-machine"]) do
+    make_pastable(entity_type)
 end
 
 for _, entity_type in pairs(data.raw["furnace"]) do
-    if not entity_type.additional_pastable_entities then
-        entity_type.additional_pastable_entities = {}
-    end
-    table.insert(entity_type.additional_pastable_entities, "constant-combinator")
+    make_pastable(entity_type)
 end

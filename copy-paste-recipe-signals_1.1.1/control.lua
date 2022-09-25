@@ -9,7 +9,8 @@ local function expected_amount(product)
 end
 
 script.on_event(defines.events.on_entity_settings_pasted, function(event)
-  if event.destination.valid and event.destination.name ~= "constant-combinator" then
+  if event.destination.valid and event.destination.name ~= "constant-combinator" and
+      event.destination.name ~= "ltn-combinator" then
     return
   end
   if not event.source.valid then
@@ -68,13 +69,21 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
       })
     end
 
+    -- The ltn-combinator has 28 signals, however the 14 first signals should
+    -- be used for LTN specific signals, we try to preserve these so LTN configurations is not lost
+    local signalsStartIndex = event.destination.name == "ltn-combinator" and (14) or 0
+
     for index, signal in pairs(signals) do
-      if behavior.signals_count >= index then
-        behavior.set_signal(index, signal)
+      local setIndex = (index + signalsStartIndex)
+      if behavior.signals_count >= setIndex then
+        behavior.set_signal(setIndex, signal)
+
       end
     end
 
-    for index = table_size(signals) + 1, behavior.signals_count do
+    local clearSignalsStartIndex = table_size(signals) + signalsStartIndex
+
+    for index = clearSignalsStartIndex + 1, behavior.signals_count do
       behavior.set_signal(index, nil)
     end
   end
