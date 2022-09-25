@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2022-09-25
+  Features:
+    - Allow pasting to LTN Combinator, LTN Combinator signals should be kept when pasting to an LTN combinator
+---------------------------------------------------------------------------------------------------
 Version: 1.1.1
 Date: 2021-05-06
   Features:
