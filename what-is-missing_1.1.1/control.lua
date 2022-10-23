@@ -531,7 +531,7 @@ local function perform(player)
         end
         for _, ent in pairs(machines[ROCKET_PART]) do
           -- check if rocket_silo_rocket inventory exists to avoid scanning if there is already a rocket
-            if ent.valid and ent.type == "rocket-silo" and ent.get_inventory(defines.inventory.rocket_silo_rocket) == nil then
+            if ent.valid and ent.type == "rocket-silo" and ent.get_inventory(defines.inventory.rocket_silo_rocket) == nil and ent.get_recipe() ~= nil then
                 -- local inv = game.player.selected.get_inventory(defines.inventory.rocket_silo_rocket); -- sattelite
                 local ingredients = ent.get_recipe().ingredients
                 local current = ent.get_inventory(defines.inventory.assembling_machine_input)
