@@ -47,19 +47,6 @@ end
 
 local function build_ui(groups)
     local results = {}
-    table.insert(results, {
-        type = "table",
-        column_count = 10,
-        children = tables.map(groups.entities, function(v)
-            return {
-                type = "sprite-button",
-                sprite = "entity/" .. v.name,
-                actions = {
-                    on_click = { action_type = "goto", type = "entity", entity = v, sprite = "entity/" .. v.name }
-                }
-            }
-        end)
-    })
     
     table.insert(results, {
         type = "label",
