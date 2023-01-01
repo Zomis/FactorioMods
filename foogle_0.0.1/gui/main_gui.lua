@@ -34,5 +34,7 @@ guis.hook_events(function(event)
         root.destroy()
     elseif action.type == "integration" then
         integrations.invoke(action.integration, game.players[event.player_index], action.info)
+        local root = find_root(event.element)
+        root.destroy()
     end
 end)
