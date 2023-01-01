@@ -53,7 +53,10 @@ local function build_ui(groups)
         children = tables.map(groups.entities, function(v)
             return {
                 type = "sprite-button",
-                sprite = "entity/" .. v.name
+                sprite = "entity/" .. v.name,
+                actions = {
+                    on_click = { action_type = "goto", type = "entity", entity = v, sprite = "entity/" .. v.name }
+                }
             }
         end)
     })
@@ -68,7 +71,10 @@ local function build_ui(groups)
         children = tables.filter(tables.map(groups.contents, function(_, k)
             return {
                 type = "sprite-button",
-                sprite = "item/" .. k
+                sprite = "item/" .. k,
+                actions = {
+                    on_click = { action_type = "goto", type = "item", name = k, sprite = "item/" .. k }
+                }
             }
         end), function() return true end, true)
     })
@@ -83,7 +89,10 @@ local function build_ui(groups)
         children = tables.filter(tables.map(groups.fluids, function(_, k)
             return {
                 type = "sprite-button",
-                sprite = "fluid/" .. k
+                sprite = "fluid/" .. k,
+                actions = {
+                    on_click = { action_type = "goto", type = "fluid", name = k, sprite = "fluid/" .. k }
+                }
             }
         end), function() return true end, true)
     })
@@ -107,7 +116,6 @@ local function show_entities(player, entities)
                 {
                     type = "scroll-pane",
                     style = "flib_naked_scroll_pane_no_padding",
-                    ref = { "scroll_pane" },
                     vertical_scroll_policy = "always",
                     style_mods = {width = 650, height = 400, padding = 6},
                     children = {

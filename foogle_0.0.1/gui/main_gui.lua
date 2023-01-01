@@ -1,4 +1,6 @@
 local guis = require("__flib__.gui")
+local single = require("gui/single")
+local integrations = require("integrations")
 
 local function find_root(element)
     if element.parent and not element.parent.parent then
@@ -24,6 +26,11 @@ guis.hook_events(function(event)
     end
     if action.type == "generic" then
         handle_action(action, event)
-    elseif action.type == "???" then
+    elseif action.action_type == "goto" then -- This event also passes another type parameter, therefore `action_type`
+        single.open(action, event)
+        local root = find_root(event.element)
+        root.destroy()
+    elseif action.type == "integration" then
+        integrations.invoke(action.integration, game.players[event.player_index], action.info)
     end
 end)
