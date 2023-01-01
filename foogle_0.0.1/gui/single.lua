@@ -8,6 +8,7 @@ local function open(action, event)
     local player = game.players[event.player_index]
     local info = action
     local integrations = integrations.find(info)
+    local sprite = action.sprite or (action.type .. "/" .. action.name)
     local gui = guis.build(player.gui.screen, {
         {
             type = "frame",
@@ -17,7 +18,7 @@ local function open(action, event)
                 header({ "foogle.title-single" }),
                 {
                     type = "sprite",
-                    sprite = action.sprite
+                    sprite = sprite
                 },
                 {
                     type = "scroll-pane",

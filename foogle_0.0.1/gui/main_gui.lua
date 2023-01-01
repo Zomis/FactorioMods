@@ -1,6 +1,7 @@
 local guis = require("__flib__.gui")
 local single = require("gui/single")
 local integrations = require("integrations")
+local auto_integration = require("auto_integration")
 
 local function find_root(element)
     if element.parent and not element.parent.parent then
@@ -22,6 +23,7 @@ end
 guis.hook_events(function(event)
 	local action = guis.read_action(event)
 	if not action then
+        auto_integration.on_event(event)
         return
     end
     if action.type == "generic" then
