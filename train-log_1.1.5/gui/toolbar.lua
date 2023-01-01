@@ -49,7 +49,15 @@ local function handle_action(action, event)
     end
 end
 
-local function create_toolbar(gui_id)
+local function create_toolbar(gui_id, parameter)
+    local filter_item = nil
+    local filter_fluid = nil
+    if parameter and parameter.type == "item" then
+        filter_item = parameter.name
+    end
+    if parameter and parameter.type == "fluid" then
+        filter_fluid = parameter.name
+    end
     return {
         type = "flow",
         direction = "vertical",
@@ -125,6 +133,7 @@ local function create_toolbar(gui_id)
                             {
                                 type = "choose-elem-button",
                                 elem_type = "item",
+                                item = filter_item,
                                 tooltip = { "train-log.filter-item-tooltip" },
                                 ref = { "filter", "item" },
                                 actions = {
@@ -141,6 +150,7 @@ local function create_toolbar(gui_id)
                             {
                                 type = "choose-elem-button",
                                 elem_type = "fluid",
+                                fluid = filter_fluid,
                                 tooltip = { "train-log.filter-fluid-tooltip" },
                                 ref = { "filter", "fluid" },
                                 actions = {

@@ -23,7 +23,7 @@ local function header(gui_id)
     }
 end
 
-local function open_gui(player)
+local function open_gui(player, parameter)
     local gui_id = "gui-" .. player.index .. "-" .. game.tick
     local gui_contents = {
         {
@@ -32,7 +32,7 @@ local function open_gui(player)
             ref = { "window" },
             children = {
                 header(gui_id),
-                toolbar.create_toolbar(gui_id),
+                toolbar.create_toolbar(gui_id, parameter),
                 {
                     type = "tabbed-pane",
                     ref = { "tabs", "pane" },
