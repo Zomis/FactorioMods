@@ -7,5 +7,5 @@
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://www.github.com/Zomis/FactorioMods",
   "description": "Keep a record of all train journeys, how much items are going where. Perfect for use with mods like LTN but also works great without other mods.",
-  "dependencies": ["flib >= 0.8.2", "? foogle"]
+  "dependencies": ["flib >= 0.8.2", "? foofle"]
 }

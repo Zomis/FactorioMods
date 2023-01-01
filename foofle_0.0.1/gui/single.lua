@@ -15,7 +15,7 @@ local function open(action, event)
             direction = "vertical",
             ref = { "window" },
             children = {
-                header({ "foogle.title-single" }),
+                header({ "foofle.title-single" }),
                 {
                     type = "sprite",
                     sprite = sprite

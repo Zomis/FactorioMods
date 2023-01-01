@@ -1,19 +1,19 @@
 data:extend {
     {
         type = 'custom-input',
-        name = 'foogle',
+        name = 'foofle',
         key_sequence = 'CONTROL + SHIFT + S',
         enabled_while_spectating = true,
     },
     {
         type = "shortcut",
-        name = "foogle",
-        localised_name = { "shortcut.foogle" },
+        name = "foofle",
+        localised_name = { "shortcut.foofle" },
         order = "a",
         action = "lua",
         style = "blue",
         icon = {
-            filename = "__foogle__/graphics/icons/icon.png",
+            filename = "__foofle__/graphics/icons/icon.png",
             flags = {
                 "icon"
             },
@@ -24,8 +24,8 @@ data:extend {
     },
     {
         type = "selection-tool",
-        name = "foogle",
-        icon = "__foogle__/graphics/icons/icon.png",
+        name = "foofle",
+        icon = "__foofle__/graphics/icons/icon.png",
         icon_size = 36,
         flags = {},
         subgroup = "tool",

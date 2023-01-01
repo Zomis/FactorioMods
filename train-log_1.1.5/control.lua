@@ -4,7 +4,7 @@ local train_log_gui = require("gui/main_gui")
 require("train_log")
 require("gui/mod_gui_button")
 require("migration")
-local foogle = require("foogle")
+local foofle = require("foofle")
 
 events.on_init(function()
     global.guis = {}
@@ -17,5 +17,5 @@ events.register("train-log-open", function(event)
 end)
 
 script.on_load(function()
-    foogle.on_load()
+    foofle.on_load()
 end)

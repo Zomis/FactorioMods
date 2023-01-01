@@ -4,14 +4,14 @@ remote.add_interface("train-log", {
     open_train_log = function(player, info)
         main_gui.open(player, info)
     end,
-    foogle_support = function(info)
+    foofle_support = function(info)
         return info.type == "fluid" or info.type == "item"
     end
 })
 
 local function on_load()
-    if remote.interfaces["foogle"] then
-        remote.call("foogle", "add_integration", "train-log", {
+    if remote.interfaces["foofle"] then
+        remote.call("foofle", "add_integration", "train-log", {
             button = {
                 type = "sprite-button",
                 name = "train_log",
@@ -19,7 +19,7 @@ local function on_load()
                 sprite = "train_log_train-36-white",
                 tooltip = { "train-log.mod-gui-tooltip" }
             },
-            supported_check = "foogle_support",
+            supported_check = "foofle_support",
             callback = "open_train_log"
         })
     end
