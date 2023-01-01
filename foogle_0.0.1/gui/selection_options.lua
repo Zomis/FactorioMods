@@ -62,22 +62,31 @@ local function build_ui(groups)
         type = "label",
         caption = "CONTENTS"
     })
-    for thing in pairs(groups.contents) do
-        table.insert(results, {
-            type = "sprite-button",
-            sprite = "item/" .. thing
-        })
-    end
+    table.insert(results, {
+        type = "table",
+        column_count = 10,
+        children = tables.filter(tables.map(groups.contents, function(_, k)
+            return {
+                type = "sprite-button",
+                sprite = "item/" .. k
+            }
+        end), function() return true end, true)
+    })
+
     table.insert(results, {
         type = "label",
         caption = "FLUIDS"
     })
-    for thing in pairs(groups.fluids) do
-        table.insert(results, {
-            type = "sprite-button",
-            sprite = "fluid/" .. thing
-        })
-    end
+    table.insert(results, {
+        type = "table",
+        column_count = 10,
+        children = tables.filter(tables.map(groups.fluids, function(_, k)
+            return {
+                type = "sprite-button",
+                sprite = "fluid/" .. k
+            }
+        end), function() return true end, true)
+    })
     return results
 end
 
