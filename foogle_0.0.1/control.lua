@@ -1,0 +1,27 @@
+local main_gui = require("gui/main_gui")
+local selector = require("selector")
+local events = require("__flib__.event")
+
+events.on_lua_shortcut(function(event)
+    -- Toolbar
+    if event.prototype_name == "foogle" then
+        selector.open(game.players[event.player_index])
+    end
+end)
+
+events.register("foogle", function(event)
+    -- Key shortcut
+    selector.open(game.players[event.player_index])
+end)
+
+remote.add_interface("foogle", {
+    open = function(query)
+
+    end,
+    auto_plugin = function(config)
+
+    end,
+    integrate = function(mod_name, func)
+
+    end
+})
