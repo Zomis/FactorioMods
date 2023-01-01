@@ -30,13 +30,11 @@ local function open(action, event)
                             type = "flow",
                             direction = "vertical",
                             children = tables.map(integrations, function(v)
-                                return {
-                                    type = "button",
-                                    caption = "HELLO WORLD " .. v.mod_name,
-                                    actions = {
-                                        on_click = { type = "integration", integration = v, player = player, info = info }
-                                    }
+                                local button = tables.deep_copy(v.button)
+                                button.actions = {
+                                    on_click = { type = "integration", integration = v, player = player, info = info }
                                 }
+                                return button
                             end)
                         },
                     }

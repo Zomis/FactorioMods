@@ -22,7 +22,13 @@ remote.add_interface("foogle", {
         if not settings.supported_check then
             error("settings must specify a supported_check function name")
         end
+        local button = settings.button or {
+            type = "button",
+            caption = mod_name
+        }
+        settings.button = nil
         table.insert(integrations, {
+            button = button,
             mod_name = mod_name,
             settings = settings,
         })
