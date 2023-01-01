@@ -23,8 +23,8 @@ local function open(action, event)
                 {
                     type = "scroll-pane",
                     style = "flib_naked_scroll_pane_no_padding",
-                    vertical_scroll_policy = "always",
-                    style_mods = {width = 650, height = 400, padding = 6},
+                    --vertical_scroll_policy = "always",
+                    --style_mods = {width = 650, height = 400, padding = 6},
                     children = {
                         {
                             type = "flow",
