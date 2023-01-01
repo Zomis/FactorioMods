@@ -63,7 +63,7 @@ local function build_ui(groups)
     
     table.insert(results, {
         type = "label",
-        caption = "CONTENTS"
+        caption = { "foogle.category-contents" }
     })
     table.insert(results, {
         type = "table",
@@ -81,7 +81,7 @@ local function build_ui(groups)
 
     table.insert(results, {
         type = "label",
-        caption = "FLUIDS"
+        caption = { "foogle.category-fluids" }
     })
     table.insert(results, {
         type = "table",
@@ -112,7 +112,7 @@ local function show_entities(player, entities)
             direction = "vertical",
             ref = { "window" },
             children = {
-                header({ "foogle.selection-title" }),
+                header({ "foogle.title-selection" }),
                 {
                     type = "scroll-pane",
                     style = "flib_naked_scroll_pane_no_padding",
