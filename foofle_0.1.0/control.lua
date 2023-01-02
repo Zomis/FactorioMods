@@ -1,4 +1,4 @@
-local main_gui = require("gui/main_gui")
+require("gui/main_gui")
 local selector = require("selector")
 local events = require("__flib__.event")
 require("integrations")

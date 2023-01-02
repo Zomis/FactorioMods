@@ -20,7 +20,7 @@ local function scan_entities(entities_to_scan)
     local fluids = {}
     local settings = {}
     local signals = {}
-    for k, entity in pairs(entities_to_scan) do
+    for _, entity in pairs(entities_to_scan) do
         table.insert(entities, entity)
         if entity.type == "character" then
             add_inventory(contents, entity.get_main_inventory())
@@ -47,7 +47,7 @@ end
 
 local function build_ui(groups)
     local results = {}
-    
+
     table.insert(results, {
         type = "label",
         caption = { "foofle.category-contents" }
