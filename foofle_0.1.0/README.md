@@ -4,18 +4,13 @@
 
 Ctrl + Shift + S is your friend. Press Ctrl + Shift + S and select something. Be it an entity, a character, or anything. Then let's see where Foofle takes you!
 
-### Integration - Open Foofle
+### Foofle from anywhere!
 
-Allow your mod to integrate with Foofle! Follow this short guide to make it easy to open Foofle from your mod:
-
-```
-<TODO>
-```
+Hold Ctrl + Shift and click a sprite containing an item or a fluid from any mod to open it in Foofle
 
 ### Integration - Go to your mod
 
-Allow Foofle to open your mod easily! Follow this short guide to make it possible for Foofle to open your mod:
+Allow Foofle to open your mod easily! See these examples of how to make it possible for Foofle to open your mod:
 
-```
-<TODO>
-```
+- [FNEI example built-in into Foofle](integrations/fnei.lua)
+- [Train Log support for Foofle](https://github.com/Zomis/FactorioMods/blob/372942ae814461abe995a39783a25010cfa13e16/train-log_1.1.6/foofle.lua)
