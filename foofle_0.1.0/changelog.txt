@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 2023-01-02
+  Features:
+    - First release!
+    - Select an area with Ctrl + Shift + S to open it in Foofle
+    - Hold Ctrl + Shift and click on a sprite showing an item or fluid in another mod to open it in Foofle.
+    - Provides an interface for other mods to integrate with Foofle
