@@ -1,3 +1,19 @@
+local function create_sprite_icon(name, size)
+    return {
+        type = "sprite",
+        name = "foofle_" .. name,
+        filename = "__foofle__/graphics/icons/" .. name .. ".png",
+        priority = "medium",
+        width = size,
+        height = size
+    }
+end
+  
+data:extend {
+    create_sprite_icon("arrow-right-bold", 24),
+    create_sprite_icon("timer-outline", 24),
+}
+
 data:extend {
     {
         type = 'custom-input',
