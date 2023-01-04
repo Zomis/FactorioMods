@@ -45,6 +45,22 @@ local function scan_entities(entities_to_scan)
     }
 end
 
+local function create_sprite_button(type, name)
+    local prototype = nil
+    if type == "item" then prototype = game.item_prototypes[name] end
+    if type == "fluid" then prototype = game.fluid_prototypes[name] end
+    if prototype == nil then error("could not create sprite button for prototype: " .. type .. "/" .. name) end
+    local sprite = type .. "/" .. name
+    return {
+        type = "sprite-button",
+        sprite = sprite,
+        tooltip = prototype.localised_name,
+        actions = {
+            on_click = { action_type = "goto", type = type, name = name, sprite = sprite }
+        }
+    }
+end
+
 local function build_ui(groups)
     local results = {}
 
@@ -56,13 +72,7 @@ local function build_ui(groups)
         type = "table",
         column_count = 10,
         children = tables.filter(tables.map(groups.contents, function(_, k)
-            return {
-                type = "sprite-button",
-                sprite = "item/" .. k,
-                actions = {
-                    on_click = { action_type = "goto", type = "item", name = k, sprite = "item/" .. k }
-                }
-            }
+            return create_sprite_button("item", k)
         end), function() return true end, true)
     })
 
@@ -74,13 +84,7 @@ local function build_ui(groups)
         type = "table",
         column_count = 10,
         children = tables.filter(tables.map(groups.fluids, function(_, k)
-            return {
-                type = "sprite-button",
-                sprite = "fluid/" .. k,
-                actions = {
-                    on_click = { action_type = "goto", type = "fluid", name = k, sprite = "fluid/" .. k }
-                }
-            }
+            return create_sprite_button("fluid", k)
         end), function() return true end, true)
     })
     return results
