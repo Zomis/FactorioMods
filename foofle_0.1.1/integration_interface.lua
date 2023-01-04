@@ -1,19 +1,11 @@
-local tables = require("__flib__.table")
-
-local integrations = {}
-
-local function find(info)
-    return tables.filter(integrations, function(v)
-        return remote.call(v.mod_name, v.settings.supported_check, info)
-    end, true)
-end
-
-local function invoke(integration, player, info)
-    remote.call(integration.mod_name, integration.settings.callback, player, info)
-end
+local integration_list = require("integration_list")
+local single = require("gui.single")
 
 remote.add_interface("foofle", {
     open = function(query)
+    end,
+    open_single = function(player_index, info)
+        single.open(info, { player_index = player_index })
     end,
     add_integration = function(mod_name, settings)
         if not settings.callback then
@@ -27,15 +19,10 @@ remote.add_interface("foofle", {
             caption = mod_name
         }
         settings.button = nil
-        table.insert(integrations, {
+        table.insert(integration_list.integrations, {
             button = button,
             mod_name = mod_name,
             settings = settings,
         })
     end
 })
-
-return {
-    find = find,
-    invoke = invoke
-}

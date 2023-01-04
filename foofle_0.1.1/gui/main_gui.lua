@@ -1,6 +1,6 @@
 local guis = require("__flib__.gui")
 local single = require("gui/single")
-local integrations = require("integrations")
+local integrations = require("integration_list")
 local auto_integration = require("auto_integration")
 
 local function find_root(element)

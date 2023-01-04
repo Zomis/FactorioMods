@@ -1,7 +1,7 @@
 require("gui/main_gui")
 local selector = require("selector")
 local events = require("__flib__.event")
-require("integrations")
+require("integration_interface")
 local integration_fnei = require("integrations/fnei")
 
 events.on_lua_shortcut(function(event)

@@ -1,6 +1,6 @@
 local guis = require("__flib__.gui")
 local tables = require("__flib__.table")
-local integrations = require("integrations")
+local integrations = require("integration_list")
 local header = require("gui/header")
 
 local function open(action, event)
