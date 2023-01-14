@@ -115,7 +115,8 @@ local function create_recipe_flow(recipe, entity)
         sprite = "foofle_arrow-right-bold"
     })
     for _, v in ipairs(recipe.products) do
-        local avg_amount = (v.catalyst_amount or 0) + v.amount or ((v.amount_min + v.amount_max) * v.probability * 0.5)
+        local avg_amount_min_max = ((v.amount_min or 0) + (v.amount_max or 0)) * (v.probability or 0) * 0.5
+        local avg_amount = (v.catalyst_amount or 0) + (v.amount or 0) + avg_amount_min_max
         table.insert(flow_children, create_sprite_button(v.type, v.name, avg_amount))
     end
     return {
