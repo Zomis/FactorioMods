@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.2
+Date: 2023-01-16
+  Features:
+    - Add more details and categories in selection options
+    - Add tooltip for sprite buttons in selection options
+    - Add `open_single` to remote interface
+---------------------------------------------------------------------------------------------------
+Version: 0.1.1
+Date: 2023-01-03
+  Features:
+    - Built-in FNEI integration
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2023-01-02
   Features:
