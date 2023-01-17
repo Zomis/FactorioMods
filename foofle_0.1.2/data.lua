@@ -54,5 +54,13 @@ data:extend {
         alt_selection_mode = {"any-entity"},
         selection_cursor_box_type = "pair",
         alt_selection_cursor_box_type = "pair"
+    },
+    {
+        type = "custom-input",
+        name = "open-foofle",
+        key_sequence = "CONTROL + SHIFT + mouse-button-1",
+        consuming = "none",
+        include_selected_prototype = true,
+        order = "a"
     }
 }
