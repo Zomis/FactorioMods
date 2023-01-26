@@ -4,6 +4,8 @@ local function make_pastable(entity_type)
     end
 
     table.insert(entity_type.additional_pastable_entities, "constant-combinator")
+    table.insert(entity_type.additional_pastable_entities, "arithmetic-combinator")
+    table.insert(entity_type.additional_pastable_entities, "decider-combinator")
 
     if mods["LTN_Combinator_Modernized"] then
         table.insert(entity_type.additional_pastable_entities, "ltn-combinator")
