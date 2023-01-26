@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.3.0
+Date: 2023-01-26
+  Features:
+    - Allow pasting to the first field of an arithmetic combinator and decider combinator (thanks FranOis!)
+    - Add settings for disabling copy-pasting to arithmetic and decider combinators (thanks FranOis!)
+---------------------------------------------------------------------------------------------------
 Version: 1.2.0
 Date: 2022-09-25
   Features:
