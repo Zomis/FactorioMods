@@ -45,6 +45,11 @@ local function scan_entities(entities_to_scan)
             categories.containers = categories.containers or { category_name = "containers", content_type = "item" }
             add_inventory(categories.containers, entity.get_inventory(defines.inventory.chest))
         end
+        if entity.type == "logistic-container" then
+            categories.logistic_containers = categories.logistic_containers or { category_name = "logistic_containers", content_type = "item" }
+            add_inventory(categories.logistic_containers, entity.get_inventory(defines.inventory.chest))
+            -- TODO: Add requests, and storage filters
+        end
         if entity.type == "storage-tank" then
             categories.storage_tanks = categories.storage_tanks or { category_name = "storage-tanks", content_type = "fluid" }
             add_fluids(categories.storage_tanks, entity)
