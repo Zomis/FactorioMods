@@ -43,7 +43,7 @@ data:extend {
         name = "foofle",
         icon = "__foofle__/graphics/icons/icon.png",
         icon_size = 36,
-        flags = {},
+        flags = { "only-in-cursor" },
         subgroup = "tool",
         order = "selection",
         stack_size = 1,
