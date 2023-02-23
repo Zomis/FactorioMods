@@ -1,13 +1,13 @@
 local guis = require("__flib__.gui")
 local tables = require("__flib__.table")
-local integrations = require("integration_list")
+local impl = require("impl")
 local header = require("gui/header")
 
 local function open(action, event)
     -- List thing, list integrations, possibly add other built-in links.
     local player = game.players[event.player_index]
     local info = action
-    local integrations = integrations.find(info)
+    local plugins = impl.find(info)
     local sprite = action.sprite or (action.type .. "/" .. action.name)
     local gui = guis.build(player.gui.screen, {
         {
@@ -29,10 +29,10 @@ local function open(action, event)
                         {
                             type = "flow",
                             direction = "vertical",
-                            children = tables.map(integrations, function(v)
-                                local button = tables.deep_copy(v.button)
+                            children = tables.map(plugins, function(v)
+                                local button = tables.deep_copy(v.quick_button)
                                 button.actions = {
-                                    on_click = { type = "integration", integration = v, player = player, info = info }
+                                    on_click = { type = "plugin", plugin_id = v.id, player = player, info = info }
                                 }
                                 return button
                             end)

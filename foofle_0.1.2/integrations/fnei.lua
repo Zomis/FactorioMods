@@ -1,8 +1,14 @@
 -- You need to declare a callback interface that Foofle can use
-remote.add_interface("foofle-fnei", {
+remote.add_interface("foofle-fnei-craft", {
     open_craft = function(_, info)
         remote.call("fnei", "show_recipe_for_prot", "craft", info.type, info.name)
     end,
+    foofle_support = function(info)
+        -- This function determines if we should show our integration button or not
+        return info.type == "fluid" or info.type == "item"
+    end
+})
+remote.add_interface("foofle-fnei-usage", {
     open_usage = function(_, info)
         remote.call("fnei", "show_recipe_for_prot", "usage", info.type, info.name)
     end,
@@ -18,7 +24,7 @@ local function on_start()
     -- In order for us to use Foofle, the "foofle" remote interface must exist
     -- In order for us to use FNEI, the "fnei" remote interface must exist
     if remote.interfaces["foofle"] and remote.interfaces["fnei"] then
-        remote.call("foofle", "add_integration", "foofle-fnei", {
+        remote.call("foofle", "add_integration", "foofle-fnei-craft", {
             button = {
                 type = "button",
                 caption = { "foofle-fnei.craft" },
@@ -27,7 +33,7 @@ local function on_start()
             supported_check = "foofle_support",
             callback = "open_craft"
         })
-        remote.call("foofle", "add_integration", "foofle-fnei", {
+        remote.call("foofle", "add_integration", "foofle-fnei-usage", {
             button = {
                 type = "button",
                 caption = { "foofle-fnei.usage" },

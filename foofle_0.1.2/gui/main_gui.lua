@@ -1,6 +1,6 @@
 local guis = require("__flib__.gui")
 local single = require("gui/single")
-local integrations = require("integration_list")
+local impl = require("impl")
 local auto_integration = require("auto_integration")
 
 local function find_root(element)
@@ -32,9 +32,11 @@ guis.hook_events(function(event)
         single.open(action, event)
         local root = find_root(event.element)
         root.destroy()
-    elseif action.type == "integration" then
-        integrations.invoke(action.integration, game.players[event.player_index], action.info)
+    elseif action.type == "plugin" then
+        impl.invoke(action.plugin_id, game.players[event.player_index], action.info)
         local root = find_root(event.element)
         root.destroy()
+    else
+        error("unexpected action type: " .. action.type)
     end
 end)
