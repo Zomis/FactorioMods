@@ -1,5 +1,12 @@
 local api = require "api"
 
+local function fnei_supported(info)
+    if not remote.interfaces["fnei"] then
+        return false
+    end
+    return info.type == "fluid" or info.type == "item"
+end
+
 api.add_plugin {
     id = "fnei-craft",
     name = { "foofle-fnei.craft" },
@@ -8,9 +15,7 @@ api.add_plugin {
         caption = { "foofle-fnei.craft" },
         tooltip = { "foofle-fnei.craft" }
     },
-    supported = function(info)
-        return info.type == "fluid" or info.type == "item"
-    end,
+    supported = fnei_supported,
     on_quick_button = function(_, info)
         remote.call("fnei", "show_recipe_for_prot", "craft", info.type, info.name)
     end
@@ -24,9 +29,7 @@ api.add_plugin {
         caption = { "foofle-fnei.usage" },
         tooltip = { "foofle-fnei.usage" }
     },
-    supported = function(info)
-        return info.type == "fluid" or info.type == "item"
-    end,
+    supported = fnei_supported,
     on_quick_button = function(_, info)
         remote.call("fnei", "show_recipe_for_prot", "usage", info.type, info.name)
     end
