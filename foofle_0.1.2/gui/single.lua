@@ -30,6 +30,9 @@ local function open(action, event)
                             type = "flow",
                             direction = "vertical",
                             children = tables.map(plugins, function(v)
+                                if not v.quick_button then
+                                    return {}
+                                end
                                 local button = tables.deep_copy(v.quick_button)
                                 button.actions = {
                                     on_click = { type = "plugin", plugin_id = v.id, player = player, info = info }
@@ -37,6 +40,16 @@ local function open(action, event)
                                 return button
                             end)
                         },
+                        {
+                            type = "flow",
+                            direction = "vertical",
+                            children = tables.map(plugins, function(v)
+                                if v.show then
+                                    return v.show(player, info)
+                                end
+                                return {}
+                            end)
+                        }
                     }
                 }
             }
