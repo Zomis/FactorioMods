@@ -160,8 +160,13 @@ node {
         }
         sh 'git commit -m"Release ' + mod + " version " + params.releaseVersion + '"'
         sh 'git tag ' + mod + '-' + params.releaseVersion
-        zip(zipFile: newDir + '.zip', glob: newDir + '/**')
-        archiveArtifacts(artifacts: newDir + '.zip')
+        if (fileExists(newDir)) {
+          zip(zipFile: newDir + '.zip', glob: newDir + '/**')
+          archiveArtifacts(artifacts: newDir + '.zip')
+        } else {
+          zip(zipFile: mod + '.zip', glob: mod + '/**')
+          archiveArtifacts(artifacts: mod + '.zip')
+        }
         sh 'git push --tags origin ' + env.BRANCH_NAME
         duga.dugaResult("$mod version $params.releaseVersion is ready for uploaded to https://mods.factorio.com/mods/zomis/" + mod)
       }
