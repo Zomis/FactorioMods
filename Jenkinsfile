@@ -138,18 +138,25 @@ node {
       def releaseString = "$mod to version $params.releaseVersion (previous: $oldVersion)"
       stage('Release') {
         echo("Starting release of $mod version $params.releaseVersion")
+        def modDir = mod
         def oldDir = mod + '_' + oldVersion
         def newDir = mod + '_' + params.releaseVersion
 
         sh 'git remote set-url origin git@github.com:Zomis/FactorioMods.git'
         sh 'git checkout ' + env.BRANCH_NAME
         sh 'git reset --hard HEAD'
-        sh 'mv ' + oldDir + ' ' + newDir
+        if (fileExists(oldDir)) {
+          sh 'mv ' + oldDir + ' ' + newDir
+        }
         dir(newDir) {
           sh 'find ./ -name info.json -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \\;'
         }
-        sh 'git rm -r ' + oldDir
-        sh 'git add ' + newDir
+        if (fileExists(newDir)) {
+          sh 'git rm -r ' + oldDir
+          sh 'git add ' + newDir
+        } else {
+          sh 'git add ' + mod
+        }
         sh 'git commit -m"Release ' + mod + " version " + params.releaseVersion + '"'
         sh 'git tag ' + mod + '-' + params.releaseVersion
         zip(zipFile: newDir + '.zip', glob: newDir + '/**')
