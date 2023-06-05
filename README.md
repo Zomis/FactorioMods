@@ -2,6 +2,13 @@
 
 Several mods for the Factorio game, each mod is described below.
 
+## Contributing
+
+- Pull requests are welcome!
+- There's no need to update the version number, my Jenkinsfile takes care of that automatically when I release a new mod.
+
+# List of mods (non-exhaustive)
+
 ## [Visual Signals](https://mods.factorio.com/mods/zomis/visual-signals) (GUI Signal Display)
 
 Allows players to keep track of circuit networks in the GUI at any time.
