@@ -146,15 +146,16 @@ node {
         sh 'git checkout ' + env.BRANCH_NAME
         sh 'git reset --hard HEAD'
         if (fileExists(oldDir)) {
+          dir(oldDir) {
+            sh 'find ./ -name info.json -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \\;'
+          }
           sh 'mv ' + oldDir + ' ' + newDir
-        }
-        dir(newDir) {
-          sh 'find ./ -name info.json -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \\;'
-        }
-        if (fileExists(newDir)) {
           sh 'git rm -r ' + oldDir
           sh 'git add ' + newDir
         } else {
+          dir(mod) {
+            sh 'find ./ -name info.json -type f -exec sed -i \'s/' + oldVersion + '/' + params.releaseVersion + '/g\' {} \\;'
+          }
           sh 'git add ' + mod
         }
         sh 'git commit -m"Release ' + mod + " version " + params.releaseVersion + '"'
