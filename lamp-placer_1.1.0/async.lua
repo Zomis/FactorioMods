@@ -252,10 +252,10 @@ function Async:on_tick()
     end
     if tick % 3600 == 2700 then
         -- Cleanup tasks
-        log("Cleanup async tasks")
+        -- log("Cleanup async tasks")
         for k, task in pairs(async_runtimes) do
             if task:is_completed() then
-                log("Cleaned async task " .. k)
+                -- log("Cleaned async task " .. k)
                 async_tasks[k] = nil
                 async_runtimes[k] = nil
             end
