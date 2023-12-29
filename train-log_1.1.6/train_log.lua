@@ -7,6 +7,9 @@ local function clear_older_force(force_index, older_than)
     global.history = tables.filter(global.history, function(v)
         return v.force_index ~= force_index or v.last_change >= older_than
     end, true)
+    global.trains = tables.filter(global.trains, function(v)
+        return v.train.valid
+    end, true)
     -- game.print("Clear older " .. old_size .. " => " .. table_size(global.history) .. " for force " .. force_index)
 end
 
