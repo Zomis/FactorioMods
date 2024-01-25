@@ -237,7 +237,7 @@ local function matches_filter(result, filters)
         end
         if not matches_station and event.station then
             local station_name = event.station.valid and event.station.backer_name or ""
-            if station_name:lower():find(filters.station_name) then
+            if station_name:lower():find(filters.station_name, 1, true) then
                 matches_station = true
             end
         end
