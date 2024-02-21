@@ -53,7 +53,7 @@ data:extend({
         name = "copy-paste-recipe-copy-item-count-as-request-chest",
         setting_type = "runtime-per-user",
         order = "dz",
-        default_value = true
+        default_value = false
     }
 })
 data:extend({
