@@ -50,9 +50,18 @@ data:extend({
 data:extend({
     {
         type = "bool-setting",
+        name = "copy-paste-recipe-copy-item-count-as-request-chest",
+        setting_type = "runtime-per-user",
+        order = "dz",
+        default_value = false
+    }
+})
+data:extend({
+    {
+        type = "bool-setting",
         name = "copy-paste-recipe-time-paste-product-arithmetic",
         setting_type = "runtime-per-user",
-        order = "e",    
+        order = "e",
         default_value = true
     }
 })
@@ -65,3 +74,4 @@ data:extend({
         default_value = true
     }
 })
+

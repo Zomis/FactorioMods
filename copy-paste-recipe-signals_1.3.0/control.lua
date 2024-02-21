@@ -23,6 +23,7 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     local add_ticks = player_settings["copy-paste-recipe-signals-include-ticks"].value
     local add_seconds = player_settings["copy-paste-recipe-signals-include-seconds"].value
     local time_includes_modules = player_settings["copy-paste-recipe-time-includes-modules"].value
+    local item_count_as_request_chest = player_settings["copy-paste-recipe-copy-item-count-as-request-chest"].value
     local allow_arithmetic = player_settings["copy-paste-recipe-time-paste-product-arithmetic"].value
     local allow_decider = player_settings["copy-paste-recipe-time-paste-product-decider"].value
 
@@ -62,6 +63,15 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
       }
     elseif event.destination.name == "constant-combinator" or event.destination.name == "ltn-combinator" then
       local signals = {}
+
+      --calculation of the ingredients/products multiplier 
+      --for the function of simulating copying to the request chest
+      --https://wiki.factorio.com/Copy_and_paste#Entity_settings
+      local product_per30s_multiplier = 1
+      if item_count_as_request_chest then
+        product_per30s_multiplier = (30 * event.source.crafting_speed) / recipe.energy
+      end
+
       if ingredients_multiplier ~= 0 then
         for _, ingredient in pairs(recipe.ingredients) do
           table.insert(signals, {
@@ -69,7 +79,8 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
               type = ingredient.type,
               name = ingredient.name
             },
-            count = ingredient.amount * ingredients_multiplier
+            --in vanilla factorio, the copy-pasting feature cannot copy less than the amount of the ingredient (this also prevents items equal to 0)
+            count = math.max(ingredient.amount * product_per30s_multiplier, ingredient.amount) * ingredients_multiplier
           })
         end
       end
@@ -81,7 +92,8 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
               type = product.type,
               name = product.name
             },
-            count = expected * products_multiplier
+            --same as in the ingredient
+            count = math.max(expected * product_per30s_multiplier, expected) * products_multiplier
           })
         end
       end
