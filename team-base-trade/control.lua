@@ -167,6 +167,4 @@ script.on_event(defines.events.on_research_finished, on_research_finished)
 -- TODO: Mark player's allowed zone on map? Show alert when in wrong zone? https://lua-api.factorio.com/latest/LuaPlayer.html#LuaPlayer.create_local_flying_text ?
 -- TODO: Set spawn position to be safe. https://lua-api.factorio.com/latest/LuaForce.html#LuaForce.set_spawn_position
 
--- Competition mode when first to research something gets it? (but then one player could do everything, which would be boring)
-
 -- on_forces_merged -- event.source_name, event.source_index , event.destination (force)
