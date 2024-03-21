@@ -1,4 +1,7 @@
+local gui_utils = require("gui/gui_utils")
 local tables = require("__flib__.table")
+
+local USE_STATION_PAYLOAD_SUMMARY = true
 
 local function flat_map(tbl, mapper)
     local output = {}
@@ -19,14 +22,42 @@ local function create_new_summary()
     }
 end
 
-local function add_diff(event, summary)
+local function add_station_payload_summary(summary, station, type, name, count)
+    local station_name = station.backer_name
+    local payload_summary = summary.stations[station_name].payload_summary
+    if not payload_summary[type] then
+        payload_summary[type] = {}
+    end
+    local payload_type_summary = payload_summary[type]
+    if not payload_type_summary[name] then
+        payload_type_summary[name] = 0
+    end
+    payload_type_summary[name] = payload_type_summary[name] + count
+end
+
+local function station_summary_children(station_payload_summary, gui_id)
+    local children = {}
+    for type, v in pairs(station_payload_summary) do
+        for name, count in pairs(v) do
+            local color = count > 0 and "green" or "red"
+            table.insert(children, gui_utils.sprite_button_type_name_amount(type, name, count, color, gui_id))
+        end
+    end
+    return children
+end
+
+local function add_diff(event, summary, last_station)
     if event.diff then
+        local has_station = last_station and last_station.valid
         for name, count in pairs(event.diff.items) do
             summary.items[name] = summary.items[name] or { loaded = 0, unloaded = 0, sum = 0, name = name }
             local data = summary.items[name]
             data.loaded = data.loaded + (count > 0 and count or 0)
             data.unloaded = data.unloaded + (count < 0 and count or 0)
             data.sum = data.sum + count
+            if USE_STATION_PAYLOAD_SUMMARY and has_station then
+                add_station_payload_summary(summary, last_station, "item", name, count)
+            end
         end
         for name, count in pairs(event.diff.fluids) do
             summary.fluids[name] = summary.fluids[name] or { loaded = 0, unloaded = 0, sum = 0, name = name }
@@ -34,6 +65,9 @@ local function add_diff(event, summary)
             data.loaded = data.loaded + (count > 0 and count or 0)
             data.unloaded = data.unloaded + (count < 0 and count or 0)
             data.sum = data.sum + count
+            if USE_STATION_PAYLOAD_SUMMARY and has_station then
+                add_station_payload_summary(summary, last_station, "fluid", name, count)
+            end
         end
     end
 end
@@ -45,6 +79,7 @@ local function add_station_stop(event, summary)
         stations[station_name] = stations[station_name] or {
             station = event.station,
             stops = 0,
+            payload_summary = {},
             position = event.station.position
         }
         stations[station_name].stops = stations[station_name].stops + 1
@@ -76,6 +111,11 @@ local function create_gui(summary, gui_id)
             count = {
                 type = "label",
                 caption = tostring(station.stops)
+            },
+            payload = {
+                type = "table",
+                column_count = 6,
+                children = station_summary_children(station.payload_summary, gui_id)
             }
         }
     end)
@@ -123,9 +163,9 @@ local function create_gui(summary, gui_id)
         },
         {
             type = "table",
-            column_count = 3,
+            column_count = 4,
             children = flat_map(stations_top, function(v)
-                return { v.icon, v.name, v.count }
+                return { v.icon, v.name, v.count, v.payload }
             end)
         },
         {

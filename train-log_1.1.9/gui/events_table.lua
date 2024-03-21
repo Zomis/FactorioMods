@@ -1,3 +1,4 @@
+local gui_utils = require("gui/gui_utils")
 local misc = require("__flib__.misc")
 local gui = require("__flib__.gui-beta")
 local trains = require("__flib__.train")
@@ -17,75 +18,6 @@ local function handle_action(action, event)
     end
 end
 
-local function sprite_button_type_name_amount(type, name, amount, color, gui_id)
-    local prototype = nil
-    if type == "item" then
-        prototype = game.item_prototypes[name]
-    elseif type == "fluid" then
-        prototype = game.fluid_prototypes[name]
-    elseif type == "virtual-signal" then
-        prototype = game.virtual_signal_prototypes[name]
-    end
-    local sprite = prototype and (type .. "/" .. name) or nil
-    local tooltip = prototype and prototype.localised_name or (type .. "/" .. name)
-    return {
-        type = "sprite-button",
-        style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
-        sprite = sprite,
-        number = amount,
-        actions = {
-            on_click = { type = "toolbar", action = "filter", filter = type, value = name, gui_id = gui_id }
-        },
-        tooltip = tooltip
-    }
-end
-
-local function sprite_button_for_state(state)
-    local description = ""
-    if state == defines.train_state.on_the_path	then
-        description = { "train-log.train_state-on_the_path" }
-    elseif state == defines.train_state.path_lost then
-        description = { "train-log.train_state-path_lost" }
-    elseif state == defines.train_state.no_schedule then
-        description = { "train-log.train_state-no_schedule" }
-    elseif state == defines.train_state.no_path then
-        description = { "train-log.train_state-no_path" }
-    elseif state == defines.train_state.arrive_signal then
-        description = { "train-log.train_state-arrive_signal" }
-    elseif state == defines.train_state.wait_signal then
-        description = { "train-log.train_state-wait_signal" }
-    elseif state == defines.train_state.arrive_station then
-        description = { "train-log.train_state-arrive_station" }
-    elseif state == defines.train_state.wait_station then
-        description = { "train-log.train_state-wait_station" }
-    elseif state == defines.train_state.manual_control_stop then
-        description = { "train-log.train_state-manual_control_stop" }
-    elseif state == defines.train_state.manual_control then
-        description = { "train-log.train_state-manual_control" }
-    elseif state == defines.train_state.destination_full then
-        description = { "train-log.train_state-destination_full" }
-    end
-    return {
-        type = "sprite-button",
-        style = "flib_slot_button_default",
-        sprite = "item/iron-plate",
-        number = state,
-        tooltip = description
-    }
-end
-
-local function signal_for_entity(entity)
-    local empty_signal = { type = "virtual", name = "signal-0" }
-    if not entity then return empty_signal end
-    if not entity.valid then return empty_signal end
-
-    local k, v = next(entity.prototype.items_to_place_this)
-    if k then
-        return { type = "item", name = v.name }
-    end
-    return empty_signal
-end
-
 local function events_row(train_data, children, summary, gui_id)
     local train_icon
     if train_data.train.valid and train_data.train.front_stock.valid then
@@ -93,7 +25,7 @@ local function events_row(train_data, children, summary, gui_id)
         train_icon = {
             type = "sprite-button",
             style = "slot_button",
-            sprite = "item/" .. signal_for_entity(train_data.train.front_stock).name,
+            sprite = "item/" .. gui_utils.signal_for_entity(train_data.train.front_stock).name,
             number = train_data.train.id,
             tooltip = prototype.localised_name,
             actions = {
@@ -115,6 +47,7 @@ local function events_row(train_data, children, summary, gui_id)
     }
 
     local event_children = {}
+    local last_station = nil
     for _, event in pairs(train_data.events) do
         --[[
         local delay = event.tick - last_change
@@ -126,7 +59,7 @@ local function events_row(train_data, children, summary, gui_id)
         table.insert(event_children, delay_button)
         ]]--
         if event.state and false then
-            table.insert(event_children, sprite_button_for_state(event.state))
+            table.insert(event_children, gui_utils.sprite_button_for_state(event.state))
         end
         if event.schedule and false then
             table.insert(event_children, {
@@ -144,6 +77,7 @@ local function events_row(train_data, children, summary, gui_id)
         end
 
         if event.station then
+            last_station = event.station
             summary_gui.add_station_stop(event, summary)
             if event.station.valid then
                 table.insert(event_children, {
@@ -178,24 +112,24 @@ local function events_row(train_data, children, summary, gui_id)
         if event.contents and false then -- This is not stored in any log event, just temporarily in train_data
             if event.contents.items then
                 for name, count in pairs(event.contents.items) do
-                    table.insert(event_children, sprite_button_type_name_amount("item", name, count, nil, gui_id))
+                    table.insert(event_children, gui_utils.sprite_button_type_name_amount("item", name, count, nil, gui_id))
                 end
             end
             if event.contents.fluids then
                 for name, count in pairs(event.contents.fluids) do
-                    table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, nil, gui_id))
+                    table.insert(event_children, gui_utils.sprite_button_type_name_amount("fluid", name, count, nil, gui_id))
                 end
             end
         end
         if event.diff then
-            summary_gui.add_diff(event, summary)
+            summary_gui.add_diff(event, summary, last_station)
             for name, count in pairs(event.diff.items) do
                 local color = count > 0 and "green" or "red"
-                table.insert(event_children, sprite_button_type_name_amount("item", name, count, color, gui_id))
+                table.insert(event_children, gui_utils.sprite_button_type_name_amount("item", name, count, color, gui_id))
             end
             for name, count in pairs(event.diff.fluids) do
                 local color = count > 0 and "green" or "red"
-                table.insert(event_children, sprite_button_type_name_amount("fluid", name, count, color, gui_id))
+                table.insert(event_children, gui_utils.sprite_button_type_name_amount("fluid", name, count, color, gui_id))
             end
         end
         -- last_change = event.tick
