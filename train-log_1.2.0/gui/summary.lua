@@ -39,8 +39,9 @@ local function station_summary_children(station_payload_summary, gui_id)
     local children = {}
     for type, v in pairs(station_payload_summary) do
         for name, count in pairs(v) do
-            local color = count > 0 and "green" or "red"
-            table.insert(children, gui_utils.sprite_button_type_name_amount(type, name, count, color, gui_id))
+            -- For station summary, reverse count so that positive = give to station, negative = take from station. Instead of "to/from train"
+            local color = -count > 0 and "green" or "red"
+            table.insert(children, gui_utils.sprite_button_type_name_amount(type, name, -count, color, gui_id))
         end
     end
     return children
