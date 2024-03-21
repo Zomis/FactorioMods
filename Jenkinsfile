@@ -164,8 +164,8 @@ node {
           zip(zipFile: newDir + '.zip', glob: newDir + '/**')
           archiveArtifacts(artifacts: newDir + '.zip')
         } else {
-          zip(zipFile: mod + '.zip', glob: mod + '/**')
-          archiveArtifacts(artifacts: mod + '.zip')
+          zip(zipFile: newDir + '.zip', glob: mod + '/**')
+          archiveArtifacts(artifacts: newDir + '.zip')
         }
         sh 'git push --tags origin ' + env.BRANCH_NAME
         duga.dugaResult("$mod version $params.releaseVersion is ready for uploaded to https://mods.factorio.com/mods/zomis/" + mod)
