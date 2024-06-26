@@ -1,3 +1,5 @@
+local tables = require("__flib__.table")
+
 local function expected_amount(product)
     local expected = product.amount
     if not expected then
@@ -8,7 +10,8 @@ local function expected_amount(product)
     return expected * probability
   end
   
-  return function(source, player_settings)
+  return function(source, player_info)
+    local player_settings = player_info.settings
     local ingredients_multiplier = player_settings["copy-paste-recipe-signals-ingredient-multiplier"].value
     local products_multiplier = player_settings["copy-paste-recipe-signals-product-multiplier"].value
     local add_ticks = player_settings["copy-paste-recipe-signals-include-ticks"].value
@@ -75,6 +78,8 @@ local function expected_amount(product)
         return signals
     end
     if source.prototype.type == "constant-combinator" then
-        return source.get_or_create_control_behavior().parameters
+        local result = source.get_or_create_control_behavior().parameters
+        result = tables.filter(result, function(v) return v.signal.name ~= nil end, true)
+        return result
     end
 end
