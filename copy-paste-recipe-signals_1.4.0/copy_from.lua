@@ -6,10 +6,10 @@ local function expected_amount(product)
       expected = (product.amount_min + product.amount_max) / 2.0
     end
     local probability = product.probability or 1
-  
+
     return expected * probability
   end
-  
+
   return function(source, player_info)
     local player_settings = player_info.settings
     local ingredients_multiplier = player_settings["copy-paste-recipe-signals-ingredient-multiplier"].value
@@ -29,7 +29,7 @@ local function expected_amount(product)
         end
         local speed_adjustment = time_includes_modules and source.crafting_speed or 1
 
-        -- Calculation of the ingredients/products multiplier 
+        -- Calculation of the ingredients/products multiplier
         -- for the function of simulating copying to the request chest
         -- https://wiki.factorio.com/Copy_and_paste#Entity_settings
         local product_per30s_multiplier = 1
@@ -45,7 +45,8 @@ local function expected_amount(product)
                 type = ingredient.type,
                 name = ingredient.name
               },
-              --in vanilla factorio, the copy-pasting feature cannot copy less than the amount of the ingredient (this also prevents items equal to 0)
+              -- in vanilla factorio, the copy-pasting feature cannot copy less than the amount of the ingredient
+              -- (this also prevents items equal to 0)
               count = math.max(ingredient.amount * product_per30s_multiplier, ingredient.amount) * ingredients_multiplier
             })
           end

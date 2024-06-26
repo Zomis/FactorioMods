@@ -44,7 +44,6 @@ local function paste_to_inserter(destination, signals, player_info)
     end
 
     if destination.name == "stack-filter-inserter" then
-        local current = destination.get_filter(1) -- type: string?
         local index, next_value = iterate(options, player_info)
         destination.set_filter(1, next_value and next_value.signal.name)
         return index
@@ -72,7 +71,7 @@ local function paste_to_computing_combinator(destination, signals, player_info)
     elseif destination.name == "decider-combinator" and allow_decider then
         local behavior = destination.get_or_create_control_behavior()
         local previous_parameters = behavior.parameters
-  
+
         local index, next_value = iterate(signals, player_info)
         behavior.parameters = {
           first_signal = next_value.signal,
@@ -88,7 +87,6 @@ end
 
 local function paste_to_constant_combinator(destination, signals, player_info)
     local behavior = destination.get_or_create_control_behavior()
-    local player_settings = player_info.settings
 
     if destination.name == "constant-combinator" or destination.name == "ltn-combinator" then
       -- The ltn-combinator has 28 signals, however the 14 first signals should

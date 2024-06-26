@@ -16,7 +16,7 @@ return function()
         "pump",
         "stack-filter-inserter"
     }
-    
+
     if mod_exists("LTN_Combinator_Modernized") then
         table.insert(pastable_types, "ltn-combinator")
     end
