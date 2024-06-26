@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2024-06-27
+  Features:
+    - Allow copying from a constant combinator
+    - Allow pasting to a stack filter inserter
+    - Iterate through which signal to paste when there's only one signal in the destination
+    - Add setting for copying like a requester chest (products for 30s) (thanks Dial-up!)
+  Changes:
+    - Major internal refactoring to more easily support new features and use-cases
+---------------------------------------------------------------------------------------------------
 Version: 1.3.0
 Date: 2023-01-26
   Features:
