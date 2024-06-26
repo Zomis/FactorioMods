@@ -1,14 +1,15 @@
+local pastable_types = require "pastable_types"
+local pastable_types_table = pastable_types()
+
 local function make_pastable(entity_type)
     if not entity_type.additional_pastable_entities then
         entity_type.additional_pastable_entities = {}
     end
 
-    table.insert(entity_type.additional_pastable_entities, "constant-combinator")
-    table.insert(entity_type.additional_pastable_entities, "arithmetic-combinator")
-    table.insert(entity_type.additional_pastable_entities, "decider-combinator")
-
-    if mods["LTN_Combinator_Modernized"] then
-        table.insert(entity_type.additional_pastable_entities, "ltn-combinator")
+    for _, other in pairs(pastable_types_table) do
+        if other ~= entity_type.name then
+            table.insert(entity_type.additional_pastable_entities, other)
+        end
     end
 end
 
