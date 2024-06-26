@@ -75,6 +75,6 @@ local function expected_amount(product)
         return signals
     end
     if source.prototype.type == "constant-combinator" then
-        return event.source.get_or_create_control_behavior().parameters
+        return source.get_or_create_control_behavior().parameters
     end
 end

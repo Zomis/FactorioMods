@@ -13,8 +13,8 @@ return function()
         "constant-combinator",
         "arithmetic-combinator",
         "decider-combinator",
-        -- "pump",
-        -- "stack-filter-inserter"
+        "pump",
+        "stack-filter-inserter"
     }
     
     if mod_exists("LTN_Combinator_Modernized") then

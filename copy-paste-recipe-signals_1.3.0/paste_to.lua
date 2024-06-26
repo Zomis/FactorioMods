@@ -1,7 +1,57 @@
 local tables = require("__flib__.table")
 
-local function paste_to_pump(destination, signals, player_settings)
+local function find_index_in_options(options, current)
+    if current == nil then
+        return nil
+    end
+    if type(current) ~= "string" then
+        -- In case there's an item/fluid/signal with the same name, we need to also check type
+        for index, v in pairs(options) do
+            if v.signal.name == current.name and v.signal.type == current.type then
+                return index
+            end
+        end
+    end
+    return tables.find(tables.map(options, function(v) return v.signal.name end), current)
+end
+
+local function iterate(options, current)
+    -- TODO:
+    -- global.player_info[player_index].last_copy = { from, to, index }
+
+    local options_count = table_size(options)
+    if options_count == 0 then
+        return nil
+    end
+    local current_index = find_index_in_options(options, current)
     
+    if current_index == nil then
+        current_index = 1
+--   Include empty after iterating through all once or not?
+--      elseif current_index == options_count then
+--        destination.set_filter(1, nil)
+--        return
+    else
+        current_index = (current_index % options_count) + 1
+    end
+    return options[current_index]
+end
+
+local function paste_to_pump(destination, signals, player_settings)
+    -- TODO: Re-order options so that fluids are first, then items, then virtual signals
+    local behavior = destination.get_or_create_control_behavior()
+    local previous_condition = behavior.circuit_condition.condition
+    local previous_signal = previous_condition and previous_condition.first_signal or nil
+    local next_value = iterate(signals, previous_signal).signal
+
+    behavior.circuit_condition = {
+        condition = {
+            first_signal = next_value, -- SignalID
+            second_signal = previous_condition.second_signal,
+            constant = previous_condition.constant,
+            comparator = previous_condition.comparator
+        }
+    }
 end
 
 local function paste_to_inserter(destination, signals, player_settings)
@@ -13,24 +63,10 @@ local function paste_to_inserter(destination, signals, player_settings)
 
     if destination.name == "stack-filter-inserter" then
         local current = destination.get_filter(1) -- type: string?
-        local current_index = tables.find(tables.map(options, function(v) return v.signal.name end), current)
-        if current_index == nil then
-            current_index = 1
---   Include empty after iterating through all once or not?
---      elseif current_index == options_count then
---        destination.set_filter(1, nil)
---        return
-        else
-            current_index = (current_index % options_count) + 1
-        end
-        if current_index <= options_count then
-            local option = options[current_index]
-            if option then
-                destination.set_filter(1, option.signal.name)
-            else
-                destination.set_filter(1, nil)
-            end
-        end
+        local next_value = iterate(options, current)
+--        game.print("current " .. serpent.line(current))
+--        game.print("current " .. serpent.line(next_value))
+        destination.set_filter(1, next_value and next_value.signal.name)
     end
 end
 

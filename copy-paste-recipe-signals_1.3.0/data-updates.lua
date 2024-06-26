@@ -21,3 +21,7 @@ end
 for _, entity_type in pairs(data.raw["furnace"]) do
     make_pastable(entity_type)
 end
+
+for _, entity_type in pairs(data.raw["constant-combinator"]) do
+    make_pastable(entity_type)
+end
