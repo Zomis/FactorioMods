@@ -1,5 +1,4 @@
 local tables = require("__flib__.table")
-local pastable_types = require "pastable_types"
 local copy_from = require "copy_from"
 local paste_to = require "paste_to"
 
@@ -42,9 +41,6 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     return
   end
   local target_name = event.destination.name
-  if not tables.find(pastable_types(), target_name) then
-    return
-  end
   if event.destination.type == event.source.type then
     return
   end
