@@ -74,4 +74,12 @@ data:extend({
         default_value = true
     }
 })
-
+data:extend({
+    {
+        type = "bool-setting",
+        name = "copy-paste-circuit-condition",
+        setting_type = "runtime-per-user",
+        order = "fz",
+        default_value = true
+    }
+})

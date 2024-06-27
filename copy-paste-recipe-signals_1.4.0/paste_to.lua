@@ -21,7 +21,10 @@ local function iterate(options, player_info)
 end
 
 local function paste_to_circuit_condition(destination, signals, player_info)
-    -- TODO: Re-order options so that fluids are first, then items, then virtual signals
+    local player_settings = player_info.settings
+    if not player_settings["copy-paste-circuit-condition"].value then
+        return nil
+    end
     local behavior = destination.get_or_create_control_behavior()
     local previous_condition = behavior.circuit_condition.condition
     local index, next_value = iterate(signals, player_info)
@@ -45,6 +48,7 @@ local function paste_to_inserter(destination, signals, player_info)
         return
     end
 
+    -- Not sure what feature is desired for regular filter inserters?
     if destination.name == "stack-filter-inserter" then
         local index, next_value = iterate(options, player_info)
         destination.set_filter(1, next_value and next_value.signal.name)
