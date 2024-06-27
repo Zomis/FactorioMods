@@ -28,6 +28,7 @@ local function get_player_info(event)
   end
 
   return {
+    player = game.players[player_index],
     last_copy = global.player_info[player_index].last_copy or {},
     settings = settings.get_player_settings(player_index)
   }

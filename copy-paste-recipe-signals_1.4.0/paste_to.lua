@@ -1,4 +1,5 @@
 local tables = require("__flib__.table")
+local popup = require("popup")
 
 local function iterate(options, player_info)
     local options_count = table_size(options)
@@ -33,6 +34,7 @@ local function paste_to_pump(destination, signals, player_info)
             comparator = previous_condition.comparator
         }
     }
+    popup.popup_circuit_condition(player_info, behavior.circuit_condition)
     return index
 end
 
