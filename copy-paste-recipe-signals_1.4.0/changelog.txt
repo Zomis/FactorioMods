@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.5.0
+Date: 2024-06-27
+  Features:
+    - Add flying text for player when pasting circuit condition
+    - Add support for pasting to more inserter types
+    - Add setting for enabling pasting to circuit condition (on by default)
+---------------------------------------------------------------------------------------------------
 Version: 1.4.0
 Date: 2024-06-27
   Features:
