@@ -16,6 +16,11 @@ return function()
         "pump",
         "stack-filter-inserter"
     }
+    if data then
+        for k in pairs(data.raw["inserter"]) do
+            table.insert(pastable_types, k)
+        end
+    end
 
     if mod_exists("LTN_Combinator_Modernized") then
         table.insert(pastable_types, "ltn-combinator")

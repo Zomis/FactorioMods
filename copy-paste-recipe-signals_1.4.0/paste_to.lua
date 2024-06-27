@@ -20,7 +20,7 @@ local function iterate(options, player_info)
     return current_index, options[current_index]
 end
 
-local function paste_to_pump(destination, signals, player_info)
+local function paste_to_circuit_condition(destination, signals, player_info)
     -- TODO: Re-order options so that fluids are first, then items, then virtual signals
     local behavior = destination.get_or_create_control_behavior()
     local previous_condition = behavior.circuit_condition.condition
@@ -115,13 +115,13 @@ return function(destination, signals, player_info)
     if destination.name == "constant-combinator" or destination.name == "ltn-combinator" then
         return paste_to_constant_combinator(destination, signals, player_info)
     end
-    if destination.name == "pump" then
-        return paste_to_pump(destination, signals, player_info)
-    end
     if (destination.name == "arithmetic-combinator") or (destination.name == "decider-combinator") then
         return paste_to_computing_combinator(destination, signals, player_info)
     end
     if destination.name == "stack-filter-inserter" then
         return paste_to_inserter(destination, signals, player_info)
+    end
+    if destination.type == "pump" or destination.type == "inserter" then
+        return paste_to_circuit_condition(destination, signals, player_info)
     end
 end
