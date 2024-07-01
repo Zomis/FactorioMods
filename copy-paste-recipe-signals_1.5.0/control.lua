@@ -33,12 +33,14 @@ local function get_player_info(event)
 end
 
 script.on_event(defines.events.on_entity_settings_pasted, function(event)
+  game.print("DO MAGIC!")
   if not event.destination.valid then
     return
   end
   if not event.source.valid then
     return
   end
+  game.print(event.source.name .. "/" .. event.source.type .. " --> " .. event.destination.name .. "/" .. event.destination.type)
   if event.destination.type == event.source.type then
     return
   end

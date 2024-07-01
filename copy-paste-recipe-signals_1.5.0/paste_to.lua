@@ -56,6 +56,21 @@ local function paste_to_inserter(destination, signals, player_info)
     end
 end
 
+local function paste_to_splitter(destination, signals, player_info)
+    local options = tables.filter(signals, function(v) return v.signal.type == "item" end, true) -- array[Signal]
+    local options_count = table_size(options)
+    if options_count == 0 then
+        return
+    end
+
+    -- Not sure what feature is desired for regular filter inserters?
+    if destination.name == "stack-filter-inserter" then
+        local index, next_value = iterate(options, player_info)
+        destination.set_filter(1, next_value and next_value.signal.name)
+        return index
+    end
+end
+
 local function paste_to_computing_combinator(destination, signals, player_info)
     local player_settings = player_info.settings
     local allow_arithmetic = player_settings["copy-paste-recipe-time-paste-product-arithmetic"].value
@@ -63,29 +78,47 @@ local function paste_to_computing_combinator(destination, signals, player_info)
 
     if destination.name == "arithmetic-combinator" and allow_arithmetic then
         local behavior = destination.get_or_create_control_behavior()
-        local previous_parameters = behavior.parameters
+        local previous = behavior.parameters
+        local previous_out = previous.output_signal
+        local previous_in = previous.first_signal
 
         local index, next_value = iterate(signals, player_info)
+        local output_was_each = previous_out.type == "virtual" and previous_out.name == "signal-each"
+        if output_was_each or tables.deep_compare(previous_in, previous_out) then
+            previous.output_signal = next_value.signal
+        end
+        if previous.second_signal and tables.deep_compare(previous_in, previous.second_signal) then
+            previous.second_signal = next_value.signal
+        end
         behavior.parameters = {
           first_signal = next_value.signal,
-          second_signal = previous_parameters.second_signal,
-          operation = previous_parameters.operation,
-          second_constant = previous_parameters.second_constant,
-          output_signal = previous_parameters.output_signal
+          second_signal = previous.second_signal,
+          operation = previous.operation,
+          second_constant = previous.second_constant,
+          output_signal = previous.output_signal
         }
         return index
     elseif destination.name == "decider-combinator" and allow_decider then
         local behavior = destination.get_or_create_control_behavior()
-        local previous_parameters = behavior.parameters
+        local previous = behavior.parameters
+        local previous_out = previous.output_signal
 
         local index, next_value = iterate(signals, player_info)
+        -- MORE COMBINATIONS MISSING
+        local output_was_each = previous_out.type == "virtual" and previous_out.name == "signal-each"
+        if output_was_each or tables.deep_compare(previous_in, previous_out) then
+            previous.output_signal = next_value.signal
+        end
+        if previous_out.type == "virtual" and previous_out.name == "signal-each" then
+            previous_out.name = "signal-everything"
+        end
         behavior.parameters = {
           first_signal = next_value.signal,
-          second_signal = previous_parameters.second_signal,
-          constant = previous_parameters.constant,
-          comparator = previous_parameters.comparator,
-          output_signal = previous_parameters.output_signal,
-          copy_count_from_input = previous_parameters.copy_count_from_input
+          second_signal = previous.second_signal,
+          constant = previous.constant,
+          comparator = previous.comparator,
+          output_signal = previous.output_signal,
+          copy_count_from_input = previous.copy_count_from_input
         }
         return index
     end
@@ -115,6 +148,12 @@ local function paste_to_constant_combinator(destination, signals, player_info)
     end
 end
 
+local circuit_condition_types = {
+    pump = true,
+    inserter = true,
+    belt = true,
+}
+
 return function(destination, signals, player_info)
     if destination.name == "constant-combinator" or destination.name == "ltn-combinator" then
         return paste_to_constant_combinator(destination, signals, player_info)
@@ -125,7 +164,10 @@ return function(destination, signals, player_info)
     if destination.name == "stack-filter-inserter" then
         return paste_to_inserter(destination, signals, player_info)
     end
-    if destination.type == "pump" or destination.type == "inserter" then
+    if destination.type == "splitter" then
+        return paste_to_splitter(destination, signals, player_info)
+    end
+    if circuit_condition_types[destination.type] then
         return paste_to_circuit_condition(destination, signals, player_info)
     end
 end
