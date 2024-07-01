@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2024-07-08
+  Bugfixes:
+    - Fix crash in some cases when pasting on combinators that were using special signals (everything, each)
+    - Fix crash in some cases when there was nothing to copy. A message will be printed instead
+  Features:
+    - Add support for copying from inserters, belts, storage-tanks and many other types
+    - Add support for copying from first signal of circuit condition
+---------------------------------------------------------------------------------------------------
 Version: 1.5.0
 Date: 2024-06-27
   Features:

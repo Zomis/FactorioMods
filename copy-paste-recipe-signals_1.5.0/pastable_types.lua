@@ -8,7 +8,7 @@ local function mod_exists(mod_name)
     return false
 end
 
-return function()
+function pastable_entity_names_table()
     local pastable_types = {
         "constant-combinator",
         "arithmetic-combinator",
@@ -20,6 +20,12 @@ return function()
         for k in pairs(data.raw["inserter"]) do
             table.insert(pastable_types, k)
         end
+        for k in pairs(data.raw["transport-belt"]) do
+            table.insert(pastable_types, k)
+        end
+        for k in pairs(data.raw["splitter"]) do
+            table.insert(pastable_types, k)
+        end
     end
 
     if mod_exists("LTN_Combinator_Modernized") then
@@ -27,3 +33,7 @@ return function()
     end
     return pastable_types
 end
+
+return {
+    entity_names = pastable_entity_names_table()
+}
