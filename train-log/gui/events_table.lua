@@ -41,9 +41,11 @@ local function events_row(train_data, children, summary, gui_id)
     end
 
     local last_change = train_data.last_change
+    local relative_time = game.tick - last_change
     local timestamp = {
         type = "label",
-        caption = misc.ticks_to_timestring(last_change, true)
+        tooltip = misc.ticks_to_timestring(last_change, true),
+        caption = { "train-log.time-relative", misc.ticks_to_timestring(relative_time, true) }
     }
 
     local event_children = {}
