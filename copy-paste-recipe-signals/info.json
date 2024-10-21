@@ -5,7 +5,7 @@
   "author": "Zomis",
   "contact": "zomis2k@hotmail.com",
   "homepage": "https://github.com/Zomis/FactorioMods",
-  "factorio_version": "1.1",
+  "factorio_version": "2.0",
   "dependencies": ["base >= 1.1", "? LTN_Combinator_Modernized", "flib >= 0.12.3"],
   "description": "Copying settings from an Assembling Machine to a combinator will paste one or more signals describing the recipe. On some entities it can be pasted again to switch the signal used"
 }
