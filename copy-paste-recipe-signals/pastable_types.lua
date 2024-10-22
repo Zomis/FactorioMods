@@ -14,7 +14,7 @@ function pastable_entity_names_table()
         "arithmetic-combinator",
         "decider-combinator",
         "pump",
-        "stack-filter-inserter"
+        "inserter"
     }
     if data then
         for k in pairs(data.raw["inserter"]) do

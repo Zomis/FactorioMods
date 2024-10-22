@@ -1,7 +1,7 @@
 require("gui/main_gui")
 local selector = require("selector")
 local events = require("__flib__.event")
-local single = require("gui.single")
+local single = require("gui/single")
 require("integration_interface")
 local integration_fnei = require("integrations/fnei")
 

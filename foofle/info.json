@@ -6,6 +6,6 @@
     "contact": "zomis2k@hotmail.com",
     "homepage": "https://github.com/Zomis/FactorioMods",
     "factorio_version": "2.0",
-    "dependencies": ["flib >= 0.12.3"],
+    "dependencies": ["flib >= 0.15.0"],
     "description": "Link between mods"
 }

@@ -11,7 +11,7 @@ data:extend({
         recipe = "gui-signal-display"
       }
     },
-    prerequisites = {"circuit-network", "optics"},
+    prerequisites = {"circuit-network", "lamp"},
     unit =
     {
       count = 200,

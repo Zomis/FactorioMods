@@ -4,13 +4,14 @@ data:extend({
     name = "gui-signal-display",
     enabled = false,
     energy_required = 20,
-    ingredients =
-    {
-      {"radar", 4},
-      {"green-wire", 40},
-      {"red-wire", 40},
-      {"small-lamp", 10}
+    ingredients = {
+      { type = "item", name = "radar", amount = 4 },
+      { type = "item", name = "electronic-circuit", amount = 80 },
+      { type = "item", name = "copper-cable", amount = 80 },
+      { type = "item", name = "small-lamp", amount = 10 }
     },
-    result = "gui-signal-display"
+    results = {
+      { type = "item", name = "gui-signal-display", amount = 1 }
+    }
   }
 })
