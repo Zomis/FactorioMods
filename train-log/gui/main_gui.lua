@@ -1,22 +1,24 @@
-local gui = require("__flib__.gui-beta")
+local gui = require("__flib__.gui")
 local toolbar = require("gui/toolbar")
 local events_table = require("gui/events_table")
+local gui_handlers = require("gui/handlers")
 
 local function header(gui_id)
     return {
         type = "flow",
-        ref = {"titlebar"},
+        name = "titlebar",
         children = {
             {type = "label", style = "frame_title", caption = {"train-log.header"}, ignored_by_interaction = true},
             {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
             {
                 type = "sprite-button",
                 style = "frame_action_button",
-                sprite = "utility/close_white",
+                sprite = "utility/close",
                 hovered_sprite = "utility/close_black",
                 clicked_sprite = "utility/close_black",
-                actions = {
-                    on_click = { type = "generic", action = "close-window", gui_id = gui_id },
+                handler = gui_handlers.close_window,
+                tags = {
+                    gui_id = gui_id
                 }
             }
         }
@@ -29,7 +31,7 @@ local function open_gui(player, parameter)
         {
             type = "frame",
             direction = "vertical",
-            ref = { "window" },
+            name = "window",
             children = {
                 header(gui_id),
                 toolbar.create_toolbar(gui_id, parameter),
@@ -45,7 +47,7 @@ local function open_gui(player, parameter)
                             content = {
                                 type = "flow",
                                 direction = "vertical",
-                                ref = { "tabs", "events_contents" }
+                                name = "tabs_events_contents"
                             }
                         },
                         {
@@ -56,7 +58,7 @@ local function open_gui(player, parameter)
                             content = {
                                 type = "flow",
                                 direction = "vertical",
-                                ref = { "tabs", "summary_contents" }
+                                name = "tabs_summary_contents"
                             }
                         }
                     }
@@ -64,8 +66,8 @@ local function open_gui(player, parameter)
             }
         }
     }
-    local train_log_gui = gui.build(player.gui.screen, gui_contents)
-    global.guis[gui_id] = {
+    local train_log_gui = gui.add(player.gui.screen, gui_contents)
+    storage.guis[gui_id] = {
         gui_id = gui_id,
         gui = train_log_gui,
         player = player
@@ -76,9 +78,9 @@ local function open_gui(player, parameter)
 end
 
 local function destroy_gui(gui_id)
-    local train_log_gui = global.guis[gui_id]
+    local train_log_gui = storage.guis[gui_id]
     train_log_gui.gui.window.destroy()
-    global.guis[gui_id] = nil
+    storage.guis[gui_id] = nil
 end
 
 local function open_or_close_gui(player, always_open)
@@ -89,7 +91,7 @@ local function open_or_close_gui(player, always_open)
     end
 
     -- close existing gui if one is open
-    for gui_id, train_log_gui in pairs(global.guis) do
+    for gui_id, train_log_gui in pairs(storage.guis) do
         if train_log_gui.player == player then
             destroy_gui(gui_id)
             return
@@ -100,27 +102,18 @@ local function open_or_close_gui(player, always_open)
     open_gui(player)
 end
 
-local function handle_action(action, event)
-    if action.action == "close-window" then
-        destroy_gui(action.gui_id)
-    end
-    if action.action == "open-train-log" then -- mod-gui-button
-        local player = game.players[event.player_index]
-        open_or_close_gui(player, event.control or event.shift)
-    end
+function gui_handlers.open_train_log(event)
+    local player = game.players[event.player_index]
+    open_or_close_gui(player, event.control or event.shift)
 end
 
-gui.hook_events(function(event)
-	local action = gui.read_action(event)
-	if action then
-        if action.type == "generic" then
-            handle_action(action, event)
-        elseif action.type == "table" then
-            events_table.handle_action(action, event)
-        elseif action.type == "toolbar" then
-            toolbar.handle_action(action, event)
-        end
-	end
+function gui_handlers.close_window(event)
+    local gui_id = event.element.tags.gui_id
+    destroy_gui(gui_id)
+end
+
+gui.add_handlers(gui_handlers, function(e, handler)
+    handler(e)
 end)
 
 return {

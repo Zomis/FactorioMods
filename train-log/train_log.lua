@@ -1,16 +1,15 @@
-local events = require("__flib__.event")
 local tables = require("__flib__.table")
 local MAX_KEEP = 60 * 60 * 60 * 24 -- ticks * seconds * minutes * hours
 
 local function clear_older_force(force_index, older_than)
-    -- local old_size = table_size(global.history)
-    global.history = tables.filter(global.history, function(v)
+    -- local old_size = table_size(storage.history)
+    storage.history = tables.filter(storage.history, function(v)
         return v.force_index ~= force_index or v.last_change >= older_than
     end, true)
-    global.trains = tables.filter(global.trains, function(v)
+    storage.trains = tables.filter(storage.trains, function(v)
         return v.train.valid
     end, false)
-    -- game.print("Clear older " .. old_size .. " => " .. table_size(global.history) .. " for force " .. force_index)
+    -- game.print("Clear older " .. old_size .. " => " .. table_size(storage.history) .. " for force " .. force_index)
 end
 
 local function clear_older(player_index, older_than)
@@ -47,15 +46,15 @@ local function diff(old_values, new_values)
 end
 
 local function get_train_data(train, train_id)
-    if not global.trains[train_id] then
-        global.trains[train_id] = new_current(train)
+    if not storage.trains[train_id] then
+        storage.trains[train_id] = new_current(train)
     end
 
-    return global.trains[train_id]
+    return storage.trains[train_id]
 end
 
 local function get_logs(force)
-    return tables.filter(global.trains, function(train_data)
+    return tables.filter(storage.trains, function(train_data)
         return train_data.force_index == force.index
     end)
 end
@@ -66,13 +65,13 @@ local function add_log(train_data, log_event)
 end
 
 local function finish_current_log(train, train_id, train_data)
-    table.insert(global.history, train_data)
+    table.insert(storage.history, train_data)
     local new_data = new_current(train)
-    global.trains[train_id] = new_data
+    storage.trains[train_id] = new_data
     clear_older_force(new_data.force_index, game.tick - MAX_KEEP)
 end
 
-events.on_train_schedule_changed(function(event)
+script.on_event(defines.events.on_train_schedule_changed, function(event)
     local train = event.train
     local train_id = train.id
     local train_data = get_train_data(train, train_id)
@@ -84,7 +83,6 @@ events.on_train_schedule_changed(function(event)
 end)
 
 local interesting_states = {
-    [defines.train_state.path_lost] = true,
     [defines.train_state.no_schedule] = true,
     [defines.train_state.no_path] = true,
     [defines.train_state.wait_signal] = false, -- TODO: Add wait at signal info later
@@ -94,14 +92,21 @@ local interesting_states = {
     [defines.train_state.destination_full] = true
 }
 
+local function contents_as_table(contents)
+    local result = {}
+    for _, v in pairs(contents) do
+        result[v.name] = v.count -- TODO: Consider quality!
+    end
+end
+
 local function read_contents(train)
     return {
-        items = train.get_contents(),
+        items = contents_as_table(train.get_contents()),
         fluids = train.get_fluid_contents()
     }
 end
 
-events.on_train_changed_state(function(event)
+script.on_event(defines.events.on_train_changed_state, function(event)
     local train = event.train
     local train_id = train.id
     local train_data = get_train_data(train, train_id)
@@ -123,7 +128,7 @@ events.on_train_changed_state(function(event)
         state = train.state
     }
     if event.old_state == defines.train_state.wait_station then
-        local diff_items = diff(train_data.contents.items, train.get_contents())
+        local diff_items = diff(train_data.contents.items, contents_as_table(train.get_contents()))
         local diff_fluids = diff(train_data.contents.fluids, train.get_fluid_contents())
         train_data.contents = read_contents(train)
         log.diff = {

@@ -1,6 +1,6 @@
 local gui_utils = require("gui/gui_utils")
-local misc = require("__flib__.misc")
-local gui = require("__flib__.gui-beta")
+local flib_format = require("__flib__.format")
+local gui = require("__flib__.gui")
 local trains = require("__flib__.train")
 local time_filter = require("filter-time")
 local summary_gui = require("gui/summary")
@@ -8,7 +8,7 @@ local summary_gui = require("gui/summary")
 local function handle_action(action, event)
     if action.action == "open-train" then
         local train_id = action.train_id
-        local train_data = global.trains[train_id]
+        local train_data = storage.trains[train_id]
         local train = train_data.train
         trains.open_gui(event.player_index, train)
     end
@@ -44,8 +44,8 @@ local function events_row(train_data, children, summary, gui_id)
     local relative_time = game.tick - last_change
     local timestamp = {
         type = "label",
-        tooltip = misc.ticks_to_timestring(last_change, true),
-        caption = { "train-log.time-relative", misc.ticks_to_timestring(relative_time, true) }
+        tooltip = flib_format.time(last_change, true),
+        caption = { "train-log.time-relative", flib_format.time(relative_time, true) }
     }
 
     local event_children = {}
@@ -56,7 +56,7 @@ local function events_row(train_data, children, summary, gui_id)
         local delay_button = {
             type = "sprite-button",
             sprite = "train_log_timer-outline",
-            tooltip = misc.ticks_to_timestring(last_change, true)
+            tooltip = flib_format.time(last_change, true)
         }
         table.insert(event_children, delay_button)
         ]]--
@@ -214,10 +214,10 @@ end
 local function create_events_table(gui_id)
     -- Loop through train datas, start with oldest (easier to move newest to the end)
     -- Loop through all the histories first and then check current, sort by the tick of last entry
-    local train_log_gui = global.guis[gui_id]
+    local train_log_gui = storage.guis[gui_id]
     local histories = {}
-    local train_datas = global.trains
-    for _, history in pairs(global.history) do
+    local train_datas = storage.trains
+    for _, history in pairs(storage.history) do
         if history.force_index == train_log_gui.player.force.index then
             table.insert(histories, history)
         end
@@ -231,22 +231,21 @@ local function create_events_table(gui_id)
     table.sort(histories, function(a, b) return a.last_change < b.last_change end)
 
     local filters = {
-        item = train_log_gui.gui.filter.item.elem_value,
-        fluid = train_log_gui.gui.filter.fluid.elem_value,
-        station_name = train_log_gui.gui.filter.station_name.text:lower(),
-        time_period = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
+        item = train_log_gui.gui.filter_item.elem_value,
+        fluid = train_log_gui.gui.filter_fluid.elem_value,
+        station_name = train_log_gui.gui.filter_station_name.text:lower(),
+        time_period = game.tick - time_filter.ticks(train_log_gui.gui.filter_time_period.selected_index)
     }
 
     local children_guis, summary = create_result_guis(histories, filters, { "train", "timestamp", "events" }, gui_id)
-    local tabs = train_log_gui.gui.tabs
-    tabs.events_contents.clear()
-    tabs.summary_contents.clear()
+    train_log_gui.gui.tabs_events_contents.clear()
+    train_log_gui.gui.tabs_summary_contents.clear()
 
-    gui.build(tabs.summary_contents, {
+    gui.add(train_log_gui.gui.tabs_summary_contents, {
         {
             type = "scroll-pane",
             style = "flib_naked_scroll_pane_no_padding",
-            ref = { "scroll_pane" },
+--            name = "scroll_pane",
             vertical_scroll_policy = "always",
             style_mods = {width = 650, height = 400, padding = 6},
             children = {
@@ -259,17 +258,17 @@ local function create_events_table(gui_id)
         }
     })
 
-    return gui.build(tabs.events_contents, {
+    return gui.add(train_log_gui.gui.tabs_events_contents, {
         {
             type = "scroll-pane",
             style = "flib_naked_scroll_pane_no_padding",
-            ref = { "scroll_pane" },
+--            name = "scroll_pane",
             vertical_scroll_policy = "always",
             style_mods = {width = 650, height = 400, padding = 6},
             children = {
                 {
                     type = "table",
-                    ref = { "events_table" },
+                    name = "events_table",
                     column_count = 3,
                     children = children_guis
                 }

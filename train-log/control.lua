@@ -1,21 +1,24 @@
-local events = require("__flib__.event")
+require("gui/handlers")
 
 local train_log_gui = require("gui/main_gui")
 require("train_log")
 require("gui/mod_gui_button")
 require("migration")
+local flib_gui = require("__flib__.gui")
 local foofle = require("foofle")
 
-events.on_init(function()
-    global.guis = {}
-    global.history = {}
-    global.trains = {}
+script.on_init(function()
+    storage.guis = {}
+    storage.history = {}
+    storage.trains = {}
 end)
 
-events.register("train-log-open", function(event)
+script.on_event("train-log-open", function(event)
 	train_log_gui.open_or_close_gui(game.players[event.player_index])
 end)
 
 script.on_load(function()
     foofle.on_load()
 end)
+
+flib_gui.handle_events()

@@ -8,7 +8,7 @@ local function refresh(gui_id)
 end
 
 local function handle_action(action, event)
-    local train_log_gui = global.guis[action.gui_id]
+    local train_log_gui = storage.guis[action.gui_id]
     if action.action == "clear-older" then
         local older_than = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
         local player = game.players[event.player_index]
@@ -74,7 +74,7 @@ local function create_toolbar(gui_id, parameter)
                         type = "drop-down",
                         items = time_filter.time_period_items,
                         selected_index = time_filter.default_index,
-                        ref = { "filter", "time_period" },
+                        name = "filter_time_period",
                         actions = {
                             on_selection_state_changed = { type = "toolbar", action = "refresh", gui_id = gui_id }
                         }
@@ -112,7 +112,7 @@ local function create_toolbar(gui_id, parameter)
                             {
                                 type = "textfield",
                                 tooltip = { "train-log.filter-station-name" },
-                                ref = { "filter", "station_name" },
+                                name = "filter_station_name",
                                 actions = {
                                     on_confirmed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
@@ -135,7 +135,7 @@ local function create_toolbar(gui_id, parameter)
                                 elem_type = "item",
                                 item = filter_item,
                                 tooltip = { "train-log.filter-item-tooltip" },
-                                ref = { "filter", "item" },
+                                name = "filter_item",
                                 actions = {
                                     on_elem_changed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,
@@ -152,7 +152,7 @@ local function create_toolbar(gui_id, parameter)
                                 elem_type = "fluid",
                                 fluid = filter_fluid,
                                 tooltip = { "train-log.filter-fluid-tooltip" },
-                                ref = { "filter", "fluid" },
+                                name = "filter_fluid",
                                 actions = {
                                     on_elem_changed = {
                                         type = "toolbar", action = "apply-filter", gui_id = gui_id,

@@ -1,4 +1,3 @@
-local events = require("__flib__.event")
 local mod_gui_button = require("gui/mod_gui_button")
 
 local function add_mod_gui_buttons()
@@ -9,6 +8,6 @@ local function add_mod_gui_buttons()
     end
 end
 
-events.on_configuration_changed(function()
+script.on_configuration_changed(function()
     add_mod_gui_buttons()
 end)

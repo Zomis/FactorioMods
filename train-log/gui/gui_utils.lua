@@ -1,11 +1,11 @@
 local function sprite_button_type_name_amount(type, name, amount, color, gui_id)
     local prototype = nil
     if type == "item" then
-        prototype = game.item_prototypes[name]
+        prototype = prototypes.item[name]
     elseif type == "fluid" then
-        prototype = game.fluid_prototypes[name]
+        prototype = prototypes.fluid[name]
     elseif type == "virtual-signal" then
-        prototype = game.virtual_signal_prototypes[name]
+        prototype = prototypes.virtual_signal[name]
     end
     local sprite = prototype and (type .. "/" .. name) or nil
     local tooltip = prototype and prototype.localised_name or (type .. "/" .. name)
@@ -25,8 +25,6 @@ local function sprite_button_for_state(state)
     local description = ""
     if state == defines.train_state.on_the_path	then
         description = { "train-log.train_state-on_the_path" }
-    elseif state == defines.train_state.path_lost then
-        description = { "train-log.train_state-path_lost" }
     elseif state == defines.train_state.no_schedule then
         description = { "train-log.train_state-no_schedule" }
     elseif state == defines.train_state.no_path then
