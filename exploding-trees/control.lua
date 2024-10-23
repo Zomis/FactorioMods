@@ -35,8 +35,8 @@ local function explode(entity)
 end
 
 local function handle_event(event_type, event)
-	if global.random == nil then
-		global.random = game.create_random_generator()
+	if storage.random == nil then
+		storage.random = game.create_random_generator()
 	end
 
 	local upper_bound = 0
@@ -49,7 +49,7 @@ local function handle_event(event_type, event)
 		upper_bound = settings.global["exploding-trees-probability-kill"].value
 	end
 
-	if global.random(1, 100) <= upper_bound then
+	if storage.random(1, 100) <= upper_bound then
 		explode(event.entity)
 	end
 end
