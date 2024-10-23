@@ -1,5 +1,17 @@
 data:extend({
   {
+    type = "shortcut",
+    name = "lamp-placer",
+    localised_name = { "shortcut.lamp-placer" },
+    order = "a",
+    action = "lua",
+    style = "default",
+    icon = "__lamp-placer__/graphics/lamp-placer.png",
+    icon_size = 32,
+    small_icon = "__lamp-placer__/graphics/lamp-placer.png",
+    small_icon_size = 32,
+  },
+  {
     type = "selection-tool",
     select = {
       mode = { "any-tile" },

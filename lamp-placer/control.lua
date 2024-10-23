@@ -18,7 +18,7 @@ end
 
 local function findElectricity(poles, x, y)
     for _, entity in ipairs(poles) do
-        if entity.valid and isInRange(entity.position, x, y, entity.prototype.supply_area_distance) then
+        if entity.valid and isInRange(entity.position, x, y, entity.prototype.get_supply_area_distance(entity.quality)) then
             return true
         end
     end
@@ -115,6 +115,14 @@ local function on_tick(event)
     Async:on_tick()
 end
 
+script.on_event(defines.events.on_lua_shortcut, function(event)
+    -- Toolbar
+    if event.prototype_name == "lamp-placer" then
+        local player = game.players[event.player_index]
+        player.cursor_stack.set_stack({ name = "lamp-placer" })
+        player.cursor_stack_temporary = true
+    end
+end)
 script.on_event(defines.events.on_tick, on_tick)
 script.on_event(defines.events.on_player_selected_area, on_player_selected_area)
 script.on_event(defines.events.on_player_alt_selected_area, on_player_selected_area)
