@@ -73,10 +73,10 @@ local function destroyCombinator(key)
 end
 
 local function onInit()
-  if not global.fum_uic then
-    global.fum_uic = {}
+  if not storage.fum_uic then
+    storage.fum_uic = {}
   end
-  combinatorsToUI = global.fum_uic
+  combinatorsToUI = storage.fum_uic
 end
 
 local function onConfigurationChanged(data)
@@ -113,7 +113,7 @@ local function onConfigurationChanged(data)
 end
 
 local function onLoad()
-  combinatorsToUI = global.fum_uic
+  combinatorsToUI = storage.fum_uic
 end
 
 --Destroys a gui and removes from table
@@ -139,9 +139,9 @@ end
 
 --When we place a new gui-signal-display, it's stored. Value is {entity, ui}
 local function onPlaceEntity(event)
-  if event.created_entity.name == "gui-signal-display" then
+  if event.entity.name == "gui-signal-display" then
     local id = getNewId()
-    local uicomb = {entity = event.created_entity, title = "Signal Display " .. id}
+    local uicomb = {entity = event.entity, title = "Signal Display " .. id}
     combinatorsToUI[id] = uicomb
     if event.robot then
       for _, player in pairs(event.robot.force.players) do

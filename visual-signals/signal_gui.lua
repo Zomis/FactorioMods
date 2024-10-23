@@ -23,22 +23,22 @@ local function CountString(count)
 end
 
 local function UpdateSingleSignal(gui, signal)
-  local typename = signal.signal.type
+  local typename = signal.signal.type or "item"
   if typename == "virtual" then
     typename = "virtual-signal"
   end
   local prototype
   if typename == "item" then
-    prototype = game.item_prototypes[signal.signal.name]
+    prototype = prototypes.item[signal.signal.name]
   elseif typename == "fluid" then
-    prototype = game.fluid_prototypes[signal.signal.name]
+    prototype = prototypes.fluid[signal.signal.name]
   elseif typename == "virtual-signal" then
-    prototype = game.virtual_signal_prototypes[signal.signal.name]
+    prototype = prototypes.virtual_signal[signal.signal.name]
   end
   local spriteName = typename .. "/" .. signal.signal.name
   if gui.icon.sprite ~= spriteName then
     gui.icon.tooltip = prototype.localised_name
-    gui.icon.sprite = typename .. "/" .. signal.signal.name
+    gui.icon.sprite = spriteName
   end
   gui.valueLabel.caption = CountString(signal.count)
 end
