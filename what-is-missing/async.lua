@@ -16,7 +16,7 @@ local async_loop_function = nil
 local function add_async_task(task)
     if not async_tasks then
         async_tasks = {}
-        global.async_tasks = async_tasks
+        storage.async_tasks = async_tasks
     end
     for k, existing_task in pairs(async_tasks) do
         if async_tasks[k] == task.save_state then
@@ -232,10 +232,10 @@ end
 function Async:initialize()
     -- game.print("Async:initialize")
     -- perform configuration step
-    if not global.async_tasks then
-        global.async_tasks = {}
+    if not storage.async_tasks then
+        storage.async_tasks = {}
     end
-    async_tasks = global.async_tasks
+    async_tasks = storage.async_tasks
     for _, task_state in pairs(async_tasks) do
         Async:load_task(task_state)
     end
