@@ -175,8 +175,8 @@ local function updateUICombinator(key, uicomb)
     destroyGui(entity)
     return false
   end
-  local circuit_red = entity.get_circuit_network(defines.wire_type.red)
-  local circuit_green = entity.get_circuit_network(defines.wire_type.green)
+  local circuit_red = entity.get_circuit_network(defines.wire_connector_id.circuit_red)
+  local circuit_green = entity.get_circuit_network(defines.wire_connector_id.circuit_green)
   local force = entity.force
   for _, player in ipairs(force.players) do
     if player.gui.left["gui_signal_display"] and player.gui.left["gui_signal_display"]["gui_signal_panel"] then
@@ -244,8 +244,8 @@ local function onClick(event)
         tableui.add({type = "checkbox", name = "gui_signal_display_shown" .. k, caption = "", state = shown})
         tableui.add({type = "textfield", name = "gui_signal_display_nameEdit" .. k, text = v.title or ""})
 
-        local circuit_red = v.entity.get_circuit_network(defines.wire_type.red)
-        local circuit_green = v.entity.get_circuit_network(defines.wire_type.green)
+        local circuit_red = v.entity.get_circuit_network(defines.wire_connector_id.circuit_red)
+        local circuit_green = v.entity.get_circuit_network(defines.wire_connector_id.circuit_green)
         SignalGui.CreateSignalGuiPanel(tableui, circuit_red, circuit_green, "signals" .. k)
       end
     end
