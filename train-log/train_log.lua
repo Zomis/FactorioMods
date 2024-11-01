@@ -149,6 +149,7 @@ script.on_event(defines.events.on_train_changed_state, function(event)
             log.contents = train_data.contents.items
             log.fluids = train_data.contents.fluids
             log.station = train.station
+            log.surface = train.front_end.rail.surface.name
         end
     end
 

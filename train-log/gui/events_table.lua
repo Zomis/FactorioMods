@@ -8,7 +8,6 @@ local summary_gui = require("gui/summary")
 
 gui_handlers.events_table = function(event)
     local action = event.element.tags
-    game.print(action.action_type)
     if action.action_type == "open-train" then
         local train_id = action.train_id
         local train_data = storage.trains[train_id]
@@ -100,7 +99,7 @@ local function events_row(train_data, children, summary, gui_id)
                     tags = {
                         action_type = "position",
                         position = event.position,
-                        surface = event.station.surface.name
+                        surface = event.surface
                     }
                 })
             else
@@ -112,7 +111,7 @@ local function events_row(train_data, children, summary, gui_id)
                     tags = {
                         action_type = "position",
                         position = event.position,
-                        surface = event.station.surface.name
+                        surface = event.surface
                     }
                 })
             end
@@ -125,7 +124,7 @@ local function events_row(train_data, children, summary, gui_id)
                 tags = {
                     action_type = "position",
                     position = event.position,
-                    surface = event.station.surface.name
+                    surface = event.surface
                 }
             })
         end
