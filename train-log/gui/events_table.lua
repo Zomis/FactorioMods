@@ -1,3 +1,4 @@
+local gui_handlers = require("gui/handlers")
 local gui_utils = require("gui/gui_utils")
 local flib_format = require("__flib__.format")
 local gui = require("__flib__.gui")
@@ -5,16 +6,23 @@ local trains = require("__flib__.train")
 local time_filter = require("filter-time")
 local summary_gui = require("gui/summary")
 
-local function handle_action(action, event)
-    if action.action == "open-train" then
+gui_handlers.events_table = function(event)
+    local action = event.element.tags
+    game.print(action.action_type)
+    if action.action_type == "open-train" then
         local train_id = action.train_id
         local train_data = storage.trains[train_id]
         local train = train_data.train
         trains.open_gui(event.player_index, train)
     end
-    if action.action == "position" then
+    if action.action_type == "position" then
         local player = game.players[event.player_index]
-        player.zoom_to_world(action.position, 0.5)
+--        player.zoom_to_world(action.position, 0.5)
+        player.set_controller({
+            type = defines.controllers.remote,
+            position = action.position,
+            surface = action.surface
+        })
     end
 end
 
@@ -28,8 +36,10 @@ local function events_row(train_data, children, summary, gui_id)
             sprite = "item/" .. gui_utils.signal_for_entity(train_data.train.front_stock).name,
             number = train_data.train.id,
             tooltip = prototype.localised_name,
-            actions = {
-                on_click = { type = "table", action = "open-train", train_id = train_data.train.id }
+            handler = gui_handlers.events_table,
+            tags = {
+                action_type = "open-train",
+                train_id = train_data.train.id
             }
         }
     else
@@ -86,8 +96,11 @@ local function events_row(train_data, children, summary, gui_id)
                     type = "sprite-button",
                     sprite = "entity/" .. event.station.name,
                     tooltip = {"train-log.station-name", event.station.backer_name},
-                    actions = {
-                        on_click = { type = "table", action = "position", position = event.position }
+                    handler = gui_handlers.events_table,
+                    tags = {
+                        action_type = "position",
+                        position = event.position,
+                        surface = event.station.surface.name
                     }
                 })
             else
@@ -95,8 +108,11 @@ local function events_row(train_data, children, summary, gui_id)
                     type = "sprite-button",
                     sprite = "train_log_train",
                     tooltip = {"train-log.station-removed"},
-                    actions = {
-                        on_click = { type = "table", action = "position", position = event.position }
+                    handler = gui_handlers.events_table,
+                    tags = {
+                        action_type = "position",
+                        position = event.position,
+                        surface = event.station.surface.name
                     }
                 })
             end
@@ -105,8 +121,11 @@ local function events_row(train_data, children, summary, gui_id)
                 type = "sprite-button",
                 sprite = "train_log_crosshairs-gps",
                 tooltip = { "train-log.temporary-stop-at", event.position.x, event.position.y },
-                actions = {
-                    on_click = { type = "table", action = "position", position = event.position }
+                handler = gui_handlers.events_table,
+                tags = {
+                    action_type = "position",
+                    position = event.position,
+                    surface = event.station.surface.name
                 }
             })
         end
@@ -278,6 +297,5 @@ local function create_events_table(gui_id)
 end
 
 return {
-    handle_action = handle_action,
     create_events_table = create_events_table
 }

@@ -1,3 +1,5 @@
+local gui_handlers = require("gui/handlers")
+
 local function sprite_button_type_name_amount(type, name, amount, color, gui_id)
     local prototype = nil
     if type == "item" then
@@ -14,8 +16,13 @@ local function sprite_button_type_name_amount(type, name, amount, color, gui_id)
         style = color and "flib_slot_button_" .. color or "flib_slot_button_default",
         sprite = sprite,
         number = amount,
-        actions = {
-            on_click = { type = "toolbar", action = "filter", filter = type, value = name, gui_id = gui_id }
+        handler = gui_handlers.toolbar,
+        tags = {
+            action_event = defines.events.on_gui_click,
+            action_type = "filter",
+            filter_type = type,
+            filter_value = name,
+            gui_id = gui_id
         },
         tooltip = tooltip
     }
