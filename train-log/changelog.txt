@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.3.0
+Date: 2024-11-01
+  Features:
+    - Update for Factorio 2.0
+    - Added checkbox for only showing train log events that includes current surface
+
+---------------------------------------------------------------------------------------------------
 Version: 1.2.1
 Date: 2024-08-13
   Changes:

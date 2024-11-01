@@ -77,6 +77,15 @@ local function open_gui(player, parameter)
     events_table.create_events_table(gui_id)
 end
 
+local function update_player_gui(player)
+    local guis = storage.guis
+    for gui_id, train_log_gui in pairs(guis) do
+        if train_log_gui and train_log_gui.player == player then
+            toolbar.refresh(gui_id)
+        end
+    end
+end
+
 local function destroy_gui(gui_id)
     local train_log_gui = storage.guis[gui_id]
     train_log_gui.gui.window.destroy()
@@ -118,5 +127,6 @@ end)
 
 return {
     open_or_close_gui = open_or_close_gui,
+    update_player_gui = update_player_gui,
     open = open_gui
 }

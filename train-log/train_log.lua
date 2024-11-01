@@ -136,6 +136,7 @@ script.on_event(defines.events.on_train_changed_state, function(event)
             items = diff_items,
             fluids = diff_fluids
         }
+        log.surface = train.front_end.rail.surface.name
         -- end old entry, but save timestamp somewhere
     end
     if new_state == defines.train_state.wait_station then

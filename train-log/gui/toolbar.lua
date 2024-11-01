@@ -117,6 +117,24 @@ local function create_toolbar(gui_id, parameter)
                 direction = "horizontal",
                 children = {
                     {
+                        type = "checkbox",
+                        name = "filter_current_surface",
+                        caption = { "train-log.filter-current-surface" },
+                        handler = gui_handlers.toolbar,
+                        state = true,
+                        tags = {
+                            action_type = "apply-filter",
+                            action_event = defines.events.on_gui_click,
+                            gui_id = gui_id
+                        }
+                    }
+                }
+            },
+            {
+                type = "flow",
+                direction = "horizontal",
+                children = {
+                    {
                         type = "flow",
                         direction = "vertical",
                         children = {
@@ -198,5 +216,6 @@ local function create_toolbar(gui_id, parameter)
 end
 
 return {
-    create_toolbar = create_toolbar
+    create_toolbar = create_toolbar,
+    refresh = refresh
 }

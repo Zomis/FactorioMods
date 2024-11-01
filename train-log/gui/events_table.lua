@@ -171,7 +171,7 @@ local function events_row(train_data, children, summary, gui_id)
     table.insert(children, event_flow)
 end
 
-local function matches_filter(result, filters)
+local function matches_filter(result, filters, player)
     if result.last_change < filters.time_period then
         return false
     end
@@ -179,7 +179,8 @@ local function matches_filter(result, filters)
     local matches_item = filters.item == nil
     local matches_fluid = filters.fluid == nil
     local matches_station = filters.station_name == ""
-    if matches_item and matches_fluid and matches_station then
+    local matches_surface = not filters.current_surface
+    if matches_item and matches_fluid and matches_station and matches_surface then
         return true
     end
     for _, event in pairs(result.events) do
@@ -195,7 +196,10 @@ local function matches_filter(result, filters)
                 matches_station = true
             end
         end
-        if matches_item and matches_fluid and matches_station then
+        if not matches_surface and event.surface then
+            matches_surface = player.surface.name == event.surface
+        end
+        if matches_item and matches_fluid and matches_station and matches_surface then
             return true
         end
     end
@@ -221,8 +225,11 @@ local function create_result_guis(results, filters, columns, gui_id)
             caption = { "train-log.table-header-" .. column }
         })
     end
+    local train_log_gui = storage.guis[gui_id]
+    local player = train_log_gui.player
+
     for _, result in iterate_backwards(results) do
-        if matches_filter(result, filters) then
+        if matches_filter(result, filters, player) then
             events_row(result, children, summary, gui_id)
         end
     end
@@ -251,6 +258,7 @@ local function create_events_table(gui_id)
     local filters = {
         item = train_log_gui.gui.filter_item.elem_value,
         fluid = train_log_gui.gui.filter_fluid.elem_value,
+        current_surface = train_log_gui.gui.filter_current_surface.state,
         station_name = train_log_gui.gui.filter_station_name.text:lower(),
         time_period = game.tick - time_filter.ticks(train_log_gui.gui.filter_time_period.selected_index)
     }
