@@ -21,11 +21,11 @@ local function handle_action(action, event)
     end
     if action.action == "filter" then
         local filter = action.filter
-        if filter == "item" and game.item_prototypes[action.value] then
+        if filter == "item" and prototypes.item[action.value] then
             train_log_gui.gui.filter.item.elem_value = action.value
             action.action = "apply-filter"
         end
-        if filter == "fluid" and game.fluid_prototypes[action.value] then
+        if filter == "fluid" and prototypes.fluid[action.value] then
             train_log_gui.gui.filter.fluid.elem_value = action.value
             action.action = "apply-filter"
         end

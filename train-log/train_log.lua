@@ -97,6 +97,7 @@ local function contents_as_table(contents)
     for _, v in pairs(contents) do
         result[v.name] = v.count -- TODO: Consider quality!
     end
+    return result
 end
 
 local function read_contents(train)
