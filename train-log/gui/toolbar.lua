@@ -16,7 +16,7 @@ gui_handlers.toolbar = function(event)
         return
     end
     if action_type == "clear-older" then
-        local older_than = game.tick - time_filter.ticks(train_log_gui.gui.filter.time_period.selected_index)
+        local older_than = game.tick - time_filter.ticks(train_log_gui.gui.filter_time_period.selected_index)
         local player = game.players[event.player_index]
         local force = player.force
         train_log.clear_older(event.player_index, older_than)
