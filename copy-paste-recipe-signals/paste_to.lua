@@ -75,7 +75,7 @@ local function paste_to_computing_combinator(destination, signals, player_info)
         local previous_in = previous.first_signal
 
         local index, next_value = iterate(signals, player_info)
-        local output_was_each = previous_out.type == "virtual" and previous_out.name == "signal-each"
+        local output_was_each = previous_out and previous_out.type == "virtual" and previous_out.name == "signal-each"
         if output_was_each or tables.deep_compare(previous_in, previous_out) then
             previous.output_signal = next_value.signal
         end
@@ -97,11 +97,11 @@ local function paste_to_computing_combinator(destination, signals, player_info)
 
         local index, next_value = iterate(signals, player_info)
         -- MORE COMBINATIONS MISSING
-        local output_was_each = previous_out.type == "virtual" and previous_out.name == "signal-each"
+        local output_was_each = previous_out and previous_out.type == "virtual" and previous_out.name == "signal-each"
         if output_was_each or tables.deep_compare(previous.first_signal, previous_out) then
             previous.output_signal = next_value.signal
         end
-        if previous_out.type == "virtual" and previous_out.name == "signal-each" then
+        if output_was_each then
             previous_out.name = "signal-everything"
         end
         behavior.parameters = {
