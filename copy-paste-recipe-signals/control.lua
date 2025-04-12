@@ -4,9 +4,9 @@ local paste_to = require "paste_to"
 local function get_player_info(event)
   local player_index = event.player_index
 
-  global.player_info = global.player_info or {}
-  if not global.player_info[player_index] then
-    global.player_info[player_index] = {
+  storage.player_info = storage.player_info or {}
+  if not storage.player_info[player_index] then
+    storage.player_info[player_index] = {
       last_copy = {
         from = nil,
         to = nil,
@@ -14,9 +14,9 @@ local function get_player_info(event)
       }
     }
   end
-  local player_info = global.player_info[player_index]
+  local player_info = storage.player_info[player_index]
   if event.source ~= player_info.last_copy.from or event.destination ~= player_info.last_copy.to then
-    global.player_info[player_index] = {
+    storage.player_info[player_index] = {
       last_copy = {
         from = nil,
         to = nil,
@@ -27,7 +27,7 @@ local function get_player_info(event)
 
   return {
     player = game.players[player_index],
-    last_copy = global.player_info[player_index].last_copy or {},
+    last_copy = storage.player_info[player_index].last_copy or {},
     settings = settings.get_player_settings(player_index)
   }
 end
@@ -57,7 +57,7 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     return
   end
   local update_result = paste_to(event.destination, source_values, player_info)
-  global.player_info[event.player_index] = {
+  storage.player_info[event.player_index] = {
     last_copy = {
       from = event.source,
       to = event.destination,
