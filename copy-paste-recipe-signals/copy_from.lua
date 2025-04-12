@@ -89,8 +89,13 @@ return function(source, player_info)
   local function add_signal_id(signal_id)
     table.insert(results, { signal = signal_id, count = 1 })
   end
-  local function add_item(name, value)
-    table.insert(results, { signal = { type = "item", name = name }, count = value or 1 })
+  local function add_item(item_with_quality, value)
+    local name = item_with_quality.name
+    local quality = item_with_quality.quality
+    if not prototypes.item[name] then
+      error("Wrong item values: " .. tostring(name) .. "; " .. tostring(value))
+    end
+    table.insert(results, { signal = { type = "item", name = name, quality = quality }, count = value or 1 })
   end
   local function add_fluid(name, value)
     table.insert(results, { signal = { type = "fluid", name = name }, count = value or 1 })
@@ -108,8 +113,8 @@ return function(source, player_info)
     local transport_lines = source.get_max_transport_line_index()
     for i = 1, transport_lines do
       local line = source.get_transport_line(i)
-      for name, count in pairs(line.get_contents()) do
-        add_item(name, count)
+      for _, item_with_quality_counts in pairs(line.get_contents()) do
+        add_item(item_with_quality_counts, item_with_quality_counts.count)
       end
     end
   end
