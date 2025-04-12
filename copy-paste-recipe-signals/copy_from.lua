@@ -79,7 +79,33 @@ local function get_recipe_signals(source, player_info)
   return signals
 end
 
+local function merge_output(signals)
+  local function signal_string_id(signal)
+    return signal.signal.type .. "//" .. signal.signal.name .. "//" .. tostring(signal.signal.quality)
+  end
+
+  -- Returns: Array of "signals", each signal has: { signal = { type, name, quality }, count = 42 }
+  local seen = {}
+  local results = {}
+  local result_index = 1
+  for _, signal in pairs(signals) do
+    local string_id = signal_string_id(signal)
+    if seen[string_id] then
+      -- Add to existing
+      local index = seen[string_id]
+      results[index].count = results[index].count + signal.count
+    else
+      results[result_index] = signal
+      seen[string_id] = result_index
+    end
+    result_index = result_index + 1
+  end
+  return results
+end
+
 return function(source, player_info)
+  -- Returns: Array of "signals", each signal has: { signal = { type, name, quality }, count = 42 }
+
   local source_type = source.prototype.type
   local results = {}
   if source_type == "assembling-machine" or source_type == "furnace" then
@@ -154,5 +180,6 @@ return function(source, player_info)
     end
   end
   results = tables.filter(results, function(v) return v.signal.name ~= nil end, true)
+  results = merge_output(results)
   return results
 end
