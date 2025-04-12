@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.0
+Date: 2025-04-12
+  Features:
+    - Update for Factorio 2.0
+    - Allow pasting to splitter filter (thanks to bugfix https://forums.factorio.com/viewtopic.php?p=613474)
+---------------------------------------------------------------------------------------------------
 Version: 1.6.0
 Date: 2024-07-08
   Bugfixes:
