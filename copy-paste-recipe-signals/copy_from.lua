@@ -20,12 +20,19 @@ local function get_recipe_signals(source, player_info)
   local time_includes_modules = player_settings["copy-paste-recipe-time-includes-modules"].value
   local item_count_as_request_chest = player_settings["copy-paste-recipe-copy-item-count-as-request-chest"].value
 
-  local recipe = source.get_recipe()
+  local recipe, quality = source.get_recipe()
   if not recipe and source.prototype.type == "furnace" then
-    recipe = source.previous_recipe
+    local previous_recipe = source.previous_recipe
+    if previous_recipe then
+      recipe = previous_recipe.name
+      if type(recipe) == "string" then
+        recipe = prototypes.recipe[recipe]
+      end
+      quality = previous_recipe.quality
+    end
   end
   if not recipe then
-      return {}
+    return {}
   end
   local speed_adjustment = time_includes_modules and source.crafting_speed or 1
 
@@ -43,7 +50,8 @@ local function get_recipe_signals(source, player_info)
       table.insert(signals, {
         signal = {
           type = ingredient.type,
-          name = ingredient.name
+          name = ingredient.name,
+          quality = quality and quality.name or "normal"
         },
         -- in vanilla factorio, the copy-pasting feature cannot copy less than the amount of the ingredient
         -- (this also prevents items equal to 0)
@@ -57,7 +65,8 @@ local function get_recipe_signals(source, player_info)
       table.insert(signals, {
         signal = {
           type = product.type,
-          name = product.name
+          name = product.name,
+          quality = quality and quality.name or "normal"
         },
         --same as in the ingredient
         count = math.max(expected * product_per30s_multiplier, expected) * products_multiplier
@@ -66,13 +75,13 @@ local function get_recipe_signals(source, player_info)
   end
   if add_ticks then
     table.insert(signals, {
-      signal = { type = "virtual", name = "signal-T" },
+      signal = { type = "virtual", name = "signal-T", quality = "normal" },
       count = recipe.energy * 60 / speed_adjustment
     })
   end
   if add_seconds then
     table.insert(signals, {
-      signal = { type = "virtual", name = "signal-S" },
+      signal = { type = "virtual", name = "signal-S", quality = "normal" },
       count = recipe.energy / speed_adjustment
     })
   end
@@ -130,7 +139,6 @@ return function(source, player_info)
     add_item(stack, stack.count)
   end
   local function add_item_filter(item_filter)
-    game.print("add_item_filter" .. type(item_filter))
     add_item(item_filter)
   end
   local function add_fluid(name, value)
