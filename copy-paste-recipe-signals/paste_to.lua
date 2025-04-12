@@ -116,6 +116,32 @@ local function paste_to_computing_combinator(destination, signals, player_info)
     end
 end
 
+local function signal_to_filter(signal)
+    return {
+        value = {
+            type = signal.signal.type,
+            name = signal.signal.name,
+            quality = signal.signal.quality,
+        },
+        min = signal.count,
+    }
+end
+
+local function paste_to_logisitic_section(section, signals)
+    -- change filters of section
+    -- type, name, quality, comparator
+    local signalsStartIndex = 0
+    for index, signal in pairs(signals) do
+        section.set_slot(index + signalsStartIndex, signal_to_filter(signal))
+    end
+
+    local clearSignalsStartIndex = table_size(signals) + signalsStartIndex
+    for index = clearSignalsStartIndex + 1, section.filters_count do
+        section.clear_filter(index)
+    end
+    return nil
+end
+
 local function paste_to_constant_combinator(destination, signals, player_info)
     local behavior = destination.get_or_create_control_behavior()
 
@@ -124,19 +150,12 @@ local function paste_to_constant_combinator(destination, signals, player_info)
       -- be used for LTN specific signals, we try to preserve these so LTN configurations is not lost
       local signalsStartIndex = destination.name == "ltn-combinator" and (14) or 0
 
-      for index, signal in pairs(signals) do
-        local setIndex = (index + signalsStartIndex)
-        if behavior.signals_count >= setIndex then
-          behavior.set_signal(setIndex, signal)
+      -- loop through sections, check for section.is_manual and active
+      for i, section in pairs(behavior.sections) do
+        if section.is_manual and section.active then
+          paste_to_logisitic_section(section, signals)
         end
       end
-
-      local clearSignalsStartIndex = table_size(signals) + signalsStartIndex
-
-      for index = clearSignalsStartIndex + 1, behavior.signals_count do
-        behavior.set_signal(index, nil)
-      end
-      return nil
     end
 end
 
