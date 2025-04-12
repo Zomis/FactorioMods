@@ -130,15 +130,18 @@ end
 local function paste_to_logisitic_section(section, signals)
     -- change filters of section
     -- type, name, quality, comparator
+
+    -- Need to clear everything first to avoid any potential conflicts
+    local count = section.filters_count
+    for index = 1, count do
+        section.clear_slot(index)
+    end
+
     local signalsStartIndex = 0
     for index, signal in pairs(signals) do
         section.set_slot(index + signalsStartIndex, signal_to_filter(signal))
     end
 
-    local clearSignalsStartIndex = table_size(signals) + signalsStartIndex
-    for index = clearSignalsStartIndex + 1, section.filters_count do
-        section.clear_slot(index)
-    end
     return nil
 end
 
