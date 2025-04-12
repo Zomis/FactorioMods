@@ -124,7 +124,7 @@ return function(source, player_info)
     table.insert(results, { signal = { type = "item", name = name, quality = quality }, count = value or 1 })
   end
   local function add_fluid(name, value)
-    table.insert(results, { signal = { type = "fluid", name = name }, count = value or 1 })
+    table.insert(results, { signal = { type = "fluid", name = name, quality = "normal" }, count = value or 1 })
   end
 
 
