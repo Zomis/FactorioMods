@@ -24,17 +24,17 @@ local function paste_to_circuit_condition(destination, signals, player_info)
         return nil
     end
     local behavior = destination.get_or_create_control_behavior()
-    local previous_condition = behavior.circuit_condition.condition
+    local previous_condition = behavior.circuit_condition or {}
     local index, next_value = iterate(signals, player_info)
 
     behavior.circuit_condition = {
-        condition = {
-            first_signal = next_value.signal, -- SignalID
-            second_signal = previous_condition.second_signal,
-            constant = previous_condition.constant,
-            comparator = previous_condition.comparator
-        }
+        first_signal = next_value.signal, -- SignalID
+        second_signal = previous_condition.second_signal,
+        constant = previous_condition.constant,
+        comparator = previous_condition.comparator
     }
+    behavior.circuit_enable_disable = true
+
     popup.popup_circuit_condition(player_info, behavior.circuit_condition)
     return index
 end
