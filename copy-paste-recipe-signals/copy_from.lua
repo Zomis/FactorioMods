@@ -172,10 +172,14 @@ return function(source, player_info)
   end
   if source_type == "container" then
     local items = source.get_inventory(defines.inventory.chest).get_contents()
-    for item, value in pairs(items) do
+    for _, value in pairs(items) do
       table.insert(results, {
-        signal = { type = "item", name = item },
-        count = value
+        signal = {
+          type = "item",
+          name = value.name,
+          quality = value.quality
+        },
+        count = value.count
       })
     end
   end
