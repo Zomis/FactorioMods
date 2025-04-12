@@ -60,7 +60,17 @@ local function paste_to_splitter(destination, signals, player_info)
     if options_count == 0 then
         return
     end
-    player_info.player.print("Not supported yet - awaiting Factorio bugfix. Please yell at mod author if this message ever appears!")
+    local index, next_value = iterate(options, player_info)
+    if destination.splitter_output_priority == "none" then
+        destination.splitter_output_priority = "left"
+    end
+    destination.splitter_filter = {
+        name = next_value.signal.name,
+        quality = next_value.signal.quality,
+        comparator = "="
+    }
+
+    return index
 end
 
 local function paste_to_computing_combinator(destination, signals, player_info)
