@@ -95,10 +95,10 @@ local function merge_output(signals)
       local index = seen[string_id]
       results[index].count = results[index].count + signal.count
     else
-      results[result_index] = signal
+      table.insert(results, signal)
       seen[string_id] = result_index
+      result_index = result_index + 1
     end
-    result_index = result_index + 1
   end
   return results
 end
