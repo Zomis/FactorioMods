@@ -126,12 +126,22 @@ return function(source, player_info)
   local function add_fluid(name, value)
     table.insert(results, { signal = { type = "fluid", name = name, quality = "normal" }, count = value or 1 })
   end
+  local function add_logistic_filter(logistic_filter)
+    table.insert(results, {
+      signal = logistic_filter.value,
+      count = logistic_filter.min
+    })
+  end
+  local function add_logistic_section(logistic_section)
+    for _, v in pairs(logistic_section.filters) do
+      add_logistic_filter(v)
+    end
+  end
 
 
   if source_type == "constant-combinator" then
-    local add = source.get_or_create_control_behavior().parameters
-    for _, v in pairs(add) do
-      table.insert(results, v)
+    for _, v in pairs(source.get_or_create_control_behavior().sections) do
+      add_logistic_section(v)
     end
   end
   if source_type == "transport-belt" or source_type == "underground-belt" or source_type == "splitter" then
