@@ -188,7 +188,7 @@ return function(source, player_info)
   local source_behavior = source.get_control_behavior()
   if source_behavior then
     if circuit_condition_types[source.type] then
-      add_signal_id(source_behavior.circuit_condition.condition.first_signal)
+     -- add_signal_id(source_behavior.circuit_condition.condition.first_signal)
     end
   end
 
