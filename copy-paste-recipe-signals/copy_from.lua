@@ -116,12 +116,22 @@ return function(source, player_info)
     table.insert(results, { signal = signal_id, count = 1 })
   end
   local function add_item(item_with_quality, value)
+    if item_with_quality == nil then
+      return
+    end
     local name = item_with_quality.name
-    local quality = item_with_quality.quality
+    local quality = item_with_quality.quality and item_with_quality.quality.name or item_with_quality.quality or "normal"
     if not prototypes.item[name] then
       error("Wrong item values: " .. tostring(name) .. "; " .. tostring(value))
     end
     table.insert(results, { signal = { type = "item", name = name, quality = quality }, count = value or 1 })
+  end
+  local function add_item_stack(stack)
+    add_item(stack, stack.count)
+  end
+  local function add_item_filter(item_filter)
+    game.print("add_item_filter" .. type(item_filter))
+    add_item(item_filter)
   end
   local function add_fluid(name, value)
     table.insert(results, { signal = { type = "fluid", name = name, quality = "normal" }, count = value or 1 })
@@ -157,12 +167,12 @@ return function(source, player_info)
   if source_type == "inserter" then
     -- items in inserter, items in filter
     if source.held_stack.count > 0 then
-      add_item(source.held_stack.name, source.held_stack.count)
+      add_item_stack(source.held_stack)
     end
 
     local filter_slot_count = source.filter_slot_count
     for i = 1, filter_slot_count do
-      add_item(source.get_filter(i))
+      add_item_filter(source.get_filter(i))
     end
   end
 
