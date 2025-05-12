@@ -1,0 +1,11 @@
+{
+  "name": "fluid-connections-inspector",
+  "version": "0.9.9",
+  "title": "Fluid Connections Inspector",
+  "author": "Zomis",
+  "contact": "zomis2k@hotmail.com",
+  "homepage": "https://github.com/Zomis/FactorioMods",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0", "flib >= 0.16.2"],
+  "description": "Get a quick view of which entities are connected to your fluid pipes. Where does it all come from and where does it go?"
+}

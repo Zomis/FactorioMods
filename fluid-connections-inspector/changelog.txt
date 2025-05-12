@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2025-05-12
+  Features:
+    - Initial release!
+    - Click a pipe while the mod shortcut is active to get an overview of the pipe's inputs and outputs
