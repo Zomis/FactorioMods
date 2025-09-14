@@ -2,7 +2,12 @@ local flib_gui = require("__flib__.gui")
 local mod_gui = require("__core__.lualib.mod-gui")
 local gui_handlers = require("gui/handlers")
 
+local show_gui_button = settings.startup["train-log-show-gui-button"].value
+
 local function add_mod_gui_button(player)
+    if not show_gui_button then
+        return
+    end
     local flow = mod_gui.get_button_flow(player)
     if flow.train_log then
         return
