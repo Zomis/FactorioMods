@@ -4,7 +4,7 @@ data:extend({
         name = "train-log-show-gui-button",
         localised_name = "Show GUI button",
         setting_type = "startup",
-        default_value = false,
+        default_value = true,
         order = "a"
     }
 })
