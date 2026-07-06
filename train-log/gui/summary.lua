@@ -1,5 +1,5 @@
 local gui_utils = require("gui/gui_utils")
-local tables = require("__flib__.table")
+local tables = require("mytable")
 
 local USE_STATION_PAYLOAD_SUMMARY = true
 

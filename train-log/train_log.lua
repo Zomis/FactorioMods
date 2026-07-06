@@ -1,4 +1,4 @@
-local tables = require("__flib__.table")
+local tables = require("mytable")
 local MAX_KEEP = 60 * 60 * 60 * 24 -- ticks * seconds * minutes * hours
 
 local function clear_older_force(force_index, older_than)

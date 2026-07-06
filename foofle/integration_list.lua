@@ -1,4 +1,4 @@
-local tables = require("__flib__.table")
+local tables = require("mytable")
 
 local integrations = {}
 

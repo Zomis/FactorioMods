@@ -1,3 +1,4 @@
+local oldtables = require("mytable")
 local tables = require("__flib__.table")
 local popup = require("popup")
 local circuit_condition_types = require("circuit_condition_types")

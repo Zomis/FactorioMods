@@ -1,4 +1,4 @@
-local tables = require("__flib__.table")
+local tables = require("mytable")
 local circuit_condition_types = require("circuit_condition_types")
 
 local function expected_amount(product)
