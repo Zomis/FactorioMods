@@ -21,6 +21,8 @@
 -- SOFTWARE.
 
 
+local flib_table = {}
+
 --- Create a filtered version of a table based on the results of a filter function.
 ---
 --- Calls `filter(value, key)` on each element in the table, returning a new table with only pairs for which
@@ -53,3 +55,4 @@ function flib_table.filter(tbl, filter, array_insert)
   end
   return output
 end 
+return flib_table

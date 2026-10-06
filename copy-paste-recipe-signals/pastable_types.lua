@@ -26,6 +26,14 @@ function pastable_entity_names_table()
         for k in pairs(data.raw["splitter"]) do
             table.insert(pastable_types, k)
         end
+        -- Requester and buffer chests can hold item requests, so a copied recipe
+        -- can be pasted into them. Taken from the prototypes instead of a list of
+        -- names so that modded requester chests work as well.
+        for name, prototype in pairs(data.raw["logistic-container"]) do
+            if prototype.logistic_mode == "requester" or prototype.logistic_mode == "buffer" then
+                table.insert(pastable_types, name)
+            end
+        end
     end
 
     if mod_exists("LTN_Combinator_Modernized") then
