@@ -83,3 +83,14 @@ data:extend({
         default_value = true
     }
 })
+data:extend({
+    {
+        type = "int-setting",
+        name = "copy-paste-recipe-request-stacks",
+        setting_type = "runtime-per-user",
+        order = "dzz",
+        default_value = 0,
+        minimum_value = 0,
+        maximum_value = 100
+    }
+})
