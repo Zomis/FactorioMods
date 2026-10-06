@@ -115,7 +115,22 @@ end
 return function(source, player_info)
   -- Returns: Array of "signals", each signal has: { signal = { type, name, quality }, count = 42 }
 
-  local source_type = source.prototype.type
+  -- A ghost is the not-yet-built version of another entity, and its own
+  -- prototype is the ghost, so the entity it will become is what decides what
+  -- can be read. A ghost holds no items, and asking a ghost belt, inserter or
+  -- container for its contents raises an error, so only settings a ghost can
+  -- actually carry are read.
+  local prototype = source.prototype
+  if source.type == "entity-ghost" then
+    prototype = source.ghost_prototype
+    local ghost_type = source.ghost_type
+    if ghost_type ~= "assembling-machine" and ghost_type ~= "furnace"
+      and ghost_type ~= "storage-tank" and ghost_type ~= "pipe" and ghost_type ~= "pipe-to-ground"
+      and ghost_type ~= "constant-combinator" then
+      return {}
+    end
+  end
+  local source_type = prototype.type
   local results = {}
   if source_type == "assembling-machine" or source_type == "furnace" then
     results = get_recipe_signals(source, player_info)

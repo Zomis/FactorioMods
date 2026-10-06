@@ -3,6 +3,23 @@ local tables = require("__flib__.table")
 local popup = require("popup")
 local circuit_condition_types = require("circuit_condition_types")
 
+-- A ghost is the not-yet-built version of another entity, so pasting onto one
+-- should configure the entity it will become. ghost_name and ghost_type throw
+-- on a normal entity, so they are only read for ghosts.
+local function effective_name(entity)
+    if entity.type == "entity-ghost" then
+        return entity.ghost_name
+    end
+    return entity.name
+end
+
+local function effective_type(entity)
+    if entity.type == "entity-ghost" then
+        return entity.ghost_type
+    end
+    return entity.type
+end
+
 local function iterate(options, player_info)
     local options_count = table_size(options)
     local current_index = player_info.last_copy.index
@@ -48,7 +65,7 @@ local function paste_to_inserter(destination, signals, player_info)
     end
 
     -- Not sure what feature is desired for regular filter inserters?
-    if destination.name == "stack-filter-inserter" then
+    if effective_name(destination) == "stack-filter-inserter" then
         local index, next_value = iterate(options, player_info)
         destination.set_filter(1, next_value and next_value.signal.name)
         return index
@@ -79,7 +96,7 @@ local function paste_to_computing_combinator(destination, signals, player_info)
     local allow_arithmetic = player_settings["copy-paste-recipe-time-paste-product-arithmetic"].value
     local allow_decider = player_settings["copy-paste-recipe-time-paste-product-decider"].value
 
-    if destination.name == "arithmetic-combinator" and allow_arithmetic then
+    if effective_name(destination) == "arithmetic-combinator" and allow_arithmetic then
         local behavior = destination.get_or_create_control_behavior()
         local previous = behavior.parameters
         local previous_out = previous.output_signal
@@ -101,7 +118,7 @@ local function paste_to_computing_combinator(destination, signals, player_info)
           output_signal = previous.output_signal
         }
         return index
-    elseif destination.name == "decider-combinator" and allow_decider then
+    elseif effective_name(destination) == "decider-combinator" and allow_decider then
         local behavior = destination.get_or_create_control_behavior()
         local previous = behavior.parameters
         local previous_out = previous.output_signal
@@ -159,10 +176,10 @@ end
 local function paste_to_constant_combinator(destination, signals, player_info)
     local behavior = destination.get_or_create_control_behavior()
 
-    if destination.name == "constant-combinator" or destination.name == "ltn-combinator" then
+    if effective_name(destination) == "constant-combinator" or effective_name(destination) == "ltn-combinator" then
       -- The ltn-combinator has 28 signals, however the 14 first signals should
       -- be used for LTN specific signals, we try to preserve these so LTN configurations is not lost
-      local signalsStartIndex = destination.name == "ltn-combinator" and (14) or 0
+      local signalsStartIndex = effective_name(destination) == "ltn-combinator" and (14) or 0
 
       -- loop through sections, check for section.is_manual and active
       for i, section in pairs(behavior.sections) do
@@ -174,19 +191,19 @@ local function paste_to_constant_combinator(destination, signals, player_info)
 end
 
 return function(destination, signals, player_info)
-    if destination.name == "constant-combinator" or destination.name == "ltn-combinator" then
+    if effective_name(destination) == "constant-combinator" or effective_name(destination) == "ltn-combinator" then
         return paste_to_constant_combinator(destination, signals, player_info)
     end
-    if (destination.name == "arithmetic-combinator") or (destination.name == "decider-combinator") then
+    if effective_name(destination) == "arithmetic-combinator" or effective_name(destination) == "decider-combinator" then
         return paste_to_computing_combinator(destination, signals, player_info)
     end
-    if destination.name == "stack-filter-inserter" then
+    if effective_name(destination) == "stack-filter-inserter" then
         return paste_to_inserter(destination, signals, player_info)
     end
-    if destination.type == "splitter" then
+    if effective_type(destination) == "splitter" then
         return paste_to_splitter(destination, signals, player_info)
     end
-    if circuit_condition_types[destination.type] then
+    if circuit_condition_types[effective_type(destination)] then
         return paste_to_circuit_condition(destination, signals, player_info)
     end
 end

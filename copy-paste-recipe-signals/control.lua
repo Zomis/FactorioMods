@@ -41,7 +41,11 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     return
   end
 --  game.print(event.source.name .. "/" .. event.source.type .. " --> " .. event.destination.name .. "/" .. event.destination.type)
-  if event.destination.type == event.source.type then
+  -- Compare what the entities will be, so a ghost and the entity it becomes
+  -- are treated as the same kind, and two different kinds of ghost are not.
+  local source_type = event.source.type == "entity-ghost" and event.source.ghost_type or event.source.type
+  local destination_type = event.destination.type == "entity-ghost" and event.destination.ghost_type or event.destination.type
+  if destination_type == source_type then
     return
   end
   local player_info = get_player_info(event)
