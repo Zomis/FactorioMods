@@ -1,5 +1,6 @@
 local copy_from = require "copy_from"
 local paste_to = require "paste_to"
+local paste_picker = require "paste_picker"
 
 local function get_player_info(event)
   local player_index = event.player_index
@@ -55,6 +56,13 @@ script.on_event(defines.events.on_entity_settings_pasted, function(event)
     local gps = "[gps=" .. source.position.x .. "," .. source.position.y .. "," .. source.surface.name .. "]"
     player_info.player.print({ "copy-paste-action.copy-paste-nothing", entity, gps })
     return
+  end
+  -- A new paste supersedes any picker that is still open.
+  paste_picker.dismiss(event.player_index)
+  if paste_picker.should_prompt(event.destination, source_values) then
+    if paste_picker.open(player_info, event.source, event.destination, source_values) then
+      return
+    end
   end
   local update_result = paste_to(event.destination, source_values, player_info)
   storage.player_info[event.player_index] = {
