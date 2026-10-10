@@ -20,6 +20,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+local flib_table = {}
 
 --- Create a filtered version of a table based on the results of a filter function.
 ---
@@ -52,4 +53,6 @@ function flib_table.filter(tbl, filter, array_insert)
     end
   end
   return output
-end 
+end
+
+return flib_table
