@@ -20,8 +20,7 @@ end
 -- @param segment_id number: The segment_id of the relevant fluidbox
 -- @return table: An array of neighbors to be scanned next
 local function _scan_in_progress(results, entity, segment_id)
-    local fluidbox = entity.fluidbox
-    local count = #fluidbox
+    local count = entity.fluids_count
     local neighbors = {}
 
     local id = entity_id(entity)
@@ -33,22 +32,22 @@ local function _scan_in_progress(results, entity, segment_id)
 
     for i = 1,count do
         -- Pumps and machines does not seem to have fluid segment id.
-        if fluidbox.get_fluid_segment_id(i) == segment_id then
-            local conn = entity.fluidbox.get_pipe_connections(i)
+        if entity.has_fluid_segment(i) and entity.get_fluid_segment_id(i) == segment_id then
+            local conn = entity.get_fluid_box_pipe_connections(i)
             for _, v in pairs(conn) do
                 if v.target then
-                    table.insert(neighbors, v.target.owner) -- TODO: Consider adding target_fluidbox_index and target_pipe_connection_index
+                    table.insert(neighbors, v.target) -- TODO: Consider adding target_fluidbox_index and target_pipe_connection_index
                 end
             end
         else
             -- At 'end', is either input or output.
             -- Might be adjecent to something in our fluid segment, figure out which.
-            local conn = entity.fluidbox.get_pipe_connections(i)
+            local conn = entity.get_fluid_box_pipe_connections(i)
             for _, v in pairs(conn) do
                 -- Just because it has a connection doesn't mean there's a pipe going out from it
                 -- e.g. a machine with two fluid outputs of the same type.
                 -- therefore check that v.target is set.
-                if v.target and results.scanned[entity_id(v.target.owner)] then
+                if v.target and results.scanned[entity_id(v.target)] then
                     local type = v.flow_direction
                     if type == "input" then
                         -- Inputs TO this entity FROM our fluid segment, so it's an output for the fluid segment
@@ -71,13 +70,14 @@ function scan(entity)
     if not entity then
         return
     end
-    if not entity.fluidbox then
+    local fluids_count = entity.fluids_count
+    if not fluids_count then
         return
     end
-    if #entity.fluidbox > 1 then
+    if fluids_count > 1 then
         return "multiple-fluidboxes"
     end
-    local segment_id = entity.fluidbox.get_fluid_segment_id(1)
+    local segment_id = entity.get_fluid_segment_id(1)
     if not segment_id then
         return "no-segment-id"
     end

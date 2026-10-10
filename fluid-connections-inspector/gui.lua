@@ -53,7 +53,8 @@ local function result_array(tbl)
         table.insert(children, {
             type = "sprite-button",
             sprite = "entity/" .. v.name,
-            number = v.fluidbox[1].amount,
+            number = v.get_fluid(1).amount,
+            -- v.get_fluid_segment_fluid(1)
             quality = v.quality.name,
             handler = {
                 [defines.events.on_gui_click] = gui_handlers.go_to

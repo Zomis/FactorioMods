@@ -30,7 +30,7 @@ script.on_event(defines.events.on_gui_opened, function(event)
     if not event.entity then
         return
     end
-    if not event.entity.fluidbox then
+    if not event.entity.fluids_count then
         return
     end
 
